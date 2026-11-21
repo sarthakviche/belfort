@@ -1,0 +1,27 @@
+name: Write or improve a lesson
+description: Claim a planned lesson from the syllabus, or fix an existing one
+labels: ["learn", "content"]
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson id from content/learn/syllabus.json
+      placeholder: e.g. r-multiples
+    validations:
+      required: true
+  - type: textarea
+    id: outline
+    attributes:
+      label: Outline
+      description: Objectives, the main sections, the "try it" action and three quiz questions.
+    validations:
+      required: true
+  - type: checkboxes
+    id: tests
+    attributes:
+      label: The syllabus screening test (docs/SYLLABUS.md)
+      options:
+        - label: It changes a decision a swing or positional trader makes, or protects their money.
+          required: true
+        - label: Any chart of a named stock uses ::chart (prices at least 30 days old).
+          required: true

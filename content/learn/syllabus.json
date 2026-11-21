@@ -1,0 +1,151 @@
+{
+  "title": "The Belfort syllabus",
+  "version": "0.1",
+  "promise": "Practical skills for swing and positional trading in Indian cash equities: how to read a chart, size a trade, check a business, keep a journal and stay out of scams. Nothing you do not need to make a decision this week.",
+  "screening_test": [
+    "Decision test: does this topic change a decision a cash-market swing or positional trader makes in a normal week (what to study, where to enter, where the stop goes, how much to buy, when to exit)? If not, it is out.",
+    "Evidence test: is there measurable evidence it helps, or can Belfort show the evidence? Folklore is taught only as 'what people believe and what the data says'.",
+    "Practice test: can the learner try it inside Belfort within five minutes (replay, paper trade, prediction, research report)? Every lesson ends with something to do.",
+    "Safety test: does knowing it protect the learner's money or rights (costs, taxes, scams, regulation)? Safety topics pass even when they are not about trading decisions.",
+    "Order test: is everything it depends on taught earlier? Lessons build in one direction."
+  ],
+  "skipped": [
+    {"topic": "Futures and options (F&O)", "why": "Leverage beginners cannot afford. SEBI's own studies found most individual F&O traders lose money. Out of scope until a later, clearly separated advanced track."},
+    {"topic": "Intraday scalping", "why": "Needs live data and fast execution that Belfort does not provide, and is where costs hurt beginners most."},
+    {"topic": "Discounted cash flow models, CAPM, beta theory", "why": "Valuation theory for analysts. A trader needs P/E against peers, debt and growth, which the business module teaches."},
+    {"topic": "Efficient market theory and academic portfolio theory", "why": "Interesting, but changes no weekly decision. Its useful core (diversify, size small) is taught in Risk and Portfolio."},
+    {"topic": "Accounting standards in depth", "why": "Traders need five numbers from the statements and their red flags, not Ind AS detail."},
+    {"topic": "Elliott waves, Gann, astrology, 'secret' indicators", "why": "No reliable evidence. Mentioned once in Scams and myths so learners recognise them."},
+    {"topic": "Crypto and forex", "why": "Different markets and rules. Out of scope."}
+  ],
+  "tracks": [
+    {
+      "id": "foundations", "title": "Foundations", "level": "Beginner",
+      "summary": "How the market works for you, how to read a chart, and why risk comes before everything else.",
+      "modules": [
+        {
+          "id": "market-basics", "title": "How the market works for you",
+          "why": "You cannot plan a trade without knowing how orders fill, when money settles and what each trade costs.",
+          "lessons": [
+            {"id": "what-is-a-share", "title": "What you own when you buy a share", "minutes": 5},
+            {"id": "order-types", "title": "Market, limit and stop-loss orders", "minutes": 7},
+            {"id": "costs-and-settlement", "title": "Costs, taxes and T+1 settlement", "minutes": 7},
+            {"id": "circuits-and-sessions", "title": "Market hours, circuits and gaps", "minutes": 5, "status": "planned"}
+          ]
+        },
+        {
+          "id": "reading-charts", "title": "Reading a price chart",
+          "why": "The chart is where entries, stops and exits are planned.",
+          "lessons": [
+            {"id": "candles", "title": "Candles: one session in one shape", "minutes": 6},
+            {"id": "trend", "title": "Trend: higher highs and higher lows", "minutes": 7},
+            {"id": "support-resistance", "title": "Support and resistance", "minutes": 8},
+            {"id": "moving-averages", "title": "Moving averages without the mystery", "minutes": 6, "status": "planned"},
+            {"id": "volume", "title": "Volume: is anyone behind the move?", "minutes": 5, "status": "planned"}
+          ]
+        },
+        {
+          "id": "risk-first", "title": "Risk comes first",
+          "why": "Most beginner accounts are lost to position size, not to bad stock picks.",
+          "lessons": [
+            {"id": "position-sizing", "title": "Position sizing: the 1% rule", "minutes": 8},
+            {"id": "stop-loss", "title": "Where the stop goes, and why it never moves down", "minutes": 7},
+            {"id": "r-multiples", "title": "Thinking in R: results as multiples of risk", "minutes": 6, "status": "planned"},
+            {"id": "risk-of-ruin", "title": "Losing streaks and risk of ruin", "minutes": 6, "status": "planned"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "practitioner", "title": "Practitioner", "level": "Intermediate",
+      "summary": "Swing and positional setups, a business sanity check, the indicators worth knowing, and the journal that makes you better.",
+      "modules": [
+        {
+          "id": "setups", "title": "Setups for swing and positional trades",
+          "why": "A setup is a repeatable reason to enter with a defined stop. Without one, every trade is a guess.",
+          "lessons": [
+            {"id": "pullback-setup", "title": "The pullback in an uptrend", "minutes": 8, "status": "planned"},
+            {"id": "breakout-setup", "title": "Breakouts and why volume matters", "minutes": 8, "status": "planned"},
+            {"id": "exits", "title": "Exits: targets, trailing stops and time stops", "minutes": 8, "status": "planned"},
+            {"id": "results-season", "title": "Results dates and holding through events", "minutes": 5, "status": "planned"}
+          ]
+        },
+        {
+          "id": "business-check", "title": "A business sanity check in ten minutes",
+          "why": "A good chart on a weak business is a trap more often than a chance.",
+          "lessons": [
+            {"id": "five-numbers", "title": "The five numbers that matter", "minutes": 8, "status": "planned"},
+            {"id": "pe-vs-peers", "title": "P/E only means something against peers", "minutes": 6, "status": "planned"},
+            {"id": "red-flags", "title": "Red flags: debt, pledges, falling cash flow", "minutes": 7, "status": "planned"}
+          ]
+        },
+        {
+          "id": "indicators", "title": "Indicators and patterns, honestly",
+          "why": "Learn what RSI, MACD, ATR and chart patterns measure, and what the evidence says they do not.",
+          "lessons": [
+            {"id": "atr", "title": "ATR: how far a stock normally moves", "minutes": 5, "status": "planned"},
+            {"id": "rsi-macd", "title": "RSI and MACD: momentum, not prophecy", "minutes": 7, "status": "planned"},
+            {"id": "pattern-evidence", "title": "Chart patterns and what the backtest shows", "minutes": 8, "status": "planned"}
+          ]
+        },
+        {
+          "id": "journal", "title": "The journal and the review",
+          "why": "Improvement comes from reviewing decisions, not from more trades.",
+          "lessons": [
+            {"id": "trade-journal", "title": "What to write before and after every trade", "minutes": 6, "status": "planned"},
+            {"id": "expectancy", "title": "Win rate is not the score: expectancy", "minutes": 7, "status": "planned"},
+            {"id": "calibration", "title": "Calibration: are your 70% calls right 70% of the time?", "minutes": 6, "status": "planned"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advanced", "title": "Advanced", "level": "Advanced",
+      "summary": "Market context, running several trades at once, the psychology that breaks plans, taxes and records, and staying safe.",
+      "modules": [
+        {
+          "id": "context", "title": "Market context",
+          "why": "Most stocks move with the index and their sector. Context decides how many setups to take.",
+          "lessons": [
+            {"id": "index-trend", "title": "Index trend and market breadth", "minutes": 7, "status": "planned"},
+            {"id": "sectors", "title": "Sector strength and rotation", "minutes": 7, "status": "planned"},
+            {"id": "flows-and-events", "title": "FII and DII flows, RBI policy and the event calendar", "minutes": 7, "status": "planned"}
+          ]
+        },
+        {
+          "id": "portfolio", "title": "Running several trades",
+          "why": "Five correlated trades are one big trade.",
+          "lessons": [
+            {"id": "open-risk", "title": "Total open risk and correlation", "minutes": 7, "status": "planned"},
+            {"id": "drawdown-rules", "title": "Drawdown rules: when to stop trading", "minutes": 6, "status": "planned"}
+          ]
+        },
+        {
+          "id": "psychology", "title": "Psychology and discipline",
+          "why": "Plans fail at the moment of fear or greed. Name the traps before they arrive.",
+          "lessons": [
+            {"id": "biases", "title": "FOMO, revenge trading and overconfidence", "minutes": 7, "status": "planned"},
+            {"id": "rules", "title": "Writing your own trading rules", "minutes": 6, "status": "planned"}
+          ]
+        },
+        {
+          "id": "taxes-records", "title": "Taxes and records for traders",
+          "why": "Net profit is what matters, and the tax treatment of trading is different from investing.",
+          "lessons": [
+            {"id": "capital-gains", "title": "Short and long-term capital gains on shares", "minutes": 7, "status": "planned"},
+            {"id": "records", "title": "Contract notes, P&L statements and filing", "minutes": 6, "status": "planned"}
+          ]
+        },
+        {
+          "id": "safety", "title": "Scams, tips and your rights",
+          "why": "The fastest way to lose money is to follow someone else's 'sure shot'.",
+          "lessons": [
+            {"id": "tip-scams", "title": "Tip groups, fake apps and guaranteed returns", "minutes": 6, "status": "planned"},
+            {"id": "check-registration", "title": "Checking SEBI registration and filing a complaint", "minutes": 5, "status": "planned"},
+            {"id": "myths", "title": "Myths: secret indicators and 'operator' stocks", "minutes": 5, "status": "planned"}
+          ]
+        }
+      ]
+    }
+  ]
+}

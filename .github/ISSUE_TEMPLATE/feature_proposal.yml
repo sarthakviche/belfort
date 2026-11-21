@@ -1,0 +1,35 @@
+name: Feature proposal
+description: Pitch a new feature for Research, Learn, Practice or News
+labels: ["proposal"]
+body:
+  - type: dropdown
+    id: vertical
+    attributes:
+      label: Which part of Belfort?
+      options: [Research, Learn, Practice, News, Assistant, Platform / other]
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does it solve, and for whom?
+      description: A beginner, an intermediate trader, or an advanced user? What decision does it help them make?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would it do?
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Belfort's principles (see docs/COMPLIANCE.md)
+      options:
+        - label: It does not tell anyone to buy, sell or hold, and does not predict prices.
+          required: true
+        - label: It involves no real money, prizes or anything redeemable.
+          required: true
+        - label: Any number it shows can carry its source and date.
+          required: true

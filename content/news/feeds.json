@@ -1,0 +1,11 @@
+{
+  "_note": "Public RSS feeds. Belfort shows only what each publisher puts in its feed (headline, short description, image) and links to the original article. Copy this file to data/feeds.json to change the list on your machine.",
+  "feeds": [
+    {"id": "et-markets", "name": "The Economic Times", "url": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms", "kind": "publisher"},
+    {"id": "mint-markets", "name": "Mint", "url": "https://www.livemint.com/rss/markets", "kind": "publisher"},
+    {"id": "bs-markets", "name": "Business Standard", "url": "https://www.business-standard.com/rss/markets-106.rss", "kind": "publisher"},
+    {"id": "bl-markets", "name": "BusinessLine", "url": "https://www.thehindubusinessline.com/markets/feeder/default.rss", "kind": "publisher"},
+    {"id": "mc-reports", "name": "Moneycontrol", "url": "https://www.moneycontrol.com/rss/marketreports.xml", "kind": "publisher"},
+    {"id": "rbi-press", "name": "Reserve Bank of India", "url": "https://www.rbi.org.in/pressreleases_rss.xml", "kind": "official"}
+  ]
+}
