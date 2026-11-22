@@ -11,7 +11,7 @@ const chip = (cls, text) => `<span class="chip c-${cls}">${esc(text)}</span>`;
 const compact = (x) => (x == null ? "n/a" : x >= 1e7 ? (x / 1e7).toFixed(2) + " cr" : x >= 1e5 ? (x / 1e5).toFixed(2) + " lakh" : num(x, 0));
 
 const S = { report: null, symbol: null, style: localStorage.getItem("style") || "swing", tab: null, list: "large", screens: null,
-  chat: [], cfg: null, sug: [], sugIdx: -1, view: "home", chatCtx: null };
+  chat: [], cfg: null, view: "home", chatCtx: null };
 
 /* ---------- sidebar: index, open files, breadcrumb ---------- */
 const FILES_KEY = "belfortFiles";
@@ -142,36 +142,8 @@ function renderDict(filter) {
     .map((g) => `<dt>${esc(g.term)}</dt><dd>${esc(g.meaning)}</dd>`).join("")}</dl>`).join("") || '<p class="missing">No term matches.</p>';
 }
 
-/* ---------- search ---------- */
-let sugTimer = null;
-function renderSug() {
-  const box = $("suggest");
-  if (!S.sug.length) { box.hidden = true; return; }
-  box.innerHTML = S.sug.map((r, i) => `<div data-i="${i}" class="${i === S.sugIdx ? "on" : ""}"><b>${esc(r.symbol)}</b><span>${esc(r.name)}</span></div>`).join("");
-  box.style.minWidth = "240px";
-  box.hidden = false;
-}
-$("q").addEventListener("input", () => {
-  clearTimeout(sugTimer);
-  const q = $("q").value.trim();
-  if (q.length < 2) { S.sug = []; renderSug(); return; }
-  sugTimer = setTimeout(async () => {
-    try { S.sug = (await api("/api/search?q=" + encodeURIComponent(q))).results; S.sugIdx = -1; renderSug(); } catch (e) { /* suggestions are optional */ }
-  }, 180);
-});
-$("q").addEventListener("keydown", (e) => {
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-    if (!S.sug.length) return;
-    e.preventDefault(); S.sugIdx = (S.sugIdx + (e.key === "ArrowDown" ? 1 : -1) + S.sug.length) % S.sug.length; renderSug();
-  } else if (e.key === "Enter") {
-    e.preventDefault();
-    const pick = S.sug[S.sugIdx >= 0 ? S.sugIdx : 0];
-    const q = pick ? pick.symbol : $("q").value.trim();
-    if (q) load(q);
-  } else if (e.key === "Escape") { S.sug = []; renderSug(); }
-});
-$("suggest").addEventListener("mousedown", (e) => { const d = e.target.closest("div[data-i]"); if (d) { e.preventDefault(); load(S.sug[+d.dataset.i].symbol); } });
-$("q").addEventListener("blur", () => setTimeout(() => { $("suggest").hidden = true; }, 150));
+/* ---------- search (the picker itself lives in stock-picker.js) ---------- */
+$("q").addEventListener("stock-pick", (e) => { load(e.detail.symbol); $("q").value = ""; $("q").blur(); });
 
 /* ---------- home: stock lists ---------- */
 async function loadScreens() {
@@ -208,7 +180,7 @@ $("home-link").addEventListener("click", (e) => { e.preventDefault(); showHome()
 
 /* ---------- analysis ---------- */
 async function load(symbol) {
-  S.symbol = symbol; S.sug = []; renderSug();
+  S.symbol = symbol;
   const id = ++reqId;
   const q = new URLSearchParams({ symbol, style: S.style, capital: $("capital").value || 100000, risk_pct: $("risk").value || 1 });
   if ($("stop").value) q.set("stop", $("stop").value);
