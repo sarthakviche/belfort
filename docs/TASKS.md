@@ -29,7 +29,7 @@
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Done ([#22](https://github.com/sarthakviche/belfort/pull/22)) |
 | T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) |
 | T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Done ([#24](https://github.com/sarthakviche/belfort/pull/24)) |
-| T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Ready |
+| T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Ready |
 | T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Ready |
 | T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Ready |
@@ -148,7 +148,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#24](https://github.com/sarthakviche/belfort/pull/24)) · `atr`, `rsi-macd`, `pattern-evidence` (use the backtest figures from `data/pattern_stats.json`).
 
 ### T18 · Lessons: Journal module
-- **P1 · M · Status:** Ready · `trade-journal`, `expectancy`, `calibration`. Point at the Practice journal and prediction scores.
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) · `trade-journal`, `expectancy`, `calibration`. Point at the Practice journal and prediction scores.
 
 ### T19 · Lessons: Market context module
 - **P1 · M · Status:** Ready · `index-trend`, `sectors`, `flows-and-events`.
@@ -268,3 +268,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T15 Lessons: Setups module, pullbacks, breakouts, exits and results dates ([#22](https://github.com/sarthakviche/belfort/pull/22)).
 - T16 Lessons: Business check module, five numbers, P/E against peers and red flags ([#23](https://github.com/sarthakviche/belfort/pull/23)).
 - T17 Lessons: Indicators and patterns module, ATR, RSI and MACD, pattern evidence ([#24](https://github.com/sarthakviche/belfort/pull/24)).
+- T18 Lessons: Journal module, trade journal, expectancy and calibration ([#25](https://github.com/sarthakviche/belfort/pull/25)).
