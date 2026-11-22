@@ -116,16 +116,16 @@
           "id": "portfolio", "title": "Running several trades",
           "why": "Five correlated trades are one big trade.",
           "lessons": [
-            {"id": "open-risk", "title": "Total open risk and correlation", "minutes": 7, "status": "planned"},
-            {"id": "drawdown-rules", "title": "Drawdown rules: when to stop trading", "minutes": 6, "status": "planned"}
+            {"id": "open-risk", "title": "Total open risk and correlation", "minutes": 7},
+            {"id": "drawdown-rules", "title": "Drawdown rules: when to stop trading", "minutes": 6}
           ]
         },
         {
           "id": "psychology", "title": "Psychology and discipline",
           "why": "Plans fail at the moment of fear or greed. Name the traps before they arrive.",
           "lessons": [
-            {"id": "biases", "title": "FOMO, revenge trading and overconfidence", "minutes": 7, "status": "planned"},
-            {"id": "rules", "title": "Writing your own trading rules", "minutes": 6, "status": "planned"}
+            {"id": "biases", "title": "FOMO, revenge trading and overconfidence", "minutes": 7},
+            {"id": "rules", "title": "Writing your own trading rules", "minutes": 6}
           ]
         },
         {
