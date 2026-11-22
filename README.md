@@ -52,7 +52,7 @@ An app for beginner and intermediate traders who want to swing or positional tra
 The full plan is in [docs/ROADMAP.md](docs/ROADMAP.md); the work ready to pick up today is in [docs/TASKS.md](docs/TASKS.md). The headlines:
 
 - **Decisions:** brand name, download location and code signing; a securities lawyer's review.
-- **Learn:** 5 of 38 lessons, replay drills linked to lessons, a content checker in CI, Hindi.
+- **Learn:** 5 of 38 lessons, replay drills linked to lessons, Hindi.
 - **Research:** editable rule thresholds, watchlists, market context.
 - **News:** wider company tagging, NSE announcements, events calendar.
 - **Platform:** browser tests, accessibility pass, offline assets, Windows installer and release workflow.

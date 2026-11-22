@@ -23,7 +23,7 @@
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Done ([#14](https://github.com/sarthakviche/belfort/pull/14)) |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Done ([#16](https://github.com/sarthakviche/belfort/pull/16)) |
 | T11 | Equity curve | 1 Practice | P2 | M | Done ([#18](https://github.com/sarthakviche/belfort/pull/18)) |
-| T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
+| T12 | Content checker in CI | 2 Learn | P0 | S | Done ([#19](https://github.com/sarthakviche/belfort/pull/19)) |
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Done ([#20](https://github.com/sarthakviche/belfort/pull/20)) |
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Done ([#21](https://github.com/sarthakviche/belfort/pull/21)) |
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Done ([#22](https://github.com/sarthakviche/belfort/pull/22)) |
@@ -128,7 +128,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::chart` where a chart helps, a `::try`, and at least three quiz questions. Follow [docs/SYLLABUS.md](../docs/SYLLABUS.md). Use `content(learn): ...` commit types.
 
 ### T12 · Content checker in CI
-- **P0 · S · Status:** Ready · **Area:** learn, ci
+- **Owner:** Devansh · **P0 · S · Status:** Done ([#19](https://github.com/sarthakviche/belfort/pull/19)) · **Area:** learn, ci
 - **Do:** `scripts/ci/check_content.py`: front matter present, quiz has 3+ valid questions, every `::chart` symbol exists in the listing fixture, every syllabus lesson not marked planned has a file and vice versa, banned wording absent, reading time roughly matches `minutes`. Add a CI step. Code-owned path: request Sarthak's review.
 - **Done when:** CI fails on a deliberately broken lesson and passes on main.
 
@@ -263,6 +263,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T09 Total open risk and size warnings ([#14](https://github.com/sarthakviche/belfort/pull/14)).
 - T10 Journal export (CSV, JSON) and backup restore ([#16](https://github.com/sarthakviche/belfort/pull/16)).
 - T11 Equity curve with largest drawdown ([#18](https://github.com/sarthakviche/belfort/pull/18)).
+- T12 Content checker in CI ([#19](https://github.com/sarthakviche/belfort/pull/19)).
 - T13 Lessons: market hours and circuits, moving averages, volume ([#20](https://github.com/sarthakviche/belfort/pull/20)).
 - T14 Lessons: R multiples, losing streaks and risk of ruin ([#21](https://github.com/sarthakviche/belfort/pull/21)).
 - T15 Lessons: Setups module, pullbacks, breakouts, exits and results dates ([#22](https://github.com/sarthakviche/belfort/pull/22)).

@@ -50,7 +50,7 @@ If `main` breaks, fixing it comes before any new task.
 2. Write the body in Markdown. Use `::chart SYMBOL BARS` for a past chart (always at least 30 days old) and `::try replay|paper|predict|research` for the hands-on step.
 3. End with a ```quiz block: a JSON list of three or more questions, each with `q`, `options`, `answer` (index) and `why`.
 4. Remove `"status": "planned"` for the lesson in `content/learn/syllabus.json`.
-5. Run the tests (they check format, quiz and wording), then read the lesson in the app.
+5. Run `python scripts/ci/check_content.py` (CI runs it too: front matter, quiz, chart symbols, syllabus, wording and length) and the tests, then read the lesson in the app.
 
 See [docs/SYLLABUS.md](docs/SYLLABUS.md) for what belongs in a lesson.
 
