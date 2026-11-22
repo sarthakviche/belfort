@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Learn: the Indicators and patterns module. ATR: how far a stock normally moves; RSI and MACD: momentum, not prophecy; and Chart patterns and what the backtest shows, which walks through Belfort's own pattern backtest against a random-entry baseline. Twenty-three of 38 lessons are now written.
 - Learn: the Business check module. The five numbers that matter (sales growth, operating margin, return on equity, debt to equity, cash from operations), P/E only means something against peers, and Red flags: debt, pledges, falling cash flow. Each lesson uses the same thresholds and wording as the research report's business section. Twenty of 38 lessons are now written.
 - Learn: the Setups module. The pullback in an uptrend and Breakouts and why volume matters, matching the checks in the research report; Exits (targets, trailing stops, time stops, and the Practice tools for each); and Results dates and holding through events (SEBI's 45 and 60-day deadlines, Belfort's 5-day swing check). Glossary adds Trailing stop and Time stop. Seventeen of 38 lessons are now written.
 - Learn: two lessons on risk. Thinking in R (results as multiples of planned risk, read alongside the Win rate and Average R cards in Practice) and Losing streaks and risk of ruin (how often streaks happen and what they cost at different risk levels). Glossary adds Drawdown and Risk of ruin. Thirteen of 38 lessons are now written.

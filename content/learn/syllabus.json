@@ -83,9 +83,9 @@
           "id": "indicators", "title": "Indicators and patterns, honestly",
           "why": "Learn what RSI, MACD, ATR and chart patterns measure, and what the evidence says they do not.",
           "lessons": [
-            {"id": "atr", "title": "ATR: how far a stock normally moves", "minutes": 5, "status": "planned"},
-            {"id": "rsi-macd", "title": "RSI and MACD: momentum, not prophecy", "minutes": 7, "status": "planned"},
-            {"id": "pattern-evidence", "title": "Chart patterns and what the backtest shows", "minutes": 8, "status": "planned"}
+            {"id": "atr", "title": "ATR: how far a stock normally moves", "minutes": 5},
+            {"id": "rsi-macd", "title": "RSI and MACD: momentum, not prophecy", "minutes": 7},
+            {"id": "pattern-evidence", "title": "Chart patterns and what the backtest shows", "minutes": 8}
           ]
         },
         {
