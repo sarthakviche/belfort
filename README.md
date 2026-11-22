@@ -67,7 +67,7 @@ Known limitations are listed in [TEAM/STATUS.md](TEAM/STATUS.md).
 **Any platform:**
 
 ```bash
-python -m venv .venv
+python -m venv .venv          # must be Python 3.12; on Windows, `py -3.12 -m venv .venv` picks it
 .venv/Scripts/python -m pip install -r requirements.txt     # macOS/Linux: .venv/bin/python
 .venv/Scripts/python -m uvicorn belfort.main:app --port 8765 --reload
 .venv/Scripts/python -m pytest -q

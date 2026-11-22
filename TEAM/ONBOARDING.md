@@ -10,14 +10,23 @@ Welcome. This page gets you from clone to your first pull request in about an ho
 git clone https://github.com/sarthakviche/belfort.git
 cd belfort
 git config user.name "Your Name"            # commits go out under your own name
-python -m venv .venv
+git config user.email "you@example.com"     # an email verified on your GitHub account
+py -3.12 -m venv .venv                      # the py launcher picks 3.12 even if another Python is the default
 .venv\Scripts\python -m pip install -r requirements-dev.txt
 .venv\Scripts\pre-commit install --hook-type pre-commit --hook-type commit-msg
 .venv\Scripts\python -m pytest --cov
 .venv\Scripts\python -m uvicorn belfort.main:app --port 8765 --reload
 ```
 
-Open <http://localhost:8765>. You need Python 3.12 (exactly 3.12, as in CI), Node.js for the JavaScript syntax check, the GitHub CLI (`gh`) for pull requests, and an internet connection (prices and news are fetched live; the tests are not).
+Every test should pass, with coverage above the threshold in `pyproject.toml`. Open <http://localhost:8765>. You need Python 3.12 (exactly 3.12, as in CI), Node.js for the JavaScript syntax check, the GitHub CLI (`gh`) for pull requests, and an internet connection (prices and news are fetched live; the tests are not).
+
+Before every push, run the same checks CI runs (from Git Bash or WSL for the loop; in PowerShell use `Get-ChildItem belfort\static\*.js | % { node --check $_ }`):
+
+```bash
+.venv/Scripts/ruff check . && .venv/Scripts/ruff format --check .
+for f in belfort/static/*.js; do node --check "$f"; done
+.venv/Scripts/python -m pytest --cov
+```
 
 The pre-commit hooks format and lint every commit and reject commit messages that are not Conventional Commits or that carry AI-tool attribution. Read [docs/CONVENTIONS.md](../docs/CONVENTIONS.md) before your first commit.
 
@@ -57,7 +66,7 @@ Optional: open **Settings** in the sidebar and paste a free Gemini key from <htt
 | `belfort/assistant/` | Bring-your-own-key provider adapter | small |
 | `belfort/static/` | `index.html`, `app.js` (shell and research), `verticals.js` (the other three), `style.css` | large |
 | `content/` | Lessons, syllabus, news feeds as plain files | grows |
-| `tests/` | 68 offline tests; `conftest.py` gives every run its own empty data folder | |
+| `tests/` | Offline tests; `conftest.py` gives every run its own empty data folder | |
 
 ## 5. Habits that matter here
 
