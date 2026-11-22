@@ -27,7 +27,7 @@
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Done ([#20](https://github.com/sarthakviche/belfort/pull/20)) |
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Done ([#21](https://github.com/sarthakviche/belfort/pull/21)) |
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Done ([#22](https://github.com/sarthakviche/belfort/pull/22)) |
-| T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Ready |
+| T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) |
 | T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Ready |
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Ready |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Ready |
@@ -142,7 +142,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · L · Status:** Done ([#22](https://github.com/sarthakviche/belfort/pull/22)) · `pullback-setup`, `breakout-setup`, `exits`, `results-season`.
 
 ### T16 · Lessons: Business check module
-- **P1 · M · Status:** Ready · `five-numbers`, `pe-vs-peers`, `red-flags`. Match the figures the Research business section shows.
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) · `five-numbers`, `pe-vs-peers`, `red-flags`. Match the figures the Research business section shows.
 
 ### T17 · Lessons: Indicators and patterns module
 - **P1 · M · Status:** Ready · `atr`, `rsi-macd`, `pattern-evidence` (use the backtest figures from `data/pattern_stats.json`).
@@ -266,3 +266,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T13 Lessons: market hours and circuits, moving averages, volume ([#20](https://github.com/sarthakviche/belfort/pull/20)).
 - T14 Lessons: R multiples, losing streaks and risk of ruin ([#21](https://github.com/sarthakviche/belfort/pull/21)).
 - T15 Lessons: Setups module, pullbacks, breakouts, exits and results dates ([#22](https://github.com/sarthakviche/belfort/pull/22)).
+- T16 Lessons: Business check module, five numbers, P/E against peers and red flags ([#23](https://github.com/sarthakviche/belfort/pull/23)).

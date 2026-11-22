@@ -38,7 +38,7 @@ An app for beginner and intermediate traders who want to swing or positional tra
 | Area | Built | Notes |
 |---|---|---|
 | **Research** | Fuzzy company search (names, initials, nicknames, typos), per-stock report, three screens, pattern reliability backtest, position sizing | Carried over from the earlier Belfort AI project. Labels are now descriptive: "Conditions met", "Partly met", "Rule excludes". |
-| **Learn** | Syllabus of 3 tracks, 12 modules, 38 lessons; **17 lessons written** with quizzes; quiz grading on the server; progress and streaks; example charts | Lesson charts only use prices at least 30 days old (SEBI education norm from July 2026). |
+| **Learn** | Syllabus of 3 tracks, 12 modules, 38 lessons; **20 lessons written** with quizzes; quiz grading on the server; progress and streaks; example charts | Lesson charts only use prices at least 30 days old (SEBI education norm from July 2026). |
 | **Practice: paper account** | Stock picker by company name (no symbol needed), order ticket with last close, mini chart, stop idea and "Size it", market and limit orders, required stop, optional target, raised and trailing stops, partial exits, open-risk total and size warnings, end-of-day fills, gaps, costs, exits, trade reviews with setup and mistake tags, journal analytics (R distribution, by setup, holding time and mistake, habits), win rate, average R, equity curve with largest drawdown, CSV and JSON export with backup restore | Long only. Virtual points, never redeemable. |
 | **Practice: predictions** | Log a call with direction, horizon and confidence; auto-resolution; Brier score, points, calibration chart, badges | |
 | **Practice: chart replay** | Random hidden past chart, plan a stop and target, animated reveal, R result, running record | |
@@ -52,7 +52,7 @@ An app for beginner and intermediate traders who want to swing or positional tra
 The full plan is in [docs/ROADMAP.md](docs/ROADMAP.md); the work ready to pick up today is in [docs/TASKS.md](docs/TASKS.md). The headlines:
 
 - **Decisions:** brand name, download location and code signing; a securities lawyer's review.
-- **Learn:** 21 of 38 lessons, replay drills linked to lessons, a content checker in CI, Hindi.
+- **Learn:** 18 of 38 lessons, replay drills linked to lessons, a content checker in CI, Hindi.
 - **Research:** editable rule thresholds, watchlists, market context.
 - **News:** wider company tagging, NSE announcements, events calendar.
 - **Platform:** browser tests, accessibility pass, offline assets, Windows installer and release workflow.
