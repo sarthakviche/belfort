@@ -484,6 +484,18 @@ G = [
         ["win rate", "hit rate"],
     ),
     (
+        "Drawdown",
+        "Practice",
+        "How far an account has fallen from its highest value, as a percentage. A 40% drawdown needs a 67% gain to recover.",
+        ["drawdown", "drawdowns"],
+    ),
+    (
+        "Risk of ruin",
+        "Practice",
+        "The chance that losses leave too little to keep trading your plan. Small risk per trade keeps it low through normal losing streaks.",
+        ["risk of ruin"],
+    ),
+    (
         "Brier score",
         "Practice",
         "A score for probability forecasts: 0 is perfect, 0.25 is a coin flip, 1 is confidently wrong. Lower is better.",
