@@ -14,8 +14,8 @@
 |---|---|---|---|---|---|
 | T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) |
 | T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | In progress |
-| T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Ready |
-| T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Blocked on T03 |
+| T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) |
+| T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Ready |
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Ready |
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Ready |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Ready |
@@ -37,9 +37,9 @@
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
 | T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Ready |
 | T25 | Editable rule profiles | 3 Research and News | P1 | L | Blocked on D1 |
-| T26 | Watchlists and in-app alerts | 3 Research and News | P1 | M | Blocked on T03 |
+| T26 | Watchlists and in-app alerts | 3 Research and News | P1 | M | Ready |
 | T27 | Market context panel | 3 Research and News | P2 | M | Ready |
-| T28 | News: tag every NSE company | 3 Research and News | P1 | M | Blocked on T03 |
+| T28 | News: tag every NSE company | 3 Research and News | P1 | M | Ready |
 | T29 | News: NSE announcements and events calendar | 3 Research and News | P2 | L | Ready |
 | T30 | A stock's news inside its report | 3 Research and News | P2 | S | Blocked on T28 |
 | T31 | Browser end-to-end tests in CI | 4 Quality | P0 | M | Ready |
@@ -73,7 +73,7 @@
 The paper account works but is hard to use: you must already know the NSE symbol, the form gives no price or chart, and sizing happens on another screen. Fix that first.
 
 ### T03 · Fuzzy stock picker everywhere
-- **Owner:** Devansh · **P0 · M · Status:** Ready · **Area:** data, ui
+- **Owner:** Devansh · **P0 · M · Status:** Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) · **Area:** data, ui
 - **Why:** Nobody should have to look up an NSE symbol. Typing "hd" must show HDFC Bank, HDFC Life and HDFC AMC.
 - **Backend:** Upgrade `NseArchiveProvider.search` (`belfort/data/providers.py`) or move it to `belfort/data/symbols.py`:
   - Match on symbol prefix, word prefixes of the company name, initials, and typo tolerance (stdlib `difflib`, or `rapidfuzz` if you add it as a pinned dependency).
@@ -86,7 +86,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** You can place a paper trade and log a prediction without ever typing a symbol, in the running app.
 
 ### T04 · Trade ticket: quote, mini chart, position-size helper
-- **Owner:** Devansh · **P0 · M · Status:** Blocked on T03 · **Area:** practice, ui
+- **Owner:** Devansh · **P0 · M · Status:** Ready · **Area:** practice, ui
 - **Do:** When a stock is picked in the order form, show last close and date, day change, a 3-month mini chart with the nearest support, and a suggested stop. Add "Size it": a risk % field that fills the quantity with `floor(account value × risk % ÷ (entry − stop))`, reusing `belfort/research/analysis/sizing.py` through `GET /api/practice/size`. Show the rupee risk and the share of the account it uses before the order is placed.
 - **Done when:** Tests cover the endpoint (never risks more than the limit, capped by available points); the ticket works in the app.
 
@@ -176,14 +176,14 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Do:** Read rule thresholds from `%LOCALAPPDATA%\Belfort\rules.json` with defaults from `settings.py`; a settings screen to edit them with validation; show the active profile in every report.
 
 ### T26 · Watchlists and in-app alerts
-- **P1 · M · Status:** Blocked on T03 · **Area:** research
+- **P1 · M · Status:** Ready · **Area:** research
 - **Do:** Named watchlists (uses the stock picker), refreshed at end of day, with in-app notices when a rule condition changes ("TCS: all conditions now met"). Alerts stay inside the app: no email, Telegram or push (see COMPLIANCE.md).
 
 ### T27 · Market context panel
 - **P2 · M · Status:** Ready · Nifty 50 trend under the same rule, breadth (share of the built-in universe above its 50-day average), and sector strength, on the Research home.
 
 ### T28 · News: tag every NSE company
-- **P1 · M · Status:** Blocked on T03 · Reuse the picker's alias index for tagging; tests for false positives (common words, short names); manual check of 50 real headlines in the PR.
+- **P1 · M · Status:** Ready · Reuse the picker's alias index for tagging; tests for false positives (common words, short names); manual check of 50 real headlines in the PR.
 
 ### T29 · News: NSE announcements and events calendar
 - **P2 · L · Status:** Ready · Corporate announcements and results dates from NSE public files (best effort, shown as missing when blocked) and RBI policy dates; a calendar view.
@@ -254,3 +254,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - v0.1 foundation (see README "What is built").
 - Production engineering setup: lint, format, coverage, pinned dependencies, CI on Windows and Linux, commit policy, conventions (PR #1).
 - T01 Onboarding steps checked on a clean clone and fixed ([#7](https://github.com/sarthakviche/belfort/pull/7)).
+- T03 Fuzzy stock picker in search, paper orders and predictions ([#9](https://github.com/sarthakviche/belfort/pull/9)).

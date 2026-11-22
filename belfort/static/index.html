@@ -25,9 +25,8 @@
 
     <div class="search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="Find a company…" autocomplete="off" aria-label="Search a company name or NSE symbol">
+      <input id="q" type="search" placeholder="Find a company…" autocomplete="off" aria-label="Search a company by name" data-stock-picker>
       <kbd>/</kbd>
-      <div id="suggest" class="suggest" hidden></div>
     </div>
 
     <nav class="index" aria-label="Main">
@@ -181,6 +180,7 @@
 </div>
 <div id="tip" class="tip" hidden></div>
 <script src="app.js"></script>
+<script src="stock-picker.js"></script>
 <script src="verticals.js"></script>
 </body>
 </html>

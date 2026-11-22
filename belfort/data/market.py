@@ -23,7 +23,12 @@ def bars(symbol: str, years: int = 5) -> pd.DataFrame:
             df = pd.concat([df, extra])
     except Exception:
         pass
-    return df[~df.index.duplicated(keep="last")].sort_index()
+    df = df[~df.index.duplicated(keep="last")].sort_index()
+    if len(df):
+        from . import symbols
+
+        symbols.remember_close(symbol, float(df["close"].iloc[-1]), df.index[-1].date().isoformat())
+    return df
 
 
 def lagged(df: pd.DataFrame, lag_days: int) -> pd.DataFrame:

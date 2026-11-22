@@ -57,17 +57,20 @@ belfort/
     market.py             daily bars for any vertical; lagged() for learning content
     cache.py              disk cache with time-to-live
     universe.py           built-in large caps with sectors
+    symbols.py            company search index: names, initials, aliases, typos; last close per symbol
   research/               the stock report (from Belfort AI): analysis/, backtest/, screens.py, router.py
   learn/                  curriculum.py (syllabus, Markdown renderer, quizzes, streaks), router.py
   practice/               engine.py (pure settlement and scoring), service.py (accounts, journal, replay), router.py
   news/                   feeds.py (RSS reader, categories, company tags, tip filter), router.py
   assistant/              chat.py (bring-your-own-key provider adapter), router.py
-  static/                 index.html, app.js (shell + research), verticals.js (learn, practice, news, settings), style.css
+  static/                 index.html, app.js (shell + research), verticals.js (learn, practice, news, settings),
+                          stock-picker.js (reusable company picker), style.css
 content/
   learn/syllabus.json     tracks -> modules -> lessons
   learn/lessons/*.md      one lesson per file, with a quiz block
   news/feeds.json         default feeds (users override in data/feeds.json)
-tests/                    81 tests; no network, every source replaced by synthetic data
+  symbols/                aliases.json (nicknames -> symbols), companies.json (built-in list when NSE is unreachable)
+tests/                    offline tests; no network, every source replaced by synthetic data
 ```
 
 ## The four verticals

@@ -19,7 +19,6 @@
 
 | Area | Limitation | Task |
 |---|---|---|
-| Practice | You must type an exact NSE symbol; no fuzzy picker | T03 |
 | Practice | The order form shows no price, chart or sizing help | T04 |
 | Practice | Each portfolio load fetches bars for every open symbol | T05 |
 | Practice | The replay trainer sends hidden bars to the browser before the decision | T06 |

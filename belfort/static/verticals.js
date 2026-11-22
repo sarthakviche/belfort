@@ -172,7 +172,7 @@ function renderPaper() {
         <form class="panel glass glow" id="order-form"><h3>New practice trade</h3>
           <p class="hint">Long only, end-of-day fills. Decide the stop before you buy; it is required.</p>
           <div class="fields">
-            <label class="wide">Stock (NSE symbol)<input name="symbol" required maxlength="20" placeholder="e.g. TCS"></label>
+            <label class="wide">Stock<input name="symbol" required maxlength="80" placeholder="Type a company, e.g. HDFC Bank" data-stock-picker></label>
             <label>Quantity<input name="qty" type="number" min="1" step="1" required></label>
             <label>Order<select name="entry_type"><option value="market">Market, next open</option><option value="limit">Limit</option></select></label>
             <label class="wide limit-only" hidden>Limit price (₹)<input name="limit_price" type="number" min="0" step="0.05"></label>
@@ -248,7 +248,7 @@ function renderPredict() {
         <form class="panel glass glow" id="predict-form"><h3>Make a call</h3>
           <p class="hint">Say which way a stock will close after a set time, and how sure you are. You are scored on honesty, not boldness.</p>
           <div class="fields">
-            <label class="wide">Stock (NSE symbol)<input name="psymbol" required maxlength="20" placeholder="e.g. JIOFIN"></label>
+            <label class="wide">Stock<input name="psymbol" required maxlength="80" placeholder="Type a company, e.g. Jio Financial" data-stock-picker></label>
             <div class="wide seg dir"><button type="button" data-dir="up" class="on">Higher</button><button type="button" data-dir="down">Lower</button></div>
             <label class="wide">After<select name="horizon">${d.horizons.map((h) => `<option ${h === "4 weeks" ? "selected" : ""}>${esc(h)}</option>`).join("")}</select></label>
             <label class="wide">Confidence <output id="pconf-out">60%</output><input name="pconf" type="range" min="50" max="95" value="60"></label>
