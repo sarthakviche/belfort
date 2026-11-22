@@ -30,7 +30,7 @@
             {"id": "what-is-a-share", "title": "What you own when you buy a share", "minutes": 5},
             {"id": "order-types", "title": "Market, limit and stop-loss orders", "minutes": 7},
             {"id": "costs-and-settlement", "title": "Costs, taxes and T+1 settlement", "minutes": 7},
-            {"id": "circuits-and-sessions", "title": "Market hours, circuits and gaps", "minutes": 5, "status": "planned"}
+            {"id": "circuits-and-sessions", "title": "Market hours, circuits and gaps", "minutes": 5}
           ]
         },
         {
@@ -40,8 +40,8 @@
             {"id": "candles", "title": "Candles: one session in one shape", "minutes": 6},
             {"id": "trend", "title": "Trend: higher highs and higher lows", "minutes": 7},
             {"id": "support-resistance", "title": "Support and resistance", "minutes": 8},
-            {"id": "moving-averages", "title": "Moving averages without the mystery", "minutes": 6, "status": "planned"},
-            {"id": "volume", "title": "Volume: is anyone behind the move?", "minutes": 5, "status": "planned"}
+            {"id": "moving-averages", "title": "Moving averages without the mystery", "minutes": 6},
+            {"id": "volume", "title": "Volume: is anyone behind the move?", "minutes": 5}
           ]
         },
         {

@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Learn: three new lessons. Market hours, circuits and gaps (NSE session times, price bands and market-wide circuit breakers, cited from NSE); Moving averages without the mystery; and Volume: is anyone behind the move? Eleven of 38 lessons are now written.
 - Content checker in CI (`scripts/ci/check_content.py`): every lesson needs front matter, a quiz of three or more valid questions, known chart symbols, no banned wording and a length that fits its minutes, and the syllabus must match the lesson files.
 - Practice equity curve: the paper account's value at the end of each trading day you open Belfort, drawn against the starting points, with the largest drawdown so far.
 - Practice data export: download trades, predictions and replays as CSV, or one JSON backup, from Settings, and restore a backup later. A file that is not a valid backup is refused and nothing changes.
