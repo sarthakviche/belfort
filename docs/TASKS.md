@@ -25,7 +25,7 @@
 | T11 | Equity curve | 1 Practice | P2 | M | Done ([#18](https://github.com/sarthakviche/belfort/pull/18)) |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Done ([#20](https://github.com/sarthakviche/belfort/pull/20)) |
-| T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Ready |
+| T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | In progress |
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Ready |
 | T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Ready |
 | T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Ready |
@@ -136,7 +136,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#20](https://github.com/sarthakviche/belfort/pull/20)) · Lesson ids: `circuits-and-sessions`, `moving-averages`, `volume`. Check NSE session times and circuit rules at the source and cite them.
 
 ### T14 · Lessons: R multiples, losing streaks
-- **P1 · M · Status:** Ready · Lesson ids: `r-multiples`, `risk-of-ruin`. Tie them to the Practice stats (average R, win rate).
+- **Owner:** Devansh · **P1 · M · Status:** In progress · Lesson ids: `r-multiples`, `risk-of-ruin`. Tie them to the Practice stats (average R, win rate).
 
 ### T15 · Lessons: Setups module
 - **P1 · L · Status:** Ready · `pullback-setup`, `breakout-setup`, `exits`, `results-season`.
