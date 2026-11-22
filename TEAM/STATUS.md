@@ -19,7 +19,6 @@
 
 | Area | Limitation | Task |
 |---|---|---|
-| Practice | The replay trainer sends hidden bars to the browser before the decision | T06 |
 | Practice | Long only, one account, end-of-day fills, no trailing stops or partial exits | T07 |
 | Learn | 8 of 38 lessons written | T13 to T22 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
