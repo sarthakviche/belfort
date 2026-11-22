@@ -26,7 +26,7 @@ from ..settings import (
     TRAIL_ATR_RANGE,
     TRAIL_PCT_RANGE,
 )
-from . import engine
+from . import analytics, engine
 
 
 class PracticeError(Exception):
@@ -122,7 +122,14 @@ def portfolio() -> dict:
             sell = t["exit_price"] * t["qty"]
             cash += sell - _cost(sell)
             pnl = (t["exit_price"] - t["entry_price"]) * t["qty"] - _cost(buy) - _cost(sell)
-            closed_rows.append({**t, "pnl": round(pnl, 2), "r": engine.r_multiple(t["entry_price"], t["stop"], t["exit_price"])})
+            closed_rows.append(
+                {
+                    **t,
+                    "mistakes": json.loads(t.get("mistakes") or "[]"),
+                    "pnl": round(pnl, 2),
+                    "r": engine.r_multiple(t["entry_price"], t["stop"], t["exit_price"]),
+                }
+            )
         elif t["status"] == "open":
             last, as_of = marks.get(t["symbol"], (t["entry_price"], t["entry_date"]))
             invested += buy
@@ -159,6 +166,7 @@ def portfolio() -> dict:
         "open": open_rows,
         "pending": pending_rows,
         "closed": closed_rows[:50],
+        "closed_all": closed_rows,
         "stats": {
             "closed": len(closed_rows),
             "win_rate": round(len(wins) / len(closed_rows), 3) if closed_rows else None,
@@ -289,8 +297,11 @@ def place_trade(
     confidence: float | None,
     entry_type: str = "market",
     limit_price: float | None = None,
+    setup: str | None = None,
 ) -> dict:
     symbol = clean_symbol(symbol)
+    if setup is not None and setup not in analytics.SETUPS:
+        raise PracticeError("Choose a setup from the list: " + ", ".join(analytics.SETUPS.values()) + ".")
     if qty < 1:
         raise PracticeError("Quantity must be at least 1 share.")
     if entry_type not in ("market", "limit"):
@@ -318,8 +329,8 @@ def place_trade(
         raise PracticeError(f"Not enough points: this needs about {need:,.0f}, you have {pf['available']:,.0f} available.")
     with db.connect() as con:
         cur = con.execute(
-            "INSERT INTO trades (account_id, symbol, qty, entry_type, limit_price, stop, target, thesis, confidence, placed_on) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO trades (account_id, symbol, qty, entry_type, limit_price, stop, target, thesis, confidence, placed_on, setup) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
             (
                 pf["account"]["id"],
                 symbol,
@@ -331,6 +342,7 @@ def place_trade(
                 thesis.strip(),
                 confidence,
                 _today(),
+                setup,
             ),
         )
         tid = cur.lastrowid
@@ -431,6 +443,28 @@ def sell_part(trade_id: int, qty: int) -> dict:
             (qty, _today(), trade_id),
         )
     return {"message": f"Selling {qty} of {t['qty']} shares at the next session's open. The other {t['qty'] - qty} stay open."}
+
+
+def tag_trade(trade_id: int, setup: str | None, mistakes: list[str]) -> dict:
+    """Set a trade's setup tag and, once it is closed, the mistakes the user sees in it."""
+    if setup is not None and setup not in analytics.SETUPS:
+        raise PracticeError("Choose a setup from the list: " + ", ".join(analytics.SETUPS.values()) + ".")
+    unknown = [m for m in mistakes if m not in analytics.MISTAKES]
+    if unknown:
+        raise PracticeError("Unknown mistake tag: " + ", ".join(unknown) + ".")
+    with db.connect() as con:
+        t = con.execute("SELECT status FROM trades WHERE id=?", (trade_id,)).fetchone()
+        if not t:
+            raise PracticeError("No such trade.")
+        if mistakes and t["status"] != "closed":
+            raise PracticeError("Mistakes are tagged in the review, once the trade is closed.")
+        con.execute("UPDATE trades SET setup=?, mistakes=? WHERE id=?", (setup, json.dumps(sorted(set(mistakes))), trade_id))
+    return {"message": "Tags saved."}
+
+
+def journal_analytics() -> dict:
+    """R distribution, results by setup and holding time, mistakes, and best and worst habits."""
+    return analytics.summarise(portfolio()["closed_all"])
 
 
 def review_trade(trade_id: int, review: str) -> dict:

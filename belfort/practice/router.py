@@ -29,6 +29,7 @@ class TradeIn(BaseModel):
     confidence: float | None = Field(default=None, ge=0.5, le=0.99)
     entry_type: str = "market"
     limit_price: float | None = Field(default=None, gt=0)
+    setup: str | None = Field(default=None, max_length=20)
 
 
 class StopIn(BaseModel):
@@ -42,6 +43,11 @@ class TrailIn(BaseModel):
 
 class SellIn(BaseModel):
     qty: int = Field(gt=0, le=10_000_000)
+
+
+class TagsIn(BaseModel):
+    setup: str | None = Field(default=None, max_length=20)
+    mistakes: list[str] = Field(default_factory=list, max_length=10)
 
 
 class ReviewIn(BaseModel):
@@ -89,7 +95,15 @@ def place(body: TradeIn):
 
     try:
         return service.place_trade(
-            body.symbol, body.qty, body.stop, body.target, body.thesis, body.confidence, body.entry_type, body.limit_price
+            body.symbol,
+            body.qty,
+            body.stop,
+            body.target,
+            body.thesis,
+            body.confidence,
+            body.entry_type,
+            body.limit_price,
+            body.setup or None,
         )
     except (PracticeError, DataError) as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -113,6 +127,16 @@ def trail(trade_id: int, body: TrailIn):
 @router.post("/trades/{trade_id}/sell")
 def sell_part(trade_id: int, body: SellIn):
     return _guard(service.sell_part, trade_id, body.qty)
+
+
+@router.post("/trades/{trade_id}/tags")
+def tags(trade_id: int, body: TagsIn):
+    return _guard(service.tag_trade, trade_id, body.setup or None, body.mistakes)
+
+
+@router.get("/analytics")
+def journal_analytics():
+    return service.journal_analytics()
 
 
 @router.post("/trades/{trade_id}/review")

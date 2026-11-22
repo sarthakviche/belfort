@@ -23,13 +23,6 @@ def bars(rows):
     return df
 
 
-@pytest.fixture
-def fresh_db(tmp_path, monkeypatch):
-    monkeypatch.setattr(settings, "DB_FILE", tmp_path / "t.db")
-    monkeypatch.setattr(market, "bars", lambda symbol, years=5: price_frame(n=400, drift=0.001))
-    return tmp_path
-
-
 # ---------------- settlement rules ----------------
 
 
