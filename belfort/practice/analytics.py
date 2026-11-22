@@ -110,6 +110,24 @@ def habits(setups: list[dict], holdings: list[dict], mistakes: list[dict]) -> di
     return {"best": best, "worst": worst[:3], "min_group": ANALYTICS_MIN_GROUP}
 
 
+def drawdown(points: list[dict]) -> dict:
+    """The largest fall from a peak in a series of {"day", "equity"} points, in points and percent of the peak."""
+    worst = {"points": 0.0, "pct": 0.0, "peak_day": None, "trough_day": None}
+    peak = None
+    for p in points:
+        if peak is None or p["equity"] > peak["equity"]:
+            peak = p
+        fall = peak["equity"] - p["equity"]
+        if fall > worst["points"]:
+            worst = {
+                "points": round(fall, 2),
+                "pct": round(fall / peak["equity"] * 100, 2) if peak["equity"] else 0.0,
+                "peak_day": peak["day"],
+                "trough_day": p["day"],
+            }
+    return worst
+
+
 def summarise(trades: list[dict]) -> dict:
     """Everything the review screen shows, from closed trades that carry r, dates, setup and mistakes."""
     setups, holdings, mistakes = by_setup(trades), by_holding(trades), by_mistake(trades)

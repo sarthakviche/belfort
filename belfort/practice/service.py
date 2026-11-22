@@ -153,6 +153,7 @@ def portfolio() -> dict:
     wins = [t for t in closed_rows if t["pnl"] > 0]
     rs = [t["r"] for t in closed_rows if t["r"] is not None]
     equity = cash + market_value
+    _snapshot(acc["id"], equity)
     return {
         "account": acc,
         "cash": round(cash, 2),
@@ -249,6 +250,31 @@ def size(symbol: str, risk_pct: float, stop: float, entry: float | None = None) 
         "capped_by_points": by_points < sized["quantity"],
         "over_limit": risk_pct > PAPER_MAX_RISK_PCT,
         "message": sized["error"] if qty == 0 else None,
+    }
+
+
+def _snapshot(account_id: int, equity: float) -> None:
+    """Keep one account value per trading day (the latest view of that day wins)."""
+    with db.connect() as con:
+        con.execute(
+            "INSERT INTO equity_snapshots (account_id, day, equity) VALUES (?,?,?) "
+            "ON CONFLICT(account_id, day) DO UPDATE SET equity = excluded.equity",
+            (account_id, market.data_day(), round(equity, 2)),
+        )
+
+
+def equity_curve() -> dict:
+    """Account value at each settled trading day, and the largest drawdown so far."""
+    pf = portfolio()
+    with db.connect() as con:
+        rows = db.rows(
+            con.execute("SELECT day, equity FROM equity_snapshots WHERE account_id = ? ORDER BY day", (pf["account"]["id"],))
+        )
+    return {
+        "start_points": pf["account"]["start_points"],
+        "points": rows,
+        "drawdown": analytics.drawdown([{"day": "start", "equity": pf["account"]["start_points"]}] + rows),
+        "note": "Account value in practice points at the end of each trading day you opened Belfort. Points have no money value.",
     }
 
 
@@ -477,6 +503,7 @@ def review_trade(trade_id: int, review: str) -> dict:
 def reset_account() -> dict:
     with db.connect() as con:
         con.execute("DELETE FROM trades")
+        con.execute("DELETE FROM equity_snapshots")
         con.execute("DELETE FROM accounts")
     account()
     return {"message": "Practice account reset to its starting points."}

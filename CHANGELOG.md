@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Practice equity curve: the paper account's value at the end of each trading day you open Belfort, drawn against the starting points, with the largest drawdown so far.
 - Practice data export: download trades, predictions and replays as CSV, or one JSON backup, from Settings, and restore a backup later. A file that is not a valid backup is refused and nothing changes.
 - Open-source release preparation: MIT licence, public README, contributing guide for outside contributors, Code of Conduct, security policy with private reporting; the task board and status page moved to `docs/`.
 - Practice journal analytics: tag each trade's setup and, in the review, the mistakes you made (moved the stop, no plan, chased, sized too big, exited early). A Your journal panel shows your results in R, by setup, by holding time and by mistake, and lists what has worked and what has cost you once a pattern has at least 3 trades.

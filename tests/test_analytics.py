@@ -98,3 +98,24 @@ def test_setup_is_saved_with_the_order_and_mistakes_wait_for_the_close(fresh_db)
     assert next(t for t in service._trades(service.account()["id"]) if t["id"] == tid)["setup"] == "pullback"
     early = c.post(f"/api/practice/trades/{tid}/tags", json={"setup": "pullback", "mistakes": ["chased"]})
     assert early.status_code == 400 and "once the trade is closed" in early.json()["detail"]
+
+
+def test_drawdown_finds_the_largest_fall_from_a_peak():
+    pts = [{"day": d, "equity": v} for d, v in [("a", 100), ("b", 120), ("c", 90), ("d", 130), ("e", 117)]]
+    assert analytics.drawdown(pts) == {"points": 30.0, "pct": 25.0, "peak_day": "b", "trough_day": "c"}
+    assert analytics.drawdown([{"day": "a", "equity": 100}, {"day": "b", "equity": 110}])["points"] == 0.0
+
+
+def test_equity_snapshots_one_per_trading_day_and_reset_clears_them(fresh_db, monkeypatch):
+    from belfort.data import market
+
+    c = TestClient(app)
+    for day in ("2026-11-18", "2026-11-19", "2026-11-19", "2026-11-20"):
+        monkeypatch.setattr(market, "data_day", lambda now=None, d=day: d)
+        c.get("/api/practice/portfolio")
+    curve = c.get("/api/practice/equity").json()
+    assert [p["day"] for p in curve["points"]] == ["2026-11-18", "2026-11-19", "2026-11-20"]
+    assert curve["start_points"] == curve["points"][0]["equity"] and curve["drawdown"]["points"] == 0.0
+    assert "no money value" in curve["note"]
+    c.post("/api/practice/reset")
+    assert [p["day"] for p in c.get("/api/practice/equity").json()["points"]] == ["2026-11-20"]

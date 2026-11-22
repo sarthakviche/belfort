@@ -134,6 +134,11 @@ def tags(trade_id: int, body: TagsIn):
     return _guard(service.tag_trade, trade_id, body.setup or None, body.mistakes)
 
 
+@router.get("/equity")
+def equity():
+    return service.equity_curve()
+
+
 @router.get("/analytics")
 def journal_analytics():
     return service.journal_analytics()

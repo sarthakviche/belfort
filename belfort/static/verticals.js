@@ -136,7 +136,10 @@ async function loadPractice() {
   const body = $("practice-body");
   body.innerHTML = '<p class="hint">Loading…</p>';
   try {
-    if (P.tab === "paper") { P.pf = await api("/api/practice/portfolio"); P.an = await api("/api/practice/analytics"); renderPaper(); }
+    if (P.tab === "paper") {
+      P.pf = await api("/api/practice/portfolio"); P.an = await api("/api/practice/analytics"); P.eq = await api("/api/practice/equity");
+      renderPaper(); drawEquity();
+    }
     else if (P.tab === "predict") { P.pred = await api("/api/practice/predictions"); renderPredict(); }
     else renderReplayIntro();
   } catch (e) { body.innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
@@ -163,6 +166,7 @@ function renderPaper() {
         ${d.pending.length ? `<div class="panel glass"><h3>Waiting to fill</h3><div class="scroll"><table><thead><tr><th>Stock</th><th>Order</th><th class="num">Qty</th><th class="num">Stop</th><th>Placed</th><th></th></tr></thead><tbody>
           ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? "limit " + inr(t.limit_price) : "market, next open", num(t.qty, 0), inr(t.stop), esc(t.placed_on),
             `<button type="button" class="btn ghost sm" data-close="${t.id}">Cancel</button>`])).join("")}</tbody></table></div></div>` : ""}
+        ${equityPanel()}
         ${journalPanel()}
         <div class="panel glass"><h3>Closed trades and reviews</h3>${d.closed.length ? d.closed.map((t) => `<div class="closed">
             <div class="closed-head"><b>${esc(t.symbol)}</b><span>${esc(t.entry_date)} → ${esc(t.exit_date)}</span><span>${inr(t.entry_price)} → ${inr(t.exit_price)}</span>
@@ -255,6 +259,26 @@ function tagEditor(t) {
   const setups = Object.entries(P.an.setups).map(([k, v]) => `<option value="${esc(k)}" ${t.setup === k ? "selected" : ""}>${esc(v)}</option>`).join("");
   const boxes = Object.entries(P.an.mistakes).map(([k, v]) => `<label class="tag"><input type="checkbox" data-mistake="${esc(k)}" ${(t.mistakes || []).includes(k) ? "checked" : ""}>${esc(v)}</label>`).join("");
   return `<div class="tags" data-tags="${t.id}"><select data-setup><option value="">Setup: not tagged</option>${setups}</select>${boxes}<button type="button" class="btn ghost sm" data-save-tags="${t.id}">Save tags</button></div>`;
+}
+function equityPanel() {
+  const e = P.eq;
+  if (!e) return "";
+  const dd = e.drawdown;
+  const ddText = dd.points > 0 ? `Largest drawdown: ${num(dd.points, 0)} points (${dd.pct}%) from ${dd.peak_day === "start" ? "the start" : esc(dd.peak_day)} to ${esc(dd.trough_day)}.` : "No drawdown yet.";
+  return `<div class="panel glass"><h3>Account value over time</h3>
+    ${e.points.length >= 2 ? '<div class="equity-chart" id="equity-chart"></div>' : '<p class="hint">The curve starts once you have opened Practice on two different trading days.</p>'}
+    <p class="hint">${ddText}</p><p class="src">${esc(e.note)}</p></div>`;
+}
+function drawEquity() {
+  const el = $("equity-chart");
+  if (!el || !window.LightweightCharts) return;
+  const c = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
+    grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" },
+    timeScale: { borderColor: "rgba(255,255,255,.08)" }, handleScroll: false, handleScale: false });
+  const s = c.addLineSeries({ color: "#facc15", lineWidth: 2, priceFormat: { type: "price", precision: 0, minMove: 1 } });
+  s.setData(P.eq.points.map((p) => ({ time: p.day, value: p.equity })));
+  s.createPriceLine({ price: P.eq.start_points, color: "#8b8b90", lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: "start" });
+  c.timeScale().fitContent();
 }
 function journalPanel() {
   const a = P.an;
