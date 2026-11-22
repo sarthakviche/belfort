@@ -1,4 +1,5 @@
 """Swing highs and lows. A pivot at bar i is only usable from bar i + k (no look-ahead)."""
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -15,10 +16,10 @@ def raw_pivots(high: np.ndarray, low: np.ndarray, k: int) -> list[Pivot]:
     out = []
     n = len(high)
     for i in range(k, n - k):
-        wh = high[i - k:i + k + 1]
+        wh = high[i - k : i + k + 1]
         if high[i] == wh.max() and (wh[:k] < high[i]).all():
             out.append(Pivot(i, float(high[i]), "H"))
-        wl = low[i - k:i + k + 1]
+        wl = low[i - k : i + k + 1]
         if low[i] == wl.min() and (wl[:k] > low[i]).all():
             out.append(Pivot(i, float(low[i]), "L"))
     return out

@@ -1,0 +1,40 @@
+[project]
+name = "belfort"
+version = "0.1.0"
+description = "Learn, practise and research Indian stocks in one app"
+requires-python = ">=3.12,<3.13"
+readme = "README.md"
+license = { text = "Proprietary: private pre-release, all rights reserved" }
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+extend-exclude = [".venv", "build", "dist"]
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, I import order, N pep8-naming, B bugbear, UP pyupgrade, SIM simplify
+select = ["E", "W", "F", "I", "N", "B", "UP", "SIM"]
+ignore = [
+  "E501",    # line length is handled by the formatter
+  "B008",    # FastAPI's Query()/Header() defaults are the documented pattern
+  "SIM105",  # explicit try/except/pass reads clearer in data fetchers
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N802", "N806"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["belfort"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 70  # raise as coverage grows; never lower it
+show_missing = false
+skip_covered = true

@@ -8,6 +8,7 @@ Directives inside a lesson body:
   ::chart SYMBOL BARS    a real chart of SYMBOL, ending at least EDU_LAG_DAYS ago (SEBI education norms)
   ::try KIND             a button into the app: replay, paper, predict, research
 """
+
 import html
 import json
 import re
@@ -32,9 +33,15 @@ def _lesson_index() -> dict[str, dict]:
     idx = {}
     for t in syllabus()["tracks"]:
         for m in t["modules"]:
-            for i, l in enumerate(m["lessons"]):
-                idx[l["id"]] = {**l, "track": t["id"], "track_title": t["title"], "module": m["id"], "module_title": m["title"],
-                                "order": i}
+            for i, lesson_info in enumerate(m["lessons"]):
+                idx[lesson_info["id"]] = {
+                    **lesson_info,
+                    "track": t["id"],
+                    "track_title": t["title"],
+                    "module": m["id"],
+                    "module_title": m["title"],
+                    "order": i,
+                }
     return idx
 
 
@@ -62,8 +69,13 @@ def render_markdown(md: str) -> str:
             lst = None
         if table:
             head, *body = [[c.strip() for c in r.strip().strip("|").split("|")] for r in table if not re.match(r"^\|?\s*:?-", r)]
-            out.append('<div class="scroll"><table><thead><tr>' + "".join(f"<th>{_inline(c)}</th>" for c in head) + "</tr></thead><tbody>"
-                       + "".join("<tr>" + "".join(f"<td>{_inline(c)}</td>" for c in r) + "</tr>" for r in body) + "</tbody></table></div>")
+            out.append(
+                '<div class="scroll"><table><thead><tr>'
+                + "".join(f"<th>{_inline(c)}</th>" for c in head)
+                + "</tr></thead><tbody>"
+                + "".join("<tr>" + "".join(f"<td>{_inline(c)}</td>" for c in r) + "</tr>" for r in body)
+                + "</tbody></table></div>"
+            )
             table = []
 
     for raw in md.splitlines():
@@ -84,7 +96,9 @@ def render_markdown(md: str) -> str:
             out.append(f"<h{n}>{_inline(m.group(2))}</h{n}>")
         elif m := re.match(r"^::chart\s+([A-Z0-9&\-]+)(?:\s+(\d+))?", line):
             flush()
-            out.append(f'<div class="lesson-chart" data-symbol="{html.escape(m.group(1))}" data-bars="{m.group(2) or 120}"></div>')
+            out.append(
+                f'<div class="lesson-chart" data-symbol="{html.escape(m.group(1))}" data-bars="{m.group(2) or 120}"></div>'
+            )
         elif m := re.match(r"^::try\s+(replay|paper|predict|research)", line):
             flush()
             out.append(f'<button type="button" class="try" data-try="{m.group(1)}">Try it in Belfort →</button>')
@@ -125,7 +139,7 @@ def parse_lesson(text: str) -> dict:
     m = re.search(r"```quiz\s*(.*?)```", body, re.S)
     if m:
         quiz = json.loads(m.group(1))
-        body = body[:m.start()] + body[m.end():]
+        body = body[: m.start()] + body[m.end() :]
     for q in quiz:
         if not (q.get("q") and len(q.get("options", [])) >= 2 and 0 <= q.get("answer", -1) < len(q["options"])):
             raise LearnError("A quiz question is malformed.")
@@ -145,9 +159,17 @@ def lesson(lesson_id: str) -> dict:
     order = [k for k, v in idx.items() if (LEARN / "lessons" / f"{k}.md").exists()]
     i = order.index(lesson_id)
     quiz_public = [{"q": q["q"], "options": q["options"]} for q in data["quiz"]]
-    return {"id": lesson_id, **info, "objectives": data["meta"]["objectives"], "html": data["html"], "quiz": quiz_public,
-            "prev": order[i - 1] if i > 0 else None, "next": order[i + 1] if i + 1 < len(order) else None,
-            "text": data["text"][:6000], "edu_lag_days": EDU_LAG_DAYS}
+    return {
+        "id": lesson_id,
+        **info,
+        "objectives": data["meta"]["objectives"],
+        "html": data["html"],
+        "quiz": quiz_public,
+        "prev": order[i - 1] if i > 0 else None,
+        "next": order[i + 1] if i + 1 < len(order) else None,
+        "text": data["text"][:6000],
+        "edu_lag_days": EDU_LAG_DAYS,
+    }
 
 
 def grade(lesson_id: str, answers: list[int]) -> dict:
@@ -157,18 +179,26 @@ def grade(lesson_id: str, answers: list[int]) -> dict:
     if not f.exists():
         raise LearnError("No such lesson.")
     quiz = parse_lesson(f.read_text(encoding="utf-8"))["quiz"]
-    results = [{"correct": i < len(answers) and answers[i] == q["answer"], "answer": q["answer"], "why": q.get("why", "")}
-               for i, q in enumerate(quiz)]
+    results = [
+        {"correct": i < len(answers) and answers[i] == q["answer"], "answer": q["answer"], "why": q.get("why", "")}
+        for i, q in enumerate(quiz)
+    ]
     score = sum(r["correct"] for r in results) / len(results) if results else 1.0
     passed = score >= 0.6
     if passed:
         with db.connect() as con:
-            con.execute("INSERT INTO lesson_progress (lesson_id, completed_on, quiz_score) VALUES (?,?,?) "
-                        "ON CONFLICT(lesson_id) DO UPDATE SET quiz_score=MAX(quiz_score, excluded.quiz_score)",
-                        (lesson_id, date.today().isoformat(), round(score, 3)))
+            con.execute(
+                "INSERT INTO lesson_progress (lesson_id, completed_on, quiz_score) VALUES (?,?,?) "
+                "ON CONFLICT(lesson_id) DO UPDATE SET quiz_score=MAX(quiz_score, excluded.quiz_score)",
+                (lesson_id, date.today().isoformat(), round(score, 3)),
+            )
         db.touch_activity("learn")
-    return {"score": round(score, 3), "passed": passed, "results": results,
-            "message": "Lesson complete." if passed else "Not yet: 60% marks the lesson complete. Reread and try again."}
+    return {
+        "score": round(score, 3),
+        "passed": passed,
+        "results": results,
+        "message": "Lesson complete." if passed else "Not yet: 60% marks the lesson complete. Reread and try again.",
+    }
 
 
 def progress() -> dict:
@@ -185,8 +215,8 @@ def progress() -> dict:
     ready_total = 0
     for t in syl["tracks"]:
         for m in t["modules"]:
-            for l in m["lessons"]:
-                l["written"] = (LEARN / "lessons" / f"{l['id']}.md").exists()
-                l["done"] = l["id"] in done
-                ready_total += l["written"]
+            for lesson_info in m["lessons"]:
+                lesson_info["written"] = (LEARN / "lessons" / f"{lesson_info['id']}.md").exists()
+                lesson_info["done"] = lesson_info["id"] in done
+                ready_total += lesson_info["written"]
     return {"syllabus": syl, "completed": len(done), "available": ready_total, "streak_days": streak}

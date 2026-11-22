@@ -4,6 +4,7 @@ Each detector returns Pattern objects with a 0..1 score, the exact bars used, a 
 target and an invalidation price. Mirror patterns (tops/bottoms) share one implementation by
 flipping the sign of prices.
 """
+
 from dataclasses import asdict, dataclass, field
 
 import numpy as np
@@ -29,10 +30,10 @@ class Ctx:
 @dataclass
 class Pattern:
     name: str
-    direction: str            # bullish / bearish / neutral
-    status: str               # forming / confirmed / holding / broken
+    direction: str  # bullish / bearish / neutral
+    status: str  # forming / confirmed / holding / broken
     score: float
-    points: list[dict] = field(default_factory=list)   # {idx, price, role}
+    points: list[dict] = field(default_factory=list)  # {idx, price, role}
     key_level: float | None = None
     target: float | None = None
     invalidation: float | None = None
@@ -68,12 +69,12 @@ def _clip(x):
 
 
 def double_patterns(c: Ctx, s: int) -> list[Pattern]:
-    HI, LO, CL, P = _view(c, s)
+    view_high, view_low, view_close, view_pivots = _view(c, s)
     n, k = c.n, c.k
     min_sep, max_sep, max_age = max(8, 2 * k), 16 * k, 6 * k
     out = []
-    for j in range(len(P) - 2):
-        (i1, h1, t1), (im, lm, _), (i2, h2, t2) = P[j], P[j + 1], P[j + 2]
+    for j in range(len(view_pivots) - 2):
+        (i1, h1, t1), (im, lm, _), (i2, h2, t2) = view_pivots[j], view_pivots[j + 1], view_pivots[j + 2]
         if not (t1 and t2) or n - 1 - i2 > max_sep:
             continue
         sep = i2 - i1
@@ -86,44 +87,50 @@ def double_patterns(c: Ctx, s: int) -> list[Pattern]:
         if diff > 0.03 or height / base < 0.04 or height < 1.5 * c.atr:
             continue
         lo0 = max(0, i1 - sep)
-        if i1 - lo0 < 5 or LO[lo0:i1].min() > lm - 0.25 * height:
+        if i1 - lo0 < 5 or view_low[lo0:i1].min() > lm - 0.25 * height:
             continue  # no real move into the first peak
-        if i2 + 1 < n and HI[i2 + 1:].max() > top + 0.01 * base:
+        if i2 + 1 < n and view_high[i2 + 1 :].max() > top + 0.01 * base:
             continue  # price already went past both peaks
-        brk = np.nonzero(CL[i2 + 1:] < lm)[0]
+        brk = np.nonzero(view_close[i2 + 1 :] < lm)[0]
         confirm = int(i2 + 1 + brk[0]) if len(brk) else None
         if confirm is not None and n - 1 - confirm > max_age:
             continue
         if confirm is None and n - 1 - i2 > 2 * max_age:
             continue
         target = lm - height
-        if confirm is not None and LO[confirm:].min() <= target:
+        if confirm is not None and view_low[confirm:].min() <= target:
             continue  # measured move already done
-        v1, v2 = c.vol[max(0, i1 - 2):i1 + 3].mean(), c.vol[max(0, i2 - 2):i2 + 3].mean()
-        score = (0.4 * (1 - diff / 0.03) + 0.3 * _clip(height / base / 0.10)
-                 + 0.15 * (v2 < v1) + 0.15 * (confirm is not None))
+        v1, v2 = c.vol[max(0, i1 - 2) : i1 + 3].mean(), c.vol[max(0, i2 - 2) : i2 + 3].mean()
+        score = 0.4 * (1 - diff / 0.03) + 0.3 * _clip(height / base / 0.10) + 0.15 * (v2 < v1) + 0.15 * (confirm is not None)
         top_side = s > 0
-        out.append(Pattern(
-            name="Double top" if top_side else "Double bottom (W)",
-            direction="bearish" if top_side else "bullish",
-            status="confirmed" if confirm is not None else "forming", score=_clip(score),
-            points=[_pt(i1, s * h1, "first peak" if top_side else "first low"),
+        out.append(
+            Pattern(
+                name="Double top" if top_side else "Double bottom (W)",
+                direction="bearish" if top_side else "bullish",
+                status="confirmed" if confirm is not None else "forming",
+                score=_clip(score),
+                points=[
+                    _pt(i1, s * h1, "first peak" if top_side else "first low"),
                     _pt(im, s * lm, "neckline"),
-                    _pt(i2, s * h2, "second peak" if top_side else "second low")],
-            key_level=s * lm, target=s * target, invalidation=s * top, confirm_idx=confirm,
-            note=("Second peak on lower volume. " if v2 < v1 and top_side else "")
-                 + f"Peaks differ by {diff * 100:.1f}%.",
-        ))
+                    _pt(i2, s * h2, "second peak" if top_side else "second low"),
+                ],
+                key_level=s * lm,
+                target=s * target,
+                invalidation=s * top,
+                confirm_idx=confirm,
+                note=("Second peak on lower volume. " if v2 < v1 and top_side else "") + f"Peaks differ by {diff * 100:.1f}%.",
+            )
+        )
     return out
 
 
 def head_shoulders(c: Ctx, s: int) -> list[Pattern]:
-    HI, LO, CL, P = _view(c, s)
+    view_high, view_low, view_close, view_pivots = _view(c, s)
     n, k = c.n, c.k
     max_age = 6 * k
     out = []
-    for j in range(len(P) - 4):
-        (i1, ls, a), (ib, t1, _), (ih, hd, d), (ie, t2, _), (i3, rs, f) = P[j:j + 5]
+    for j in range(len(view_pivots) - 4):
+        (i1, ls, a), (ib, t1, _), (ih, hd, d), (ie, t2, _), (i3, rs, f) = view_pivots[j : j + 5]
         if not (a and d and f) or n - 1 - i3 > 16 * k or i3 - i1 > 24 * k:
             continue
         base = abs(hd)
@@ -146,12 +153,12 @@ def head_shoulders(c: Ctx, s: int) -> list[Pattern]:
         if ls - nl(i1) < 0.25 * height or rs - nl(i3) < 0.25 * height:
             continue
         lo0 = max(0, i1 - (i3 - i1))
-        if i1 - lo0 < 5 or LO[lo0:i1].min() > min(t1, t2):
+        if i1 - lo0 < 5 or view_low[lo0:i1].min() > min(t1, t2):
             continue
-        if i3 + 1 < n and HI[i3 + 1:].max() > hd:
+        if i3 + 1 < n and view_high[i3 + 1 :].max() > hd:
             continue
         xs = np.arange(i3 + 1, n)
-        brk = np.nonzero(CL[i3 + 1:] < nl(xs))[0]
+        brk = np.nonzero(view_close[i3 + 1 :] < nl(xs))[0]
         confirm = int(i3 + 1 + brk[0]) if len(brk) else None
         if confirm is not None and n - 1 - confirm > max_age:
             continue
@@ -159,20 +166,35 @@ def head_shoulders(c: Ctx, s: int) -> list[Pattern]:
             continue
         ref = confirm if confirm is not None else n - 1
         target = nl(ref) - height
-        if confirm is not None and LO[confirm:].min() <= target:
+        if confirm is not None and view_low[confirm:].min() <= target:
             continue
-        score = (0.35 * (1 - sh_diff / 0.05) + 0.25 * _clip((hd - max(ls, rs)) / base / 0.06)
-                 + 0.2 * (1 - abs(t2 - t1) / (0.5 * height)) + 0.2 * (confirm is not None))
+        score = (
+            0.35 * (1 - sh_diff / 0.05)
+            + 0.25 * _clip((hd - max(ls, rs)) / base / 0.06)
+            + 0.2 * (1 - abs(t2 - t1) / (0.5 * height))
+            + 0.2 * (confirm is not None)
+        )
         top_side = s > 0
-        out.append(Pattern(
-            name="Head and shoulders" if top_side else "Inverse head and shoulders",
-            direction="bearish" if top_side else "bullish",
-            status="confirmed" if confirm is not None else "forming", score=_clip(score),
-            points=[_pt(i1, s * ls, "left shoulder"), _pt(ib, s * t1, "neckline"), _pt(ih, s * hd, "head"),
-                    _pt(ie, s * t2, "neckline"), _pt(i3, s * rs, "right shoulder")],
-            key_level=s * nl(ref), target=s * target, invalidation=s * rs, confirm_idx=confirm,
-            note=f"Shoulders differ by {sh_diff * 100:.1f}% of the head price.",
-        ))
+        out.append(
+            Pattern(
+                name="Head and shoulders" if top_side else "Inverse head and shoulders",
+                direction="bearish" if top_side else "bullish",
+                status="confirmed" if confirm is not None else "forming",
+                score=_clip(score),
+                points=[
+                    _pt(i1, s * ls, "left shoulder"),
+                    _pt(ib, s * t1, "neckline"),
+                    _pt(ih, s * hd, "head"),
+                    _pt(ie, s * t2, "neckline"),
+                    _pt(i3, s * rs, "right shoulder"),
+                ],
+                key_level=s * nl(ref),
+                target=s * target,
+                invalidation=s * rs,
+                confirm_idx=confirm,
+                note=f"Shoulders differ by {sh_diff * 100:.1f}% of the head price.",
+            )
+        )
     return out
 
 
@@ -212,7 +234,7 @@ def triangles(c: Ctx) -> list[Pattern]:
     else:
         return []
     xs = np.arange(start, end + 1)
-    cl = c.close[start:end + 1]
+    cl = c.close[start : end + 1]
     if ((cl > up(xs) + 0.75 * atr) | (cl < lo(xs) - 0.75 * atr)).mean() > 0.05:
         return []
     confirm, direction, status = None, bias, "forming"
@@ -238,70 +260,104 @@ def triangles(c: Ctx) -> list[Pattern]:
         key = up(last) if bias != "bearish" else lo(last)
         target = up(last) + gap0 if bias != "bearish" else lo(last) - gap0
         inval = lo(last) if bias != "bearish" else up(last)
-    score = (0.3 * (len(highs) == 3 and len(lows) == 3) + 0.3 * (1 - res / (0.6 * atr))
-             + 0.2 * (1 - gap1 / gap0) + 0.2 * (confirm is not None))
-    pts = sorted([_pt(p.idx, p.price, "upper line") for p in highs]
-                 + [_pt(p.idx, p.price, "lower line") for p in lows], key=lambda p: p["idx"])
-    return [Pattern(name=name, direction=direction, status=status, score=_clip(score), points=pts,
-                    key_level=key, target=target, invalidation=inval, confirm_idx=confirm,
-                    note=f"Upper line now ₹{up(n - 1):.2f}, lower line ₹{lo(n - 1):.2f}.")]
+    score = (
+        0.3 * (len(highs) == 3 and len(lows) == 3)
+        + 0.3 * (1 - res / (0.6 * atr))
+        + 0.2 * (1 - gap1 / gap0)
+        + 0.2 * (confirm is not None)
+    )
+    pts = sorted(
+        [_pt(p.idx, p.price, "upper line") for p in highs] + [_pt(p.idx, p.price, "lower line") for p in lows],
+        key=lambda p: p["idx"],
+    )
+    return [
+        Pattern(
+            name=name,
+            direction=direction,
+            status=status,
+            score=_clip(score),
+            points=pts,
+            key_level=key,
+            target=target,
+            invalidation=inval,
+            confirm_idx=confirm,
+            note=f"Upper line now ₹{up(n - 1):.2f}, lower line ₹{lo(n - 1):.2f}.",
+        )
+    ]
 
 
 def cup_handle(c: Ctx) -> list[Pattern]:
     n, k = c.n, c.k
     highs = [p for p in c.piv if p.kind == "H"]
     for ci in range(len(highs) - 1, 0, -1):
-        C = highs[ci]
-        handle_len = n - 1 - C.idx
+        right_rim = highs[ci]
+        handle_len = n - 1 - right_rim.idx
         if handle_len > 8 * k:
             break
         for ai in range(ci - 1, -1, -1):
-            A = highs[ai]
-            length = C.idx - A.idx
+            left_rim = highs[ai]
+            length = right_rim.idx - left_rim.idx
             if length < 6 * k:
                 continue
             if length > 30 * k:
                 break
-            if abs(C.price - A.price) / A.price > 0.06:
+            if abs(right_rim.price - left_rim.price) / left_rim.price > 0.06:
                 continue
-            seg = c.low[A.idx:C.idx + 1]
-            b = A.idx + int(seg.argmin())
-            B = float(seg.min())
-            depth = (A.price - B) / A.price
+            seg = c.low[left_rim.idx : right_rim.idx + 1]
+            b = left_rim.idx + int(seg.argmin())
+            cup_low = float(seg.min())
+            depth = (left_rim.price - cup_low) / left_rim.price
             if not (0.12 <= depth <= 0.40):
                 continue
-            if c.high[A.idx + 1:C.idx].max() > max(A.price, C.price) * 1.01:
+            if c.high[left_rim.idx + 1 : right_rim.idx].max() > max(left_rim.price, right_rim.price) * 1.01:
                 continue
-            pos = (b - A.idx) / length
+            pos = (b - left_rim.idx) / length
             if not (0.25 <= pos <= 0.75):
                 continue
-            cl = c.close[A.idx:C.idx + 1]
-            low_zone = float((cl < B + 0.4 * (A.price - B)).mean())
+            cl = c.close[left_rim.idx : right_rim.idx + 1]
+            low_zone = float((cl < cup_low + 0.4 * (left_rim.price - cup_low)).mean())
             if low_zone < 0.30:
                 continue  # V-shaped, not a rounded base
-            brk = np.nonzero(c.close[C.idx + 1:] > C.price)[0]
-            confirm = int(C.idx + 1 + brk[0]) if len(brk) else None
+            brk = np.nonzero(c.close[right_rim.idx + 1 :] > right_rim.price)[0]
+            confirm = int(right_rim.idx + 1 + brk[0]) if len(brk) else None
             h_end = confirm if confirm is not None else n - 1
-            h_low = float(c.low[C.idx + 1:h_end + 1].min()) if h_end > C.idx else C.price
-            h_idx = C.idx + 1 + int(c.low[C.idx + 1:h_end + 1].argmin()) if h_end > C.idx else C.idx
-            h_depth = (C.price - h_low) / (C.price - B)
+            h_low = float(c.low[right_rim.idx + 1 : h_end + 1].min()) if h_end > right_rim.idx else right_rim.price
+            h_idx = (
+                right_rim.idx + 1 + int(c.low[right_rim.idx + 1 : h_end + 1].argmin()) if h_end > right_rim.idx else right_rim.idx
+            )
+            h_depth = (right_rim.price - h_low) / (right_rim.price - cup_low)
             if h_depth > 0.5:
                 continue
             if confirm is not None and n - 1 - confirm > 6 * k:
                 continue
-            target = C.price + (C.price - B)
+            target = right_rim.price + (right_rim.price - cup_low)
             if confirm is not None and c.high[confirm:].max() >= target:
                 continue
-            score = (0.3 * (1 - abs(C.price - A.price) / A.price / 0.06) + 0.25 * _clip(low_zone / 0.5)
-                     + 0.25 * (1 - h_depth / 0.5) + 0.2 * (confirm is not None))
-            return [Pattern(
-                name="Cup and handle", direction="bullish",
-                status="confirmed" if confirm is not None else "forming", score=_clip(score),
-                points=[_pt(A.idx, A.price, "left rim"), _pt(b, B, "cup low"),
-                        _pt(C.idx, C.price, "right rim"), _pt(h_idx, h_low, "handle low")],
-                key_level=C.price, target=target, invalidation=h_low, confirm_idx=confirm,
-                note=f"Cup depth {depth * 100:.0f}% over {length} bars; handle retraced {h_depth * 100:.0f}% of the cup.",
-            )]
+            score = (
+                0.3 * (1 - abs(right_rim.price - left_rim.price) / left_rim.price / 0.06)
+                + 0.25 * _clip(low_zone / 0.5)
+                + 0.25 * (1 - h_depth / 0.5)
+                + 0.2 * (confirm is not None)
+            )
+            return [
+                Pattern(
+                    name="Cup and handle",
+                    direction="bullish",
+                    status="confirmed" if confirm is not None else "forming",
+                    score=_clip(score),
+                    points=[
+                        _pt(left_rim.idx, left_rim.price, "left rim"),
+                        _pt(b, cup_low, "cup low"),
+                        _pt(right_rim.idx, right_rim.price, "right rim"),
+                        _pt(h_idx, h_low, "handle low"),
+                    ],
+                    key_level=right_rim.price,
+                    target=target,
+                    invalidation=h_low,
+                    confirm_idx=confirm,
+                    note=f"Cup depth {depth * 100:.0f}% over {length} bars; handle retraced {h_depth * 100:.0f}% of the cup.",
+                )
+            ]
     return []
 
 
@@ -328,11 +384,18 @@ def trend_lines(c: Ctx) -> list[Pattern]:
             status = "holding" if c.close[-1] >= now - 0.5 * atr else "broken"
         else:
             status = "holding" if c.close[-1] <= now + 0.5 * atr else "broken"
-        out.append(Pattern(
-            name=name, direction=direction, status=status, score=_clip(0.6 + 0.4 * (1 - res / (0.75 * atr))),
-            points=[_pt(p.idx, p.price, "touch") for p in pts], key_level=now, invalidation=now,
-            note=f"Line through three swing {'lows' if kind == 'L' else 'highs'}; value today ₹{now:.2f}.",
-        ))
+        out.append(
+            Pattern(
+                name=name,
+                direction=direction,
+                status=status,
+                score=_clip(0.6 + 0.4 * (1 - res / (0.75 * atr))),
+                points=[_pt(p.idx, p.price, "touch") for p in pts],
+                key_level=now,
+                invalidation=now,
+                note=f"Line through three swing {'lows' if kind == 'L' else 'highs'}; value today ₹{now:.2f}.",
+            )
+        )
     return out
 
 

@@ -1,0 +1,7 @@
+# Development and CI tools, pinned. Install with: pip install -r requirements-dev.txt
+-r requirements.txt
+pytest==9.2.0
+pytest-cov==7.1.0
+ruff==0.17.6
+pip-audit==2.10.1
+pre-commit==4.3.0

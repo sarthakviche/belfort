@@ -4,10 +4,19 @@ These are textbook shapes with noise. They tell us whether the code finds the sh
 find and how often it sees shapes in random data. They say nothing about whether a pattern predicts
 price; that is measured on real history in evaluate.py.
 """
+
 import numpy as np
 
-KINDS = ["Double top", "Double bottom (W)", "Head and shoulders", "Inverse head and shoulders",
-         "Ascending triangle", "Descending triangle", "Symmetrical triangle", "Cup and handle"]
+KINDS = [
+    "Double top",
+    "Double bottom (W)",
+    "Head and shoulders",
+    "Inverse head and shoulders",
+    "Ascending triangle",
+    "Descending triangle",
+    "Symmetrical triangle",
+    "Cup and handle",
+]
 
 
 def _mirror(wp):

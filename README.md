@@ -9,7 +9,7 @@
 
 ![Status](https://img.shields.io/badge/status-private%20pre--release-facc15?style=flat-square&labelColor=0e0e10)
 ![Version](https://img.shields.io/badge/version-0.1-8b8b90?style=flat-square&labelColor=0e0e10)
-![Tests](https://img.shields.io/badge/tests-68%20passing-facc15?style=flat-square&labelColor=0e0e10)
+![Tests](https://img.shields.io/badge/tests-81%20passing-facc15?style=flat-square&labelColor=0e0e10)
 ![Python](https://img.shields.io/badge/python-3.12-8b8b90?style=flat-square&labelColor=0e0e10)
 
 </div>
@@ -44,7 +44,7 @@ An app for beginner and intermediate traders who want to swing or positional tra
 | **Practice: chart replay** | Random hidden past chart, plan a stop and target, animated reveal, R result, running record | |
 | **News** | Six RSS sources, de-duplication, categories, company tags, hover definitions, "Explain this", tip-style headlines hidden | Headlines and feed descriptions only; links out. |
 | **Assistant** | Bring-your-own-key chat with Gemini or OpenAI-compatible providers; context-aware (report, lesson, story); wording filter | Not yet tried with a real key, only with simulated replies in tests. |
-| **Platform** | FastAPI app, SQLite store with migrations, static front end, Windows launcher, 68 offline tests, GitHub Actions CI | |
+| **Platform** | FastAPI app, SQLite store with migrations, static front end, Windows launcher, 81 offline tests, lint, format and coverage checks, CI on Windows and Linux | |
 | **Docs** | Architecture, syllabus method, compliance, competitor landscape, roadmap | In [docs/](docs). |
 
 ## What is yet to build
@@ -82,9 +82,9 @@ A modular monolith: FastAPI and plain HTML, CSS and JavaScript with no build ste
 ```
 belfort/    research/  learn/  practice/  news/  assistant/  core/  data/  static/
 content/    learn/syllabus.json   learn/lessons/*.md   news/feeds.json
-docs/       ARCHITECTURE  SYLLABUS  COMPLIANCE  LANDSCAPE  ROADMAP
-TEAM/       ONBOARDING  TASKS  STATUS   (temporary, for the founders)
-tests/      68 tests, no network needed
+docs/       ARCHITECTURE  CONVENTIONS  SYLLABUS  COMPLIANCE  LANDSCAPE  ROADMAP
+TEAM/       ONBOARDING  TASKS  STATUS  START_PROMPT   (temporary, for the founders)
+tests/      81 tests, no network needed
 ```
 
 ## Data

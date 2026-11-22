@@ -1,4 +1,5 @@
 """End-to-end tests of the report and API with the network replaced by synthetic data."""
+
 import json
 from pathlib import Path
 
@@ -6,9 +7,9 @@ import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 
-from belfort.research.analysis import explain, pipeline
 from belfort.data.providers import DataError, NseArchiveProvider
 from belfort.main import app
+from belfort.research.analysis import explain, pipeline
 from tests.helpers import price_frame, statements
 
 
@@ -44,8 +45,12 @@ class FakeNse:
         return pd.DataFrame()
 
     def listed(self):
-        return [("TCS", "Tata Consultancy Services Limited"), ("RELIANCE", "Reliance Industries Limited"),
-                ("HDFCBANK", "HDFC Bank Limited"), ("NOSUCH", "No Such Company Limited")]
+        return [
+            ("TCS", "Tata Consultancy Services Limited"),
+            ("RELIANCE", "Reliance Industries Limited"),
+            ("HDFCBANK", "HDFC Bank Limited"),
+            ("NOSUCH", "No Such Company Limited"),
+        ]
 
     def search(self, query, limit=8):
         return NseArchiveProvider.search(self, query, limit)
@@ -56,6 +61,7 @@ def fake(monkeypatch):
     def install(**kw):
         monkeypatch.setattr(pipeline, "prices", FakePrices(**kw))
         monkeypatch.setattr(pipeline, "nse", FakeNse())
+
     install()
     return install
 
@@ -134,8 +140,8 @@ def test_api_and_access_codes(fake, monkeypatch):
     assert c.get("/").status_code == 200
     assert c.get("/api/analyze", params={"symbol": "TCS"}).status_code == 200
     assert c.get("/api/analyze", params={"symbol": "bad symbol!"}).status_code == 400
-    assert c.get("/api/analyze", params={"symbol": "hdfc bank"}).json()["symbol"] == "HDFCBANK"   # company name works
-    assert c.get("/api/analyze", params={"symbol": "relia"}).json()["symbol"] == "RELIANCE"       # partial name works
+    assert c.get("/api/analyze", params={"symbol": "hdfc bank"}).json()["symbol"] == "HDFCBANK"  # company name works
+    assert c.get("/api/analyze", params={"symbol": "relia"}).json()["symbol"] == "RELIANCE"  # partial name works
     assert c.get("/api/analyze", params={"symbol": "NOSUCH"}).status_code == 400
     assert c.get("/api/analyze", params={"symbol": "TCS", "risk_pct": 0}).status_code == 422
     monkeypatch.setenv("ACCESS_CODES", "alpha, beta")
@@ -148,7 +154,7 @@ def test_static_pages_contain_no_promise_wording():
     root = Path(__file__).resolve().parent.parent
     files = list((root / "belfort" / "static").iterdir()) + list((root / "content" / "learn" / "lessons").glob("*.md"))
     for f in files:
-        if f.suffix not in {".html", ".js", ".css", ".md"}:   # skip img/ and other non-text assets
+        if f.suffix not in {".html", ".js", ".css", ".md"}:  # skip img/ and other non-text assets
             continue
         assert not explain.find_banned(f.read_text(encoding="utf-8")), f.name
 
@@ -190,6 +196,7 @@ def test_chat_blocks_promise_wording(fake, monkeypatch):
 
 def test_dictionary_covers_terms_and_is_plain():
     from belfort.core.glossary import GLOSSARY
+
     terms = {g["term"] for g in GLOSSARY}
     for must in ("Support", "Resistance", "Stop-loss", "Lower highs and lower lows", "P/E", "ATR", "Promoter pledge"):
         assert must in terms

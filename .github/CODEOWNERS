@@ -1,0 +1,10 @@
+# Changes to these paths need Sarthak's approval before merging.
+# Everything else: the author merges once CI is green and the task's checks are done (see CONTRIBUTING.md).
+
+/belfort/core/compliance.py   @sarthakviche
+/docs/COMPLIANCE.md           @sarthakviche
+/LICENSE                      @sarthakviche
+/.github/                     @sarthakviche
+/scripts/ci/                  @sarthakviche
+/CLAUDE.md                    @sarthakviche
+/.claude/                     @sarthakviche

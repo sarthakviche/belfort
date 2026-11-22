@@ -1,4 +1,5 @@
 """Practice, Learn, News and Assistant: rules tested on synthetic data, with the network replaced."""
+
 import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
@@ -31,10 +32,22 @@ def fresh_db(tmp_path, monkeypatch):
 
 # ---------------- settlement rules ----------------
 
+
 def trade(**kw):
-    t = {"status": "pending", "entry_type": "market", "limit_price": None, "stop": 95.0, "target": 110.0,
-         "placed_on": "2026-01-01", "entry_price": None, "entry_date": None, "exit_price": None, "exit_date": None,
-         "exit_reason": None, "close_requested_on": None}
+    t = {
+        "status": "pending",
+        "entry_type": "market",
+        "limit_price": None,
+        "stop": 95.0,
+        "target": 110.0,
+        "placed_on": "2026-01-01",
+        "entry_price": None,
+        "entry_date": None,
+        "exit_price": None,
+        "exit_date": None,
+        "exit_reason": None,
+        "close_requested_on": None,
+    }
     t.update(kw)
     return t
 
@@ -76,7 +89,7 @@ def test_brier_rewards_honest_confidence():
     assert engine.brier(0.5, True) == engine.brier(0.5, False) == 0.25
     assert engine.forecast_points(engine.brier(0.5, True)) == 0
     assert engine.forecast_points(engine.brier(0.9, True)) == 96
-    assert engine.forecast_points(engine.brier(0.9, False)) < -200   # confident and wrong costs far more
+    assert engine.forecast_points(engine.brier(0.9, False)) < -200  # confident and wrong costs far more
 
 
 def test_prediction_resolves_after_horizon():
@@ -89,6 +102,7 @@ def test_prediction_resolves_after_horizon():
 
 # ---------------- practice service and API ----------------
 
+
 def test_paper_account_flow(fresh_db):
     c = TestClient(app)
     pf = c.get("/api/practice/portfolio").json()
@@ -96,13 +110,23 @@ def test_paper_account_flow(fresh_db):
     last = float(price_frame(n=400, drift=0.001)["close"].iloc[-1])
     bad = c.post("/api/practice/trades", json={"symbol": "TCS", "qty": 10, "stop": last * 0.95, "thesis": "short"})
     assert bad.status_code == 400 and "why" in bad.json()["detail"]
-    ok = c.post("/api/practice/trades", json={"symbol": "TCS", "qty": 10, "stop": last * 0.95, "target": last * 1.1,
-                                               "thesis": "Pullback to the 20-day average in an uptrend."})
+    ok = c.post(
+        "/api/practice/trades",
+        json={
+            "symbol": "TCS",
+            "qty": 10,
+            "stop": last * 0.95,
+            "target": last * 1.1,
+            "thesis": "Pullback to the 20-day average in an uptrend.",
+        },
+    )
     assert ok.status_code == 200
     pf = c.get("/api/practice/portfolio").json()
-    assert len(pf["pending"]) == 1 and pf["reserved"] > 0          # fills after the last bar we have
-    too_big = c.post("/api/practice/trades", json={"symbol": "TCS", "qty": 10_000_000, "stop": last * 0.95,
-                                                    "thesis": "Testing the points limit here."})
+    assert len(pf["pending"]) == 1 and pf["reserved"] > 0  # fills after the last bar we have
+    too_big = c.post(
+        "/api/practice/trades",
+        json={"symbol": "TCS", "qty": 10_000_000, "stop": last * 0.95, "thesis": "Testing the points limit here."},
+    )
     assert too_big.status_code == 400 and "Not enough points" in too_big.json()["detail"]
     tid = pf["pending"][0]["id"]
     assert "cancelled" in c.post(f"/api/practice/trades/{tid}/close").json()["message"]
@@ -110,11 +134,23 @@ def test_paper_account_flow(fresh_db):
 
 def test_predictions_api(fresh_db):
     c = TestClient(app)
-    r = c.post("/api/practice/predictions", json={"symbol": "INFY", "direction": "up", "horizon": "4 weeks",
-                                                   "confidence": 0.65, "reason": "Higher lows since the results."})
+    r = c.post(
+        "/api/practice/predictions",
+        json={
+            "symbol": "INFY",
+            "direction": "up",
+            "horizon": "4 weeks",
+            "confidence": 0.65,
+            "reason": "Higher lows since the results.",
+        },
+    )
     assert r.status_code == 200
-    assert c.post("/api/practice/predictions", json={"symbol": "INFY", "direction": "up", "horizon": "4 weeks",
-                                                      "confidence": 0.3}).status_code == 422
+    assert (
+        c.post(
+            "/api/practice/predictions", json={"symbol": "INFY", "direction": "up", "horizon": "4 weeks", "confidence": 0.3}
+        ).status_code
+        == 422
+    )
     d = c.get("/api/practice/predictions").json()
     assert len(d["open"]) == 1 and d["badges"][0]["name"] == "First call"
 
@@ -131,6 +167,7 @@ def test_replay_uses_only_lagged_data_and_scores(fresh_db):
 
 # ---------------- learn ----------------
 
+
 def test_every_written_lesson_parses_and_has_a_valid_quiz():
     idx = curriculum._lesson_index()
     written = [k for k in idx if (curriculum.LEARN / "lessons" / f"{k}.md").exists()]
@@ -138,7 +175,7 @@ def test_every_written_lesson_parses_and_has_a_valid_quiz():
     for k in written:
         les = curriculum.lesson(k)
         assert les["html"] and les["objectives"] and len(les["quiz"]) >= 3, k
-        assert "answer" not in les["quiz"][0]          # answers never reach the page before grading
+        assert "answer" not in les["quiz"][0]  # answers never reach the page before grading
         assert not compliance.find_banned(les["text"]), k
 
 
@@ -157,7 +194,7 @@ def test_quiz_grading_and_progress(fresh_db):
     prog = c.get("/api/learn/syllabus").json()
     assert prog["completed"] == 1 and prog["streak_days"] == 1
     assert c.get("/api/learn/lessons/../../etc").status_code == 404
-    assert c.get("/api/learn/lessons/risk-of-ruin").status_code == 404   # on the syllabus, not written yet
+    assert c.get("/api/learn/lessons/risk-of-ruin").status_code == 404  # on the syllabus, not written yet
 
 
 def test_example_chart_is_lagged(fresh_db):
@@ -187,15 +224,18 @@ def test_rss_parse_clean_and_categorise():
     assert a["published"].startswith("2026-11-20")
 
 
-@pytest.mark.parametrize("title,tip", [
-    ("Which metal stocks to buy for good returns? Target, SL", True),
-    ("Buy Infosys, target ₹2,100: brokerage", True),
-    ("Top picks for the week from analysts", True),
-    ("RBI keeps repo rate unchanged", False),
-    ("RBI to conduct a repo auction. Sl. No. 1, notified amount", False),
-    ("SEBI recommends a framework for research analysts", False),
-    ("Sensex closes 400 points higher as banks rally", False),
-])
+@pytest.mark.parametrize(
+    "title,tip",
+    [
+        ("Which metal stocks to buy for good returns? Target, SL", True),
+        ("Buy Infosys, target ₹2,100: brokerage", True),
+        ("Top picks for the week from analysts", True),
+        ("RBI keeps repo rate unchanged", False),
+        ("RBI to conduct a repo auction. Sl. No. 1, notified amount", False),
+        ("SEBI recommends a framework for research analysts", False),
+        ("Sensex closes 400 points higher as banks rally", False),
+    ],
+)
 def test_tip_style_headlines_are_flagged(title, tip):
     assert feeds.tip_style(title, "") is tip
 
@@ -208,6 +248,7 @@ def test_news_tags_companies(monkeypatch):
 
 
 # ---------------- assistant ----------------
+
 
 def test_openai_compatible_provider_and_local_needs_no_key(monkeypatch):
     for k in ("GEMINI_API_KEY", "OPENAI_API_KEY", "AI_PROVIDER", "OPENAI_BASE_URL"):
@@ -230,7 +271,7 @@ def test_openai_compatible_provider_and_local_needs_no_key(monkeypatch):
     assert seen["url"] == "http://localhost:11434/v1/chat/completions" and seen["headers"] == {}
     assert seen["body"]["messages"][0]["role"] == "system"
     with pytest.raises(chat.ChatError):
-        chat.Provider.resolve("openai", "", None, None)       # hosted service without a key
+        chat.Provider.resolve("openai", "", None, None)  # hosted service without a key
 
 
 def test_chat_key_comes_from_headers(monkeypatch):
@@ -238,8 +279,9 @@ def test_chat_key_comes_from_headers(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     got = {}
     monkeypatch.setattr(chat, "_call", lambda p, turns: got.setdefault("p", p) and "An explanation.")
-    r = TestClient(app).post("/api/chat", json={"question": "Explain", "mode": "news"},
-                             headers={"X-AI-Provider": "gemini", "X-AI-Key": "user-key"})
+    r = TestClient(app).post(
+        "/api/chat", json={"question": "Explain", "mode": "news"}, headers={"X-AI-Provider": "gemini", "X-AI-Key": "user-key"}
+    )
     assert r.status_code == 200 and got["p"].key == "user-key" and got["p"].kind == "gemini"
 
 

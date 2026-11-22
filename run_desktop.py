@@ -3,6 +3,7 @@
 One process does both jobs. Closing the window stops the server.
 Run with pythonw (no console) via the desktop shortcut, or:  .venv\\Scripts\\python belfort.py
 """
+
 import socket
 import subprocess
 import sys
@@ -13,11 +14,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 PORT = 8765
 URL = f"http://127.0.0.1:{PORT}"
+LR_LOADFROMFILE, IMAGE_ICON, WM_SETICON = 0x10, 1, 0x80  # Win32 constants for the window icon
 
 # pythonw has no console, so stdout/stderr are None and logging would crash the server.
 if sys.stdout is None or sys.stderr is None:
     (ROOT / "data").mkdir(exist_ok=True)
-    _log = open(ROOT / "data" / "belfort.log", "a", encoding="utf-8", buffering=1)
+    _log = open(ROOT / "data" / "belfort.log", "a", encoding="utf-8", buffering=1)  # noqa: SIM115 (open for the whole run)
     sys.stdout = sys.stdout or _log
     sys.stderr = sys.stderr or _log
 
@@ -30,6 +32,7 @@ def port_open() -> bool:
 
 def start_server():
     import uvicorn
+
     sys.path.insert(0, str(ROOT))
     config = uvicorn.Config("belfort.main:app", host="127.0.0.1", port=PORT, log_level="warning")
     server = uvicorn.Server(config)
@@ -50,16 +53,16 @@ def set_icon():
     """Give the app window the Belfort logo (taskbar, Alt+Tab, title bar)."""
     try:
         import ctypes
+
         u = ctypes.windll.user32
         ico = str(ROOT / "scripts" / "belfort.ico")
-        for _ in range(40):                  # wait for the window to exist
+        for _ in range(40):  # wait for the window to exist
             hwnd = u.FindWindowW(None, "Belfort")
             if hwnd:
                 break
             time.sleep(0.25)
         else:
             return
-        LR_LOADFROMFILE, IMAGE_ICON, WM_SETICON = 0x10, 1, 0x80
         for kind, size in ((1, 48), (0, 16)):  # big icon (taskbar), small icon (title bar)
             h = u.LoadImageW(None, ico, IMAGE_ICON, size, size, LR_LOADFROMFILE)
             if h:
@@ -70,24 +73,25 @@ def set_icon():
 
 def main():
     server = None
-    if not port_open():                      # already running? just open a window on it
+    if not port_open():  # already running? just open a window on it
         server = start_server()
         if not wait_ready():
             sys.exit("Belfort: the server did not start.")
 
     try:
         import webview
-    except ImportError:                      # no pywebview: fall back to an Edge app window
+    except ImportError:  # no pywebview: fall back to an Edge app window
         subprocess.Popen(["msedge", f"--app={URL}"])
         if server:
             while True:
                 time.sleep(3600)
         return
 
-    store = ROOT / "data" / "webview"        # keeps open files, capital, risk between launches
+    store = ROOT / "data" / "webview"  # keeps open files, capital, risk between launches
     store.mkdir(parents=True, exist_ok=True)
-    try:                                     # own taskbar identity, so Windows stops grouping it under Python
+    try:  # own taskbar identity, so Windows stops grouping it under Python
         import ctypes
+
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Belfort.AI")
     except Exception:
         pass

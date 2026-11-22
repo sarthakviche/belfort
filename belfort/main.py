@@ -4,6 +4,7 @@ Run:  python -m uvicorn belfort.main:app --port 8765
 The server binds to your own machine. Set ACCESS_CODES only if you knowingly share it on a private network;
 Belfort is not designed to be run as a public service (see docs/COMPLIANCE.md).
 """
+
 import os
 from pathlib import Path
 
@@ -37,11 +38,18 @@ app = FastAPI(title="Belfort", version=VERSION, docs_url="/api/docs", redoc_url=
 
 @app.get("/api/config")
 def config():
-    return {"version": VERSION, "requires_code": bool(_codes()), "disclaimer": DISCLAIMER, "ai_notice": AI_NOTICE,
-            "styles": [{"key": s.key, "name": s.name, "holds": s.holds} for s in STYLES.values()],
-            "universe": UNIVERSE, "glossary": GLOSSARY, "chat_env_ready": chat.configured(),
-            "practice": {"start_points": PAPER_START_POINTS, "horizons": list(PREDICTION_HORIZONS)},
-            "edu_lag_days": EDU_LAG_DAYS}
+    return {
+        "version": VERSION,
+        "requires_code": bool(_codes()),
+        "disclaimer": DISCLAIMER,
+        "ai_notice": AI_NOTICE,
+        "styles": [{"key": s.key, "name": s.name, "holds": s.holds} for s in STYLES.values()],
+        "universe": UNIVERSE,
+        "glossary": GLOSSARY,
+        "chat_env_ready": chat.configured(),
+        "practice": {"start_points": PAPER_START_POINTS, "horizons": list(PREDICTION_HORIZONS)},
+        "edu_lag_days": EDU_LAG_DAYS,
+    }
 
 
 for r in (research_router, learn_router, practice_router, news_router, assistant_router):

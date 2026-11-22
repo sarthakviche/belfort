@@ -2,6 +2,7 @@
 
 One file (data/belfort.db) on the user's own machine. No account, no server. Migrations are numbered and run once.
 """
+
 import sqlite3
 import threading
 from contextlib import contextmanager
@@ -84,5 +85,6 @@ def rows(cur) -> list[dict]:
 def touch_activity(kind: str = "any"):
     """Record that the user did something today (for the learning streak)."""
     from datetime import date
+
     with connect() as con:
         con.execute("INSERT OR IGNORE INTO activity (day, kind) VALUES (?, ?)", (date.today().isoformat(), kind))

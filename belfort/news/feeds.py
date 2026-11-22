@@ -3,13 +3,14 @@
 Only feed-provided fields are used (title, description, image, link). Belfort never scrapes or stores full articles:
 the reader goes to the publisher to read the story.
 """
+
 import hashlib
 import html
 import json
 import re
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 
 import httpx
@@ -74,16 +75,19 @@ def _when(s: str) -> str | None:
         except ValueError:
             return None
     if d.tzinfo is None:
-        d = d.replace(tzinfo=timezone.utc)
-    return d.astimezone(timezone.utc).isoformat()
+        d = d.replace(tzinfo=UTC)
+    return d.astimezone(UTC).isoformat()
 
 
 # Headlines that pass on someone's buy/sell call or price target. Belfort hides them by default: it does not
 # relay stock tips, even when a publisher prints them.
-TIP_RE = re.compile(r"(stocks? to (buy|sell|watch|pick)|buy or sell|should you buy|buy,? sell,? hold|\bbuy\b.*\btarget\b|"
-                    r"\btarget price\b|\btarget,? (sl|stop)|(?-i:\bSL\b)|stop[- ]loss|multibagger|top picks?|\bpicks? for\b|"
-                    r"recommends? (a )?(buy|sell)|\bbrokerage(s)? (say|bet|bullish|suggest)|technical picks|trading ideas?|"
-                    r"(buy|sell|accumulate)\s+(rating|call)|(upside|downside) of\s+\d)", re.I)
+TIP_RE = re.compile(
+    r"(stocks? to (buy|sell|watch|pick)|buy or sell|should you buy|buy,? sell,? hold|\bbuy\b.*\btarget\b|"
+    r"\btarget price\b|\btarget,? (sl|stop)|(?-i:\bSL\b)|stop[- ]loss|multibagger|top picks?|\bpicks? for\b|"
+    r"recommends? (a )?(buy|sell)|\bbrokerage(s)? (say|bet|bullish|suggest)|technical picks|trading ideas?|"
+    r"(buy|sell|accumulate)\s+(rating|call)|(upside|downside) of\s+\d)",
+    re.I,
+)
 
 
 def tip_style(title: str, summary: str) -> bool:
@@ -108,11 +112,22 @@ def parse(xml_text: str, feed: dict) -> list[dict]:
             continue
         summary = clean(item.findtext("description") or "")
         if summary.lower().startswith(title.lower()[:40]):
-            summary = summary[len(title):].strip(" -–:") if len(summary) > len(title) + 20 else ""
-        out.append({"id": hashlib.sha1(link.encode()).hexdigest()[:12], "title": title, "summary": summary, "url": link,
-                    "source": feed["name"], "source_id": feed["id"], "kind": feed.get("kind", "publisher"),
-                    "published": _when(_text(item, "pubDate", "{http://purl.org/dc/elements/1.1/}date")),
-                    "image": _image(item), "category": categorise(title, summary), "tip": tip_style(title, summary)})
+            summary = summary[len(title) :].strip(" -–:") if len(summary) > len(title) + 20 else ""
+        out.append(
+            {
+                "id": hashlib.sha1(link.encode()).hexdigest()[:12],
+                "title": title,
+                "summary": summary,
+                "url": link,
+                "source": feed["name"],
+                "source_id": feed["id"],
+                "kind": feed.get("kind", "publisher"),
+                "published": _when(_text(item, "pubDate", "{http://purl.org/dc/elements/1.1/}date")),
+                "image": _image(item),
+                "category": categorise(title, summary),
+                "tip": tip_style(title, summary),
+            }
+        )
     return out
 
 
@@ -128,11 +143,14 @@ def _fetch(feed: dict) -> dict:
 
 # ---- company tagging: the built-in stock lists, matched by symbol or by a short company name ----
 
+
 def _aliases() -> dict[str, str]:
     from ..research.screens import BROADER, NIFTY
+
     names = {}
     try:
         from ..research.analysis.pipeline import nse
+
         listed = dict(nse.listed())
     except Exception:
         listed = {}
@@ -149,8 +167,11 @@ def _aliases() -> dict[str, str]:
 
 def tag(stories: list[dict]) -> None:
     al = cached("news-aliases:v1", 7 * 86400, _aliases)
-    pats = [(re.compile(r"(?<![A-Za-z])" + re.escape(k) + r"(?![A-Za-z])", 0 if k.isupper() else re.I), v)
-            for k, v in sorted(al.items(), key=lambda kv: -len(kv[0])) if len(k) >= 3]
+    pats = [
+        (re.compile(r"(?<![A-Za-z])" + re.escape(k) + r"(?![A-Za-z])", 0 if k.isupper() else re.I), v)
+        for k, v in sorted(al.items(), key=lambda kv: -len(kv[0]))
+        if len(k) >= 3
+    ]
     for s in stories:
         text = s["title"] + " " + s["summary"]
         found = []
@@ -180,16 +201,21 @@ def build() -> dict:
     except Exception:
         for s in stories:
             s.setdefault("symbols", [])
-    return {"generated": datetime.now(timezone.utc).isoformat(), "stories": stories,
-            "sources": [{"name": r["feed"]["name"], "kind": r["feed"].get("kind"), "count": len(r["items"]), "error": r["error"]}
-                        for r in results],
-            "categories": [c for c, _ in CATEGORIES],
-            "note": "Headlines and short descriptions as published in each source's public RSS feed. Open a story to read it "
-                    "on the publisher's site. News is not a signal to trade."}
+    return {
+        "generated": datetime.now(UTC).isoformat(),
+        "stories": stories,
+        "sources": [
+            {"name": r["feed"]["name"], "kind": r["feed"].get("kind"), "count": len(r["items"]), "error": r["error"]}
+            for r in results
+        ],
+        "categories": [c for c, _ in CATEGORIES],
+        "note": "Headlines and short descriptions as published in each source's public RSS feed. Open a story to read it "
+        "on the publisher's site. News is not a signal to trade.",
+    }
 
 
 def get(refresh: bool = False) -> dict:
-    key = "news:v2:" + datetime.now().strftime("%Y-%m-%d %H") + (":%02d" % (datetime.now().minute // 15))
+    key = "news:v2:" + datetime.now().strftime("%Y-%m-%d %H") + f":{datetime.now().minute // 15:02d}"
     if refresh:
         key += ":r" + datetime.now().strftime("%M%S")
     return cached(key, 15 * 60, build)

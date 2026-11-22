@@ -1,0 +1,33 @@
+# Install once per clone:  pre-commit install --hook-type pre-commit --hook-type commit-msg
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: ruff check --fix
+        language: python
+        additional_dependencies: [ruff==0.17.6]
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: ruff format
+        language: python
+        additional_dependencies: [ruff==0.17.6]
+        types: [python]
+      - id: commit-policy
+        name: conventional commit, no AI attribution
+        entry: python scripts/ci/check_commit_policy.py --message-file
+        language: system
+        stages: [commit-msg]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=800]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]

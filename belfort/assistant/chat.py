@@ -7,6 +7,7 @@ Two provider shapes cover most services:
 The key travels from the user's browser to this local server with each request (or comes from .env) and is
 forwarded only to the provider the user chose. Belfort never stores it on disk and has no server of its own.
 """
+
 import os
 from dataclasses import dataclass
 
@@ -57,12 +58,18 @@ class Provider:
             raise ChatError("Unknown AI provider. Choose gemini or openai (any OpenAI-compatible service).")
         env_key = os.environ.get("GEMINI_API_KEY") if kind == "gemini" else os.environ.get("OPENAI_API_KEY")
         dm, dbase = DEFAULTS[kind]
-        p = cls(kind, (key or env_key or "").strip(), (model or os.environ.get("AI_MODEL") or dm).strip(),
-                (base or os.environ.get("OPENAI_BASE_URL") or dbase).strip().rstrip("/"))
+        p = cls(
+            kind,
+            (key or env_key or "").strip(),
+            (model or os.environ.get("AI_MODEL") or dm).strip(),
+            (base or os.environ.get("OPENAI_BASE_URL") or dbase).strip().rstrip("/"),
+        )
         local = p.kind == "openai" and ("localhost" in p.base or "127.0.0.1" in p.base)
         if not p.key and not local:
-            raise ChatError("Ask Belfort needs your own AI key. Open Settings, choose a provider and paste a key. "
-                            "Gemini keys are free from Google AI Studio; a local Ollama needs no key.")
+            raise ChatError(
+                "Ask Belfort needs your own AI key. Open Settings, choose a provider and paste a key. "
+                "Gemini keys are free from Google AI Studio; a local Ollama needs no key."
+            )
         return p
 
 
@@ -82,17 +89,25 @@ def _turns(history: list[dict] | None) -> list[tuple[str, str]]:
 def _call(p: Provider, turns: list[tuple[str, str]]) -> str:
     try:
         if p.kind == "gemini":
-            body = {"system_instruction": {"parts": [{"text": SYSTEM}]},
-                    "contents": [{"role": "model" if r == "assistant" else "user", "parts": [{"text": t}]} for r, t in turns],
-                    "generationConfig": {"temperature": 0.3, "maxOutputTokens": 800}}
+            body = {
+                "system_instruction": {"parts": [{"text": SYSTEM}]},
+                "contents": [{"role": "model" if r == "assistant" else "user", "parts": [{"text": t}]} for r, t in turns],
+                "generationConfig": {"temperature": 0.3, "maxOutputTokens": 800},
+            }
             r = httpx.post(GEMINI_URL.format(model=p.model), headers={"x-goog-api-key": p.key}, json=body, timeout=40.0)
         else:
-            body = {"model": p.model, "temperature": 0.3, "max_tokens": 800,
-                    "messages": [{"role": "system", "content": SYSTEM}] + [{"role": r, "content": t} for r, t in turns]}
+            body = {
+                "model": p.model,
+                "temperature": 0.3,
+                "max_tokens": 800,
+                "messages": [{"role": "system", "content": SYSTEM}] + [{"role": r, "content": t} for r, t in turns],
+            }
             headers = {"Authorization": f"Bearer {p.key}"} if p.key else {}
             r = httpx.post(p.base + "/chat/completions", headers=headers, json=body, timeout=60.0)
     except httpx.HTTPError:
-        raise ChatError("Could not reach the AI service. Check your internet connection (or that your local model is running).")
+        raise ChatError(
+            "Could not reach the AI service. Check your internet connection (or that your local model is running)."
+        ) from None
     if r.status_code != 200:
         try:
             err = r.json().get("error", {})
@@ -113,14 +128,17 @@ def _call(p: Provider, turns: list[tuple[str, str]]) -> str:
     return answer
 
 
-def ask(question: str, history: list[dict] | None = None, context: str = "", mode: str = "report",
-        provider: Provider | None = None) -> str:
+def ask(
+    question: str, history: list[dict] | None = None, context: str = "", mode: str = "report", provider: Provider | None = None
+) -> str:
     p = provider or Provider.resolve()
     prompt = question.strip()[:2000]
     if context:
         prompt = f"{MODES.get(mode, MODES['general'])}:\n{context[:6000]}\n\nUser question: {prompt}"
     answer = _call(p, _turns(history) + [("user", prompt)])
     if find_banned(answer):
-        return ("I can't answer that the way it came out, because the reply used promise-style wording Belfort does not "
-                "allow. I can explain what the label, the checks or any term on the screen mean.")
+        return (
+            "I can't answer that the way it came out, because the reply used promise-style wording Belfort does not "
+            "allow. I can explain what the label, the checks or any term on the screen mean."
+        )
     return answer

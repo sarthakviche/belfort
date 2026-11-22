@@ -8,6 +8,7 @@ End-of-day model, long only (the cash market most beginners start in):
     the open. If one session touches both, the stop is assumed first (the cautious reading).
   - A close request exits at the open of the next session.
 """
+
 from dataclasses import dataclass
 
 import pandas as pd
@@ -32,7 +33,9 @@ def _after(df: pd.DataFrame, day: str, inclusive: bool = False) -> pd.DataFrame:
 
 def settle_trade(t: dict, df: pd.DataFrame) -> Fill:
     """Return the trade's state after replaying every bar we have since it was placed."""
-    f = Fill(t["status"], t.get("entry_price"), t.get("entry_date"), t.get("exit_price"), t.get("exit_date"), t.get("exit_reason"))
+    f = Fill(
+        t["status"], t.get("entry_price"), t.get("entry_date"), t.get("exit_price"), t.get("exit_date"), t.get("exit_reason")
+    )
     if f.status in ("closed", "cancelled", "expired"):
         return f
 
@@ -87,7 +90,7 @@ def r_multiple(entry: float, stop: float, exit_price: float) -> float | None:
 
 def brier(confidence: float, correct: bool) -> float:
     """Brier score for a yes/no forecast: 0 is perfect, 0.25 is a coin flip, 1 is confidently wrong."""
-    return round((1 - confidence) ** 2 if correct else confidence ** 2, 4)
+    return round((1 - confidence) ** 2 if correct else confidence**2, 4)
 
 
 def forecast_points(b: float) -> int:
@@ -105,8 +108,14 @@ def resolve_prediction(p: dict, df: pd.DataFrame) -> dict | None:
     went_up = close > float(p["ref_close"])
     correct = went_up if p["direction"] == "up" else not went_up
     b = brier(float(p["confidence"]), correct)
-    return {"outcome_date": bar_ts.strftime("%Y-%m-%d"), "outcome_close": close, "correct": int(correct),
-            "brier": b, "score": forecast_points(b), "status": "resolved"}
+    return {
+        "outcome_date": bar_ts.strftime("%Y-%m-%d"),
+        "outcome_close": close,
+        "correct": int(correct),
+        "brier": b,
+        "score": forecast_points(b),
+        "status": "resolved",
+    }
 
 
 def calibration(resolved: list[dict]) -> list[dict]:
@@ -116,7 +125,12 @@ def calibration(resolved: list[dict]) -> list[dict]:
     for lo, hi in buckets:
         xs = [p for p in resolved if lo <= p["confidence"] < hi]
         if xs:
-            out.append({"range": f"{int(lo * 100)}–{int(min(hi, 1) * 100)}%", "count": len(xs),
-                        "stated": round(sum(p["confidence"] for p in xs) / len(xs), 3),
-                        "actual": round(sum(p["correct"] for p in xs) / len(xs), 3)})
+            out.append(
+                {
+                    "range": f"{int(lo * 100)}–{int(min(hi, 1) * 100)}%",
+                    "count": len(xs),
+                    "stated": round(sum(p["confidence"] for p in xs) / len(xs), 3),
+                    "actual": round(sum(p["correct"] for p in xs) / len(xs), 3),
+                }
+            )
     return out

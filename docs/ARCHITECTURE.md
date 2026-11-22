@@ -67,7 +67,7 @@ content/
   learn/syllabus.json     tracks -> modules -> lessons
   learn/lessons/*.md      one lesson per file, with a quiz block
   news/feeds.json         default feeds (users override in data/feeds.json)
-tests/                    68 tests; no network, every source replaced by synthetic data
+tests/                    81 tests; no network, every source replaced by synthetic data
 ```
 
 ## The four verticals
@@ -96,7 +96,7 @@ The **assistant** serves all four: the page sends the context on screen (a repor
 | Data | Yahoo and NSE archive files, unofficial | Provider plugin interface, with user-keyed broker APIs (Kite Connect, Upstox) or licensed feeds; the user brings the key, as with AI |
 | Storage | SQLite with numbered migrations | Same. SQLite is the right store for one user. Export and import of the practice journal (CSV, JSON) |
 | Content | Markdown files in the repo | Same, plus a content linter in CI (quiz shape, banned wording, lagged charts) and translations (Hindi first) |
-| Quality | 68 unit and API tests, GitHub Actions | Browser smoke tests (Playwright), accessibility checks, release checklist |
+| Quality | 81 unit and API tests; Ruff, coverage, audit and policy checks in GitHub Actions on Windows and Linux | Browser smoke tests (Playwright), accessibility checks, release checklist |
 | Hosting | None | A **static** docs and landing site only. A hosted Research service is deliberately not planned: per-stock labels served for money would fall under SEBI's research analyst rules. Hosting shared, non-personal content (lessons, news) is possible later. |
 
 ## Extension points for contributors

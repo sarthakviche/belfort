@@ -1,4 +1,5 @@
 """Small disk cache with a time-to-live. Stores only data this app fetched itself."""
+
 import hashlib
 import pickle
 import time

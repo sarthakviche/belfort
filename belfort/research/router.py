@@ -1,4 +1,5 @@
 """Research vertical API: search, screens, the per-stock report, pattern reliability."""
+
 import logging
 
 from fastapi import APIRouter, HTTPException, Query
@@ -26,17 +27,24 @@ def api_screens():
 
 
 @router.get("/analyze")
-def api_analyze(symbol: str = Query(..., max_length=60), style: str = "swing",
-                capital: float = Query(100000, gt=0, le=1e12), risk_pct: float = Query(1.0, gt=0, le=100),
-                stop: float | None = Query(None, gt=0), entry: float | None = Query(None, gt=0)):
+def api_analyze(
+    symbol: str = Query(..., max_length=60),
+    style: str = "swing",
+    capital: float = Query(100000, gt=0, le=1e12),
+    risk_pct: float = Query(1.0, gt=0, le=100),
+    stop: float | None = Query(None, gt=0),
+    entry: float | None = Query(None, gt=0),
+):
     try:
         return analyze(symbol, style, capital, risk_pct, stop, entry)
     except DataError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception:
         log.exception("analysis failed for %s", symbol)
-        raise HTTPException(status_code=502, detail="The analysis could not be completed. The data source may be "
-                                                    "unavailable; try again in a minute.")
+        raise HTTPException(
+            status_code=502,
+            detail="The analysis could not be completed. The data source may be unavailable; try again in a minute.",
+        ) from None
 
 
 @router.get("/pattern-stats")
