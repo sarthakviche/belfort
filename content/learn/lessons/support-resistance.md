@@ -1,6 +1,6 @@
 ---
 title: Support and resistance
-minutes: 8
+minutes: 40
 objectives: Find support and resistance from past swing points | Use levels to plan an entry, a stop and a target | Know why levels are zones, not exact prices
 ---
 **Support** is a price where buyers stepped in before: falls stopped there and reversed. **Resistance** is a price where sellers stepped in: rallies stopped there. Traders remember these prices, and orders tend to gather around them.
