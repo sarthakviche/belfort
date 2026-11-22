@@ -14,6 +14,9 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Ask Belfort: errors now say what to do (wrong key, unknown model, rate limit, provider outage, slow answer, local model not running) and never show your key back to you.
 - Renamed single-letter and uppercase local variables in the research engine to descriptive names; no behaviour change.
 
+### Fixed
+- Chart replay: the company and the future bars stay inside Belfort until you decide, and the reveal shows the correct end date instead of "[object Object]".
+
 ## [0.1.0] - 2026-11-21
 
 ### Added

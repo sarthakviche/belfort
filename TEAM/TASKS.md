@@ -17,7 +17,7 @@
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Done ([#10](https://github.com/sarthakviche/belfort/pull/10)) |
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Done ([#11](https://github.com/sarthakviche/belfort/pull/11)) |
-| T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Ready |
+| T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Done ([#12](https://github.com/sarthakviche/belfort/pull/12)) |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Ready |
 | T08 | Journal analytics | 1 Practice | P1 | M | Ready |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Ready |
@@ -97,7 +97,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** With 20 open symbols the portfolio loads in under a second on the second visit; tests cover cache expiry and the once-per-day settlement.
 
 ### T06 · Replay: keep hidden bars on the server
-- **P1 · M · Status:** Ready · **Area:** practice
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#12](https://github.com/sarthakviche/belfort/pull/12)) · **Area:** practice
 - **Do:** Store replay sessions server-side (id, symbol, window). `/replay/new` returns only the visible bars and an id; `/replay/score` takes the id and the plan and returns the rest.
 - **Done when:** No response contains hidden bars before the decision; tests prove it.
 
@@ -257,3 +257,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T03 Fuzzy stock picker in search, paper orders and predictions ([#9](https://github.com/sarthakviche/belfort/pull/9)).
 - T04 Order ticket with quote, mini chart, stop idea and sizing ([#10](https://github.com/sarthakviche/belfort/pull/10)).
 - T05 Bar cache until the next end-of-day release; settlement once per trading day ([#11](https://github.com/sarthakviche/belfort/pull/11)).
+- T06 Replay hidden bars kept on the server; reveal date fixed ([#12](https://github.com/sarthakviche/belfort/pull/12)).

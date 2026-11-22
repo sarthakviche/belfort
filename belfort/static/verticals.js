@@ -333,7 +333,7 @@ async function replayStart() {
   try {
     const d = await api("/api/practice/replay/new");
     P.replay = d;
-    const seen = d.candles.slice(0, d.visible), last = seen[seen.length - 1].close;
+    const seen = d.candles, last = seen[seen.length - 1].close;  // only the visible bars ever reach the page
     const lows = seen.slice(-20).map((c) => c.low), lo = Math.min(...lows);
     document.querySelector("#practice-body .col-main").innerHTML = `<div class="panel chart-panel"><div class="chart-head"><div><b>Mystery stock</b> <span class="hint">· ${d.visible} sessions shown · last close ${inr(last)}</span></div></div><div id="replay-chart" class="chart"></div></div>
       <div class="panel glass"><p class="hint">${esc(d.note)}</p></div>`;
@@ -349,7 +349,7 @@ async function replayDecide(decision) {
   const d = P.replay; if (!d) return;
   const stop = +$("rp-stop").value, target = +$("rp-target").value;
   let res;
-  try { res = await post("/api/practice/replay/score", { symbol: d.symbol, candles: d.candles, visible: d.visible, decision, stop, target }); }
+  try { res = await post("/api/practice/replay/score", { id: d.id, decision, stop, target }); }
   catch (e) { status(e.message, true); return; }
   document.querySelectorAll("#replay-long,#replay-skip").forEach((b) => { b.disabled = true; });
   const v = d.view;
@@ -357,20 +357,21 @@ async function replayDecide(decision) {
     v.series.createPriceLine({ price: stop, color: "#8b8b90", lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: "stop" });
     if (target) v.series.createPriceLine({ price: target, color: "#facc15", lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: "target" });
   }
-  let i = d.visible;
+  const hidden = res.hidden || [];
+  let i = 0;
   const timer = setInterval(() => {
-    if (!v || i >= d.candles.length) {
+    if (!v || i >= hidden.length) {
       clearInterval(timer);
       if (v) { v.chart.applyOptions({ timeScale: { visible: true } }); v.chart.timeScale().fitContent(); }
       const cls = res.outcome === "target" ? "good" : res.outcome === "stop" ? "bad" : "plain";
       replayStats(res.stats);
       $("replay-side").insertAdjacentHTML("beforeend", `<div class="note ${cls}"><b>${esc(res.outcome === "skipped" ? "Skipped" : res.r == null ? "Result" : (res.r >= 0 ? "+" : "") + res.r + "R")}</b>${esc(res.text)}</div>
-        <p class="hint">The chart was <b>${esc(d.symbol)}</b>, ${esc(d.candles[0].time)} to ${esc(d.candles[d.candles.length - 1].time)}.</p>
+        <p class="hint">The chart was <b>${esc(res.symbol)}</b>, ${esc(res.start_date)} to ${esc(res.end_date)}.</p>
         <div class="row"><button type="button" class="btn" id="replay-start">Next chart</button></div>`);
       glossify($("replay-side"));
       return;
     }
-    v.series.update(d.candles[i]); i += 1;
+    v.series.update({ ...hidden[i] }); i += 1;
   }, 45);
 }
 

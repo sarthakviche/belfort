@@ -44,9 +44,7 @@ class PredictionIn(BaseModel):
 
 
 class ReplayIn(BaseModel):
-    symbol: str = Field(max_length=30)
-    candles: list[dict] = Field(max_length=400)
-    visible: int = Field(gt=1)
+    id: str = Field(min_length=8, max_length=40)
     decision: str
     stop: float | None = None
     target: float | None = None
@@ -126,9 +124,7 @@ def replay_new(symbol: str | None = None):
 
 @router.post("/replay/score")
 def replay_score(body: ReplayIn):
-    res = _guard(service.replay_score, body.candles, body.visible, body.decision, body.stop, body.target)
-    service.replay_save(body.symbol, body.candles[0]["time"], body.decision, res.get("r"), res["outcome"])
-    return {**res, "stats": service.replay_stats()}
+    return _guard(service.replay_score, body.id, body.decision, body.stop, body.target)
 
 
 @router.get("/replay/stats")
