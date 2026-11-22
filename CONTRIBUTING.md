@@ -1,11 +1,25 @@
-# How we work
+# Contributing to Belfort
 
-Belfort is a private repository shared by Sarthak and Devansh. This is our working agreement; change it by PR when it stops helping. Naming and Git rules are in [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
+Thanks for helping. Belfort is free, open-source software (MIT) for learning, practising and researching Indian stocks. Contributions of every size are welcome: a typo, a lesson, a feed, a fix, a feature. Naming and Git rules are in [docs/CONVENTIONS.md](docs/CONVENTIONS.md); please also follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Set up (Windows, Python 3.12)
+
+```powershell
+git clone https://github.com/sarthakviche/belfort.git     # or your fork
+cd belfort
+py -3.12 -m venv .venv
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\pre-commit install --hook-type pre-commit --hook-type commit-msg
+.venv\Scripts\python -m pytest --cov
+.venv\Scripts\python -m uvicorn belfort.main:app --port 8765 --reload
+```
+
+Open <http://localhost:8765> and click through Research, Learn, Practice and News. Then read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/COMPLIANCE.md](docs/COMPLIANCE.md).
 
 ## Roles
 
-- **Devansh** builds the remaining app from [TEAM/TASKS.md](TEAM/TASKS.md). He owns each task end to end: build it, verify it, and **integrate it into `main`** once CI is green.
-- **Sarthak** owns product decisions (the D-items in TASKS.md) and must approve changes to compliance, licence and CI files (see `.github/CODEOWNERS`). He reviews other PRs when he can; review is not a blocker for them.
+- **Maintainers** (Sarthak Viche, Devansh Narlawar) review and merge PRs and make product decisions (the D-items in [docs/TASKS.md](docs/TASKS.md)). Changes to compliance, licence and CI files need Sarthak's approval (`.github/CODEOWNERS`).
+- **Contributors** pick a `Ready` task, or open an issue first for anything not on the board. Outside contributors work from a fork; a maintainer merges once CI is green and the review is done.
 
 ## Flow for every task
 
