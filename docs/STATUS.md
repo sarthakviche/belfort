@@ -24,7 +24,7 @@
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
 | Research | Rule thresholds can be changed only in code | T25 |
 | Front end | No browser tests; JavaScript is checked only by syntax check and clicking through | T31 |
-| Packaging | Needs Python; data is stored next to the code; fonts and the chart library load from CDNs | T35 to T38 |
+| Packaging | `Belfort.exe` builds and runs (single file, unsigned, no installer or uninstaller yet); fonts still load from Google Fonts | T36, T38, T39, D7 |
 | Data | Yahoo Finance and NSE archive files are unofficial and can change or block access | D4 |
 | Brand | The sidebar still says "Belfort AI" | D2, T41 |
 

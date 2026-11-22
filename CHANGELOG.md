@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Windows app: `scripts\build_windows.ps1` builds a single `Belfort.exe` (no Python needed). It keeps user data in `%LOCALAPPDATA%\Belfort`, uses port 8766 (or a free port if that is taken) so it can run next to the older Belfort AI, and bundles the chart library so charts work offline.
 - Learn: the Running several trades and Psychology modules. Total open risk and correlation (matching the Practice Open risk card and its 2% and 6% warnings), Drawdown rules: when to stop trading (with the equity curve), FOMO, revenge trading and overconfidence (each bias linked to a journal mistake tag), and Writing your own trading rules. Thirty-three of 38 lessons are now written.
 - Learn: the Market context module. Index trend and market breadth, Sector strength and rotation, and FII and DII flows, RBI policy and the event calendar. Glossary adds Market breadth. Twenty-nine of 38 lessons are now written.
 - Learn: the Journal module. What to write before and after every trade (using the Practice order form, review box and mistake tags), Win rate is not the score: expectancy (read as Average R), and Calibration (the Brier score and the Calibration panel on the Predict page). Twenty-six of 38 lessons are now written.
@@ -24,6 +25,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Production engineering setup: Ruff lint and format, coverage threshold, pinned dependencies, dependency audit, Windows and Linux CI, commit and PR policy checks, pre-commit hooks, Dependabot, code owners, conventions guide.
 
 ### Changed
+- README shortened to the essentials; project details moved to `docs/ABOUT.md`.
 - Practice: the portfolio opens much faster on repeat visits. Daily prices are kept until the next end-of-day release, and the paper account settles once per trading day instead of on every view.
 - Ask Belfort: errors now say what to do (wrong key, unknown model, rate limit, provider outage, slow answer, local model not running) and never show your key back to you.
 - Renamed single-letter and uppercase local variables in the research engine to descriptive names; no behaviour change.

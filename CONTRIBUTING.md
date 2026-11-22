@@ -16,6 +16,14 @@ py -3.12 -m venv .venv
 
 Open <http://localhost:8765> and click through Research, Learn, Practice and News. Then read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/COMPLIANCE.md](docs/COMPLIANCE.md).
 
+## Build the Windows app
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build_windows.ps1
+```
+
+This produces `dist\Belfort.exe` and its SHA-256. The spec is `packaging/belfort.spec`.
+
 ## Roles
 
 - **Maintainers** (Sarthak Viche, Devansh Narlawar) review and merge PRs and make product decisions (the D-items in [docs/TASKS.md](docs/TASKS.md)). Changes to compliance, licence and CI files need Sarthak's approval (`.github/CODEOWNERS`).
