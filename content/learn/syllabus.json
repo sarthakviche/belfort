@@ -92,9 +92,9 @@
           "id": "journal", "title": "The journal and the review",
           "why": "Improvement comes from reviewing decisions, not from more trades.",
           "lessons": [
-            {"id": "trade-journal", "title": "What to write before and after every trade", "minutes": 6, "status": "planned"},
-            {"id": "expectancy", "title": "Win rate is not the score: expectancy", "minutes": 7, "status": "planned"},
-            {"id": "calibration", "title": "Calibration: are your 70% calls right 70% of the time?", "minutes": 6, "status": "planned"}
+            {"id": "trade-journal", "title": "What to write before and after every trade", "minutes": 6},
+            {"id": "expectancy", "title": "Win rate is not the score: expectancy", "minutes": 7},
+            {"id": "calibration", "title": "Calibration: are your 70% calls right 70% of the time?", "minutes": 6}
           ]
         }
       ]
