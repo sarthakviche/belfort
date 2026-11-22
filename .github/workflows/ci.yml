@@ -37,6 +37,20 @@ jobs:
         run: |
           for f in belfort/static/*.js; do node --check "$f"; done
 
+  content:
+    name: Learn content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: pip install -r requirements.txt
+      - name: Lessons, quizzes, charts, syllabus and wording
+        run: python scripts/ci/check_content.py
+
   test:
     name: Tests (${{ matrix.os }})
     needs: lint

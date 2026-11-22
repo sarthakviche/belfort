@@ -101,3 +101,7 @@ AI_MAX_OUTPUT_TOKENS = 800
 AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
 
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}
+
+# Content checker (scripts/ci/check_content.py)
+CONTENT_MIN_QUIZ_QUESTIONS = 3
+CONTENT_WORDS_PER_MINUTE = (25, 70)  # lesson minutes include the chart, the try step and the quiz, not just reading
