@@ -28,7 +28,7 @@
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Done ([#21](https://github.com/sarthakviche/belfort/pull/21)) |
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Done ([#22](https://github.com/sarthakviche/belfort/pull/22)) |
 | T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) |
-| T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Ready |
+| T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | In progress |
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Ready |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Ready |
 | T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Ready |
@@ -145,7 +145,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) · `five-numbers`, `pe-vs-peers`, `red-flags`. Match the figures the Research business section shows.
 
 ### T17 · Lessons: Indicators and patterns module
-- **P1 · M · Status:** Ready · `atr`, `rsi-macd`, `pattern-evidence` (use the backtest figures from `data/pattern_stats.json`).
+- **Owner:** Devansh · **P1 · M · Status:** In progress · `atr`, `rsi-macd`, `pattern-evidence` (use the backtest figures from `data/pattern_stats.json`).
 
 ### T18 · Lessons: Journal module
 - **P1 · M · Status:** Ready · `trade-journal`, `expectancy`, `calibration`. Point at the Practice journal and prediction scores.
