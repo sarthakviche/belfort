@@ -1,8 +1,10 @@
 """Practice vertical API: paper account, prediction journal, chart replay. Virtual points only."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from .. import settings
+from ..data.providers import DataError
 from . import service
 from .service import PracticeError
 
@@ -12,7 +14,7 @@ router = APIRouter(prefix="/api/practice", tags=["practice"])
 def _guard(fn, *a, **k):
     try:
         return fn(*a, **k)
-    except PracticeError as e:
+    except (PracticeError, DataError) as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -53,6 +55,21 @@ class ReplayIn(BaseModel):
 @router.get("/portfolio")
 def portfolio():
     return service.portfolio()
+
+
+@router.get("/quote")
+def quote(symbol: str = Query(min_length=1, max_length=30)):
+    return _guard(service.quote, symbol)
+
+
+@router.get("/size")
+def size(
+    symbol: str = Query(min_length=1, max_length=30),
+    stop: float = Query(gt=0),
+    risk_pct: float = Query(default=settings.PAPER_DEFAULT_RISK_PCT, gt=0, le=100),
+    entry: float | None = Query(default=None, gt=0),
+):
+    return _guard(service.size, symbol, risk_pct, stop, entry)
 
 
 @router.post("/trades")

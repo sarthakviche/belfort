@@ -7,7 +7,17 @@ from ..core import db
 from ..data import market
 from ..data.providers import DataError, clean_symbol
 from ..data.universe import ALL_SYMBOLS
-from ..settings import EDU_LAG_DAYS, PAPER_COST_PCT, PAPER_START_POINTS, PREDICTION_HORIZONS
+from ..research.analysis.sizing import position_size, suggest_stop
+from ..settings import (
+    EDU_LAG_DAYS,
+    PAPER_COST_PCT,
+    PAPER_DEFAULT_RISK_PCT,
+    PAPER_MAX_RISK_PCT,
+    PAPER_START_POINTS,
+    PREDICTION_HORIZONS,
+    STYLES,
+    TICKET_CHART_BARS,
+)
 from . import engine
 
 
@@ -132,6 +142,79 @@ def portfolio() -> dict:
         },
         "note": "Virtual points only (1 point stands for ₹1). They have no money value and cannot be redeemed. "
         "Fills use end-of-day prices: orders fill at the next session's open.",
+    }
+
+
+def quote(symbol: str) -> dict:
+    """What the order ticket shows for a stock: last close, day change, a 3-month chart, nearest support, a stop idea."""
+    from ..research.analysis.pipeline import technical
+
+    symbol = clean_symbol(symbol)
+    try:
+        df = market.bars(symbol, 1)
+    except DataError as e:
+        raise PracticeError(str(e)) from e
+    if len(df) < 2:
+        raise PracticeError(f"Not enough price history for {symbol} yet.")
+    last, prev = float(df["close"].iloc[-1]), float(df["close"].iloc[-2])
+    tech = technical(df, STYLES["swing"])
+    supports = [s for s in tech["levels"]["supports"] if s["price"] < last]
+    stop = suggest_stop(last, tech["atr"], supports, STYLES["swing"])
+    recent = df.tail(TICKET_CHART_BARS)
+    return {
+        "symbol": symbol,
+        "last_close": round(last, 2),
+        "as_of": df.index[-1].strftime("%Y-%m-%d"),
+        "change_pct": round((last / prev - 1) * 100, 2),
+        "candles": [
+            {
+                "time": d.strftime("%Y-%m-%d"),
+                "open": float(r.open),
+                "high": float(r.high),
+                "low": float(r.low),
+                "close": float(r.close),
+            }
+            for d, r in recent.iterrows()
+        ],
+        "support": {"price": round(supports[0]["price"], 2), "touches": supports[0]["touches"]} if supports else None,
+        "suggested_stop": stop["stop"],
+        "stop_basis": stop["basis"],
+        "source": "Daily prices (Yahoo Finance, NSE end-of-day file), computed by this app",
+        "default_risk_pct": PAPER_DEFAULT_RISK_PCT,
+        "max_risk_pct": PAPER_MAX_RISK_PCT,
+        "note": "A stop idea from the swing rule, not a recommendation. Where the stop goes is your decision.",
+    }
+
+
+def size(symbol: str, risk_pct: float, stop: float, entry: float | None = None) -> dict:
+    """Shares that risk at most risk_pct of the account between entry and stop, capped by the points available."""
+    symbol = clean_symbol(symbol)
+    if entry is None:
+        try:
+            entry = float(market.bars(symbol, 1)["close"].iloc[-1])
+        except DataError as e:
+            raise PracticeError(str(e)) from e
+    pf = portfolio()
+    sized = position_size(pf["equity"], risk_pct, entry, stop)
+    if sized["error"] and sized["quantity"] == 0 and sized["risk_per_share"] is None:
+        raise PracticeError(sized["error"])
+    by_points = int(max(0.0, pf["available"]) // (entry * (1 + PAPER_COST_PCT)))
+    qty = min(sized["quantity"], by_points)
+    risk = round(qty * (entry - stop), 2)
+    return {
+        "symbol": symbol,
+        "entry": round(entry, 2),
+        "stop": stop,
+        "risk_pct": risk_pct,
+        "quantity": qty,
+        "risk_amount": risk,
+        "risk_share_pct": round(risk / pf["equity"] * 100, 2) if pf["equity"] > 0 else None,
+        "position_value": round(qty * entry, 2),
+        "account_value": pf["equity"],
+        "available": pf["available"],
+        "capped_by_points": by_points < sized["quantity"],
+        "over_limit": risk_pct > PAPER_MAX_RISK_PCT,
+        "message": sized["error"] if qty == 0 else None,
     }
 
 

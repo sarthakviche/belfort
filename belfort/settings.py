@@ -69,6 +69,9 @@ EDU_LAG_DAYS = 30
 # Practice: virtual points only. 1 point stands for 1 rupee. Never redeemable for anything.
 PAPER_START_POINTS = 1_000_000
 PAPER_COST_PCT = 0.0005  # rough cost per side (brokerage, taxes) so practice is not cost-free
+PAPER_DEFAULT_RISK_PCT = 1.0  # the "Size it" helper starts at the 1% rule taught in Learn
+PAPER_MAX_RISK_PCT = 2.0  # one trade risking more than this gets a warning
+TICKET_CHART_BARS = 63  # about three months of sessions on the order ticket's mini chart
 # ---------------- Stock search (the picker) ----------------
 SEARCH_LIMIT = 8  # rows in the picker dropdown
 SEARCH_MIN_INITIALS = 2  # "hul" matches Hindustan Unilever from two letters up

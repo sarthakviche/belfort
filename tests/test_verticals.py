@@ -132,6 +132,43 @@ def test_paper_account_flow(fresh_db):
     assert "cancelled" in c.post(f"/api/practice/trades/{tid}/close").json()["message"]
 
 
+def test_ticket_quote_shows_price_chart_support_and_stop(fresh_db):
+    q = TestClient(app).get("/api/practice/quote", params={"symbol": "tcs"}).json()
+    last = float(price_frame(n=400, drift=0.001)["close"].iloc[-1])
+    assert q["symbol"] == "TCS" and q["last_close"] == round(last, 2) and q["as_of"]
+    assert len(q["candles"]) == settings.TICKET_CHART_BARS and {"time", "open", "high", "low", "close"} <= set(q["candles"][0])
+    assert q["suggested_stop"] < q["last_close"] and q["stop_basis"]
+    assert q["support"] is None or q["support"]["price"] < q["last_close"]
+    assert compliance.find_banned(q["note"] + q["stop_basis"]) == []
+
+
+def test_size_never_risks_more_than_the_limit(fresh_db):
+    c = TestClient(app)
+    for risk_pct in (0.5, 1.0, 2.0):
+        s = c.get("/api/practice/size", params={"symbol": "TCS", "entry": 100, "stop": 95, "risk_pct": risk_pct}).json()
+        budget = settings.PAPER_START_POINTS * risk_pct / 100
+        assert s["risk_amount"] <= budget and s["quantity"] == int(budget // 5)
+        assert s["risk_share_pct"] <= risk_pct and s["over_limit"] is False
+    assert c.get("/api/practice/size", params={"symbol": "TCS", "entry": 100, "stop": 95, "risk_pct": 3}).json()["over_limit"]
+
+
+def test_size_is_capped_by_available_points(fresh_db):
+    s = TestClient(app).get("/api/practice/size", params={"symbol": "TCS", "entry": 1000, "stop": 999, "risk_pct": 2}).json()
+    assert s["capped_by_points"] is True
+    assert s["position_value"] * (1 + settings.PAPER_COST_PCT) <= settings.PAPER_START_POINTS
+    assert s["risk_amount"] <= settings.PAPER_START_POINTS * 0.02
+
+
+def test_size_rejects_a_stop_above_entry_and_tiny_budgets(fresh_db):
+    c = TestClient(app)
+    bad = c.get("/api/practice/size", params={"symbol": "TCS", "entry": 100, "stop": 105})
+    assert bad.status_code == 400 and "below the entry" in bad.json()["detail"]
+    zero = c.get("/api/practice/size", params={"symbol": "TCS", "entry": 100000, "stop": 1, "risk_pct": 0.01}).json()
+    assert zero["quantity"] == 0 and zero["message"]
+    uses_last_close = c.get("/api/practice/size", params={"symbol": "TCS", "stop": 1}).json()
+    assert uses_last_close["entry"] == round(float(price_frame(n=400, drift=0.001)["close"].iloc[-1]), 2)
+
+
 def test_predictions_api(fresh_db):
     c = TestClient(app)
     r = c.post(
