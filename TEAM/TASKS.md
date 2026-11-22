@@ -12,7 +12,7 @@
 
 | ID | Task | Phase | P | Size | Status |
 |---|---|---|---|---|---|
-| T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | In progress |
+| T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) |
 | T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | Ready |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Ready |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Blocked on T03 |
@@ -59,7 +59,7 @@
 ## Phase 0: onboarding
 
 ### T01 · Run Belfort and fix setup docs
-- **Owner:** Devansh · **P0 · S · Status:** In progress · **Area:** platform
+- **Owner:** Devansh · **P0 · S · Status:** Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) · **Area:** platform
 - **Do:** Follow [ONBOARDING.md](ONBOARDING.md) on a clean clone. Fix anything wrong or unclear in ONBOARDING.md, README.md or CLAUDE.md.
 - **Done when:** Merged PR `docs: fix onboarding steps (T01)`, or a PR that only marks the task Done if nothing needed fixing.
 
@@ -253,3 +253,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 
 - v0.1 foundation (see README "What is built").
 - Production engineering setup: lint, format, coverage, pinned dependencies, CI on Windows and Linux, commit policy, conventions (PR #1).
+- T01 Onboarding steps checked on a clean clone and fixed ([#7](https://github.com/sarthakviche/belfort/pull/7)).
