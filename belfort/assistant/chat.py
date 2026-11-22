@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 import httpx
 
+from .. import settings
 from ..core.compliance import find_banned
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
@@ -86,35 +87,67 @@ def _turns(history: list[dict] | None) -> list[tuple[str, str]]:
     return out
 
 
+def _redact(text: str, key: str) -> str:
+    """Remove the user's key from a provider's error text."""
+    if key:
+        text = text.replace(key, "[your key]")
+    return text
+
+
+def _http_error(p: Provider, status: int, provider_msg: str) -> ChatError:
+    """Turn a provider's HTTP error into a sentence that tells the user what to do next."""
+    name = "Gemini" if p.kind == "gemini" else "The AI service"
+    lowered = provider_msg.lower()
+    if status in (401, 403) or (status == 400 and ("api key" in lowered or "api_key" in lowered)):
+        hint = " Gemini keys are free from Google AI Studio." if p.kind == "gemini" else ""
+        return ChatError(f"{name} did not accept your key. Open Settings, check the provider and paste the key again.{hint}")
+    if status == 404:
+        return ChatError(f'The model "{p.model}" was not found at this provider. Open Settings and check the model name.')
+    if status == 429:
+        return ChatError(
+            f"{name} says you have reached its rate or quota limit. Wait a minute and try again, or check your plan with the provider."
+        )
+    if status >= 500:
+        return ChatError(f"{name} is having trouble right now (error {status}). Try again in a few minutes.")
+    detail = _redact(provider_msg, p.key)[: settings.AI_ERROR_DETAIL_CHARS]
+    return ChatError(f"{name} returned an error ({status}). {detail}".strip())
+
+
 def _call(p: Provider, turns: list[tuple[str, str]]) -> str:
+    timeout = settings.AI_TIMEOUT_SECONDS[p.kind]
+    local = p.kind == "openai" and ("localhost" in p.base or "127.0.0.1" in p.base)
     try:
         if p.kind == "gemini":
             body = {
                 "system_instruction": {"parts": [{"text": SYSTEM}]},
                 "contents": [{"role": "model" if r == "assistant" else "user", "parts": [{"text": t}]} for r, t in turns],
-                "generationConfig": {"temperature": 0.3, "maxOutputTokens": 800},
+                "generationConfig": {"temperature": 0.3, "maxOutputTokens": settings.AI_MAX_OUTPUT_TOKENS},
             }
-            r = httpx.post(GEMINI_URL.format(model=p.model), headers={"x-goog-api-key": p.key}, json=body, timeout=40.0)
+            r = httpx.post(GEMINI_URL.format(model=p.model), headers={"x-goog-api-key": p.key}, json=body, timeout=timeout)
         else:
             body = {
                 "model": p.model,
                 "temperature": 0.3,
-                "max_tokens": 800,
+                "max_tokens": settings.AI_MAX_OUTPUT_TOKENS,
                 "messages": [{"role": "system", "content": SYSTEM}] + [{"role": r, "content": t} for r, t in turns],
             }
             headers = {"Authorization": f"Bearer {p.key}"} if p.key else {}
-            r = httpx.post(p.base + "/chat/completions", headers=headers, json=body, timeout=60.0)
+            r = httpx.post(p.base + "/chat/completions", headers=headers, json=body, timeout=timeout)
+    except httpx.TimeoutException:
+        raise ChatError("The AI service took too long to answer. Try again, or choose a faster model in Settings.") from None
     except httpx.HTTPError:
-        raise ChatError(
-            "Could not reach the AI service. Check your internet connection (or that your local model is running)."
-        ) from None
+        if local:
+            raise ChatError(
+                f"Could not reach your local model at {p.base}. Start Ollama (or LM Studio) and check the address in Settings."
+            ) from None
+        raise ChatError("Could not reach the AI service. Check your internet connection and try again.") from None
     if r.status_code != 200:
         try:
             err = r.json().get("error", {})
             msg = err.get("message", "") if isinstance(err, dict) else str(err)
         except Exception:
             msg = ""
-        raise ChatError(f"The AI service returned an error ({r.status_code}). {msg[:200]}".strip())
+        raise _http_error(p, r.status_code, msg)
     try:
         data = r.json()
         if p.kind == "gemini":
