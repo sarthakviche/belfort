@@ -31,7 +31,7 @@
 | T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Done ([#24](https://github.com/sarthakviche/belfort/pull/24)) |
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) |
-| T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Ready |
+| T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | In progress |
 | T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Ready |
 | T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | Ready |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
@@ -154,7 +154,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) · `index-trend`, `sectors`, `flows-and-events`.
 
 ### T20 · Lessons: Portfolio and Psychology modules
-- **P1 · M · Status:** Ready · `open-risk`, `drawdown-rules`, `biases`, `rules`.
+- **Owner:** Devansh · **P1 · M · Status:** In progress · `open-risk`, `drawdown-rules`, `biases`, `rules`.
 
 ### T21 · Lessons: Taxes and records module
 - **P1 · M · Status:** Ready · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
