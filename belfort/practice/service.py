@@ -46,11 +46,19 @@ def _trades(account_id: int) -> list[dict]:
         return db.rows(con.execute("SELECT * FROM trades WHERE account_id = ? ORDER BY id DESC", (account_id,)))
 
 
-def settle_all() -> None:
-    """Replay new end-of-day bars against every pending and open trade."""
+def settle_all(force: bool = False) -> None:
+    """Replay end-of-day bars against every pending and open trade, at most once per new trading day.
+
+    New bars only arrive once a day, and orders placed or exits requested today act on the next session's bar, so a
+    second settlement on the same data day cannot change anything. A day is marked settled only if every symbol loaded.
+    """
     acc = account()
+    day = market.data_day()
+    if acc.get("settled_for") == day and not force:
+        return
     live = [t for t in _trades(acc["id"]) if t["status"] in ("pending", "open")]
     frames = {}
+    complete = True
     for t in live:
         if t["symbol"] not in frames:
             try:
@@ -59,6 +67,7 @@ def settle_all() -> None:
                 frames[t["symbol"]] = None
         df = frames[t["symbol"]]
         if df is None:
+            complete = False
             continue
         f = engine.settle_trade(t, df)
         if f.status != t["status"] or f.entry_price != t["entry_price"]:
@@ -68,6 +77,9 @@ def settle_all() -> None:
                     "WHERE id=?",
                     (f.status, f.entry_price, f.entry_date, f.exit_price, f.exit_date, f.exit_reason, t["id"]),
                 )
+    if complete:
+        with db.connect() as con:
+            con.execute("UPDATE accounts SET settled_for = ? WHERE id = ?", (day, acc["id"]))
 
 
 def _last_closes(symbols: set[str]) -> dict[str, tuple[float, str]]:

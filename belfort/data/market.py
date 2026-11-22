@@ -4,12 +4,66 @@ Practice and learning call `bars()`; tests replace it. The providers live in the
 substitution (pipeline.prices / pipeline.nse) changes the data for every vertical.
 """
 
-from datetime import date, timedelta
+import threading
+from datetime import date, datetime, time, timedelta, timezone
 
 import pandas as pd
 
+from .. import settings
+
+IST = timezone(timedelta(hours=5, minutes=30))
+_memory: dict[tuple[str, int], tuple[datetime, pd.DataFrame]] = {}
+_memory_lock = threading.Lock()
+
+
+def last_release(now: datetime | None = None) -> datetime:
+    """The latest moment (IST) at or before `now` when a session's end-of-day data became complete."""
+    now = (now or datetime.now(IST)).astimezone(IST)
+    ready = time(*settings.MARKET_DATA_READY_IST)
+    day = now.date()
+    while True:
+        moment = datetime.combine(day, ready, tzinfo=IST)
+        if day.weekday() < 5 and moment <= now:
+            return moment
+        day -= timedelta(days=1)
+
+
+def next_release(now: datetime | None = None) -> datetime:
+    """The first moment (IST) after `now` when new end-of-day data is expected. Holidays only cost one extra fetch."""
+    now = (now or datetime.now(IST)).astimezone(IST)
+    ready = time(*settings.MARKET_DATA_READY_IST)
+    day = now.date()
+    while True:
+        moment = datetime.combine(day, ready, tzinfo=IST)
+        if day.weekday() < 5 and moment > now:
+            return moment
+        day += timedelta(days=1)
+
+
+def data_day(now: datetime | None = None) -> str:
+    """The session whose end-of-day data is the newest that can exist now, as an ISO date."""
+    return last_release(now).date().isoformat()
+
+
+def clear_cache() -> None:
+    with _memory_lock:
+        _memory.clear()
+
 
 def bars(symbol: str, years: int = 5) -> pd.DataFrame:
+    """Daily bars, kept in memory until the next end-of-day data release so repeat views do not refetch."""
+    now = datetime.now(IST)
+    with _memory_lock:
+        hit = _memory.get((symbol, years))
+    if hit and hit[0] > now:
+        return hit[1].copy()
+    df = _fetch_bars(symbol, years)
+    with _memory_lock:
+        _memory[(symbol, years)] = (next_release(now), df)
+    return df.copy()
+
+
+def _fetch_bars(symbol: str, years: int) -> pd.DataFrame:
     from ..research.analysis import pipeline
 
     df = pipeline.prices.history(symbol, years)

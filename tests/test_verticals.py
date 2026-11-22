@@ -384,3 +384,100 @@ def test_db_migrations_are_idempotent(tmp_path, monkeypatch):
     db._ready.clear()
     with db.connect() as con:
         assert con.execute("SELECT COUNT(*) FROM schema_version").fetchone()[0] == len(db.MIGRATIONS)
+
+
+# ---------------- T05: bar cache and once-per-day settlement ----------------
+
+
+def _ist(*args):
+    return market.datetime(*args, tzinfo=market.IST)
+
+
+def test_bar_cache_lasts_until_the_next_end_of_day_release():
+    monday_morning, monday_evening, friday_evening = _ist(2026, 11, 16, 10), _ist(2026, 11, 16, 19), _ist(2026, 11, 20, 19)
+    assert market.last_release(monday_morning) == _ist(2026, 11, 13, 18)  # Friday's data is still the newest
+    assert market.next_release(monday_morning) == _ist(2026, 11, 16, 18)
+    assert market.next_release(monday_evening) == _ist(2026, 11, 17, 18)
+    assert market.next_release(friday_evening) == _ist(2026, 11, 23, 18)  # nothing new over the weekend
+    assert market.data_day(_ist(2026, 11, 22, 12)) == "2026-11-20"
+
+
+class _CountingPrices:
+    def __init__(self, delay=0.0):
+        self.calls, self.delay = 0, delay
+
+    def history(self, symbol, years=5):
+        import time as clock
+
+        self.calls += 1
+        clock.sleep(self.delay)
+        return price_frame(n=300, drift=0.001)
+
+
+class _NoNse:
+    def recent_bars(self, symbol, after):
+        return pd.DataFrame()
+
+
+def test_bars_are_fetched_once_until_the_cache_expires(monkeypatch):
+    from belfort.research.analysis import pipeline
+
+    prices = _CountingPrices()
+    monkeypatch.setattr(pipeline, "prices", prices)
+    monkeypatch.setattr(pipeline, "nse", _NoNse())
+    first = market.bars("TCS", 1)
+    first.iloc[-1, 0] = -1  # callers get a copy and cannot spoil the cache
+    assert market.bars("TCS", 1)["open"].iloc[-1] != -1 and prices.calls == 1
+    monkeypatch.setattr(market, "next_release", lambda now=None: _ist(2000, 1, 3, 18))  # everything cached is stale
+    market.clear_cache()
+    market.bars("TCS", 1)
+    market.bars("TCS", 1)
+    assert prices.calls == 3  # stale entries are refetched every time
+
+
+def _open_positions(symbols):
+    acc = service.account()
+    with db.connect() as con:
+        for sym in symbols:
+            con.execute(
+                "INSERT INTO trades (account_id, symbol, qty, entry_type, stop, thesis, placed_on, status, entry_price, entry_date) "
+                "VALUES (?, ?, 1, 'market', 1, 'test position', '2026-01-02', 'open', 100, '2026-01-05')",
+                (acc["id"], sym),
+            )
+
+
+def test_settlement_runs_once_per_trading_day(fresh_db, monkeypatch):
+    _open_positions(["TCS", "INFY"])
+    runs = []
+    real = engine.settle_trade
+    monkeypatch.setattr(engine, "settle_trade", lambda t, df: runs.append(t["symbol"]) or real(t, df))
+    service.portfolio()
+    service.portfolio()
+    assert sorted(runs) == ["INFY", "TCS"]  # the second view did not settle again
+    monkeypatch.setattr(market, "data_day", lambda now=None: "2099-01-01")  # a new session's data arrived
+    service.portfolio()
+    assert len(runs) == 4
+
+
+def test_settlement_retries_when_a_symbol_failed_to_load(fresh_db, monkeypatch):
+    _open_positions(["TCS"])
+    monkeypatch.setattr(market, "bars", lambda symbol, years=5: (_ for _ in ()).throw(RuntimeError("offline")))
+    service.portfolio()
+    assert service.account()["settled_for"] is None
+
+
+def test_portfolio_with_twenty_symbols_is_fast_on_the_second_visit(fresh_db, monkeypatch):
+    import time as clock
+
+    from belfort.research.analysis import pipeline
+
+    monkeypatch.undo()  # use the real cached market.bars, not the fixture's fake
+    monkeypatch.setattr(settings, "DB_FILE", fresh_db / "t.db")
+    monkeypatch.setattr(pipeline, "prices", _CountingPrices(delay=0.05))
+    monkeypatch.setattr(pipeline, "nse", _NoNse())
+    _open_positions([f"SYM{i}" for i in range(20)])
+    service.portfolio()
+    started = clock.perf_counter()
+    pf = service.portfolio()
+    assert clock.perf_counter() - started < 1.0 and len(pf["open"]) == 20
+    assert pipeline.prices.calls == 20
