@@ -615,3 +615,37 @@ def test_portfolio_with_twenty_symbols_is_fast_on_the_second_visit(fresh_db, mon
     pf = service.portfolio()
     assert clock.perf_counter() - started < 1.0 and len(pf["open"]) == 20
     assert pipeline.prices.calls == 20
+
+
+# ---------------- T09: total open risk and size warnings ----------------
+
+
+def test_portfolio_reports_open_risk_from_the_current_stop(fresh_db):
+    tid = _filled_trade(qty=10)  # entry 100, stop 50
+    last = float(price_frame(n=400, drift=0.001)["close"].iloc[-1])
+    risk = service.portfolio()["risk"]
+    assert risk["open_points"] == round((last - 50) * 10, 2) and risk["pending_points"] == 0
+    assert risk["total_pct"] == round(risk["total_points"] / service.portfolio()["equity"] * 100, 2)
+    service.raise_stop(tid, 60)
+    assert service.portfolio()["risk"]["open_points"] == round((last - 60) * 10, 2)  # a raised stop lowers the risk
+
+
+def test_order_warnings_for_one_big_trade_and_for_total_open_risk(fresh_db):
+    c = TestClient(app)
+    last = float(price_frame(n=400, drift=0.001)["close"].iloc[-1])
+    small = c.post(
+        "/api/practice/trades", json={"symbol": "TCS", "qty": 10, "stop": last * 0.95, "thesis": "Small and planned trade."}
+    )
+    assert small.json()["warnings"] == []
+    qty = int(settings.PAPER_START_POINTS * 0.035 / (last * 0.1))  # about 3.5% of the account at risk
+    big = c.post(
+        "/api/practice/trades", json={"symbol": "INFY", "qty": qty, "stop": last * 0.9, "thesis": "Deliberately too big."}
+    )
+    assert any("per trade" in w for w in big.json()["warnings"])
+    more = c.post(
+        "/api/practice/trades", json={"symbol": "SBIN", "qty": qty, "stop": last * 0.9, "thesis": "Pushes open risk over."}
+    )
+    assert any("open risk would be" in w for w in more.json()["warnings"])
+    risk = c.get("/api/practice/portfolio").json()["risk"]
+    assert risk["pending_points"] > 0 and risk["over_limit"] is True
+    assert compliance.find_banned(" ".join(more.json()["warnings"]) + risk["note"]) == []

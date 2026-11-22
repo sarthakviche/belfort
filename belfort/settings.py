@@ -73,6 +73,7 @@ MARKET_DATA_READY_IST = (18, 0)
 PAPER_COST_PCT = 0.0005  # rough cost per side (brokerage, taxes) so practice is not cost-free
 PAPER_DEFAULT_RISK_PCT = 1.0  # the "Size it" helper starts at the 1% rule taught in Learn
 PAPER_MAX_RISK_PCT = 2.0  # one trade risking more than this gets a warning
+PAPER_MAX_OPEN_RISK_PCT = 6.0  # open positions and orders together risking more than this get a warning
 REPLAY_WINDOW_BARS = 200  # one replay chart: what you see plus what is revealed
 REPLAY_VISIBLE_BARS = 140  # sessions shown before the decision; the other 60 stay on the server
 REPLAY_MIN_HISTORY_BARS = 260  # skip symbols with less lagged history than this
