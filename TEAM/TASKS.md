@@ -22,7 +22,7 @@
 | T08 | Journal analytics | 1 Practice | P1 | M | Done ([#15](https://github.com/sarthakviche/belfort/pull/15)) |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Done ([#14](https://github.com/sarthakviche/belfort/pull/14)) |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Done ([#16](https://github.com/sarthakviche/belfort/pull/16)) |
-| T11 | Equity curve | 1 Practice | P2 | M | Done ([#17](https://github.com/sarthakviche/belfort/pull/17)) |
+| T11 | Equity curve | 1 Practice | P2 | M | Done ([#18](https://github.com/sarthakviche/belfort/pull/18)) |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Ready |
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Ready |
@@ -120,7 +120,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Do:** Download trades, predictions and replays as CSV and as one JSON backup; import the JSON backup with validation.
 
 ### T11 · Equity curve
-- **Owner:** Devansh · **P2 · M · Status:** Done ([#17](https://github.com/sarthakviche/belfort/pull/17)) · **Area:** practice
+- **Owner:** Devansh · **P2 · M · Status:** Done ([#18](https://github.com/sarthakviche/belfort/pull/18)) · **Area:** practice
 - **Do:** Snapshot account value each settled day; draw the curve and the largest drawdown.
 
 ## Phase 2: Learn (finish the syllabus)
@@ -262,4 +262,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T08 Journal analytics with setup and mistake tags ([#15](https://github.com/sarthakviche/belfort/pull/15)).
 - T09 Total open risk and size warnings ([#14](https://github.com/sarthakviche/belfort/pull/14)).
 - T10 Journal export (CSV, JSON) and backup restore ([#16](https://github.com/sarthakviche/belfort/pull/16)).
-- T11 Equity curve with largest drawdown ([#17](https://github.com/sarthakviche/belfort/pull/17)).
+- T11 Equity curve with largest drawdown ([#18](https://github.com/sarthakviche/belfort/pull/18)).
