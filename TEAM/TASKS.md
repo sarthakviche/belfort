@@ -20,7 +20,7 @@
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Done ([#12](https://github.com/sarthakviche/belfort/pull/12)) |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Done ([#13](https://github.com/sarthakviche/belfort/pull/13)) |
 | T08 | Journal analytics | 1 Practice | P1 | M | Ready |
-| T09 | Total open risk and size warnings | 1 Practice | P1 | S | Ready |
+| T09 | Total open risk and size warnings | 1 Practice | P1 | S | In progress |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Ready |
 | T11 | Equity curve | 1 Practice | P2 | M | Ready |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
@@ -112,7 +112,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** Analytics come from a tested pure module; the review screen shows them.
 
 ### T09 · Total open risk and size warnings
-- **P1 · S · Status:** Ready · **Area:** practice
+- **Owner:** Devansh · **P1 · S · Status:** In progress · **Area:** practice
 - **Do:** Show total rupee risk across open positions (sum of distance to stop × quantity) as a share of the account, and warn on an order that pushes it above a threshold in `settings.py` or risks over 2% on one trade.
 
 ### T10 · Export and import the journal
