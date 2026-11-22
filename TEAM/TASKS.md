@@ -12,7 +12,7 @@
 
 | ID | Task | Phase | P | Size | Status |
 |---|---|---|---|---|---|
-| T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | Ready |
+| T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | In progress |
 | T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | Ready |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Ready |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Blocked on T03 |
@@ -59,7 +59,7 @@
 ## Phase 0: onboarding
 
 ### T01 · Run Belfort and fix setup docs
-- **Owner:** Devansh · **P0 · S · Status:** Ready · **Area:** platform
+- **Owner:** Devansh · **P0 · S · Status:** In progress · **Area:** platform
 - **Do:** Follow [ONBOARDING.md](ONBOARDING.md) on a clean clone. Fix anything wrong or unclear in ONBOARDING.md, README.md or CLAUDE.md.
 - **Done when:** Merged PR `docs: fix onboarding steps (T01)`, or a PR that only marks the task Done if nothing needed fixing.
 
