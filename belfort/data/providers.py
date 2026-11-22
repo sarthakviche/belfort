@@ -150,29 +150,11 @@ class NseArchiveProvider:
             rows = load()
         return rows
 
-    def search(self, query: str, limit: int = 8) -> list[dict]:
-        """Find companies by symbol or by name."""
-        q = " ".join((query or "").upper().split())
-        if not q:
-            return []
-        scored = []
-        for sym, name in self.listed():
-            up = name.upper()
-            if sym == q:
-                rank = 0
-            elif sym.startswith(q):
-                rank = 1
-            elif up.startswith(q):
-                rank = 2
-            elif any(w.startswith(q) for w in up.split()) or (" " in q and q in up):
-                rank = 3
-            elif q in up or q in sym:
-                rank = 4
-            else:
-                continue
-            scored.append((rank, len(name), sym, name))
-        scored.sort()
-        return [{"symbol": s, "name": n} for _, _, s, n in scored[:limit]]
+    def search(self, query: str, limit: int | None = None) -> list[dict]:
+        """Find companies by symbol, name, initials, nickname or a near miss (see data/symbols.py)."""
+        from . import symbols
+
+        return symbols.search(self.listed(), query, limit)
 
     def _bhav(self, d: date) -> pd.DataFrame | None:
         def load():

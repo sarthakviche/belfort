@@ -69,6 +69,13 @@ EDU_LAG_DAYS = 30
 # Practice: virtual points only. 1 point stands for 1 rupee. Never redeemable for anything.
 PAPER_START_POINTS = 1_000_000
 PAPER_COST_PCT = 0.0005  # rough cost per side (brokerage, taxes) so practice is not cost-free
+# ---------------- Stock search (the picker) ----------------
+SEARCH_LIMIT = 8  # rows in the picker dropdown
+SEARCH_MIN_INITIALS = 2  # "hul" matches Hindustan Unilever from two letters up
+SEARCH_MIN_SUBSTRING = 3  # shorter queries only match prefixes, to keep the list relevant
+SEARCH_MIN_FUZZY = 4  # typo tolerance starts at four characters
+SEARCH_FUZZY_MIN_RATIO = 0.75  # difflib similarity per word ("hdcf" vs "hdfc" is 0.75)
+
 # ---------------- Ask Belfort (assistant) ----------------
 AI_TIMEOUT_SECONDS = {"gemini": 40.0, "openai": 60.0}  # local models can be slow on the first answer
 AI_MAX_OUTPUT_TOKENS = 800

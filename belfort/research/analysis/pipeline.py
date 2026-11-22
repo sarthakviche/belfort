@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from ...core.compliance import DISCLAIMER
+from ...data import symbols
 from ...data.providers import DataError, NseArchiveProvider, YahooProvider, clean_symbol
 from ...data.universe import LENDER_SECTORS, SECTOR_OF, peers_of
 from ...settings import FUND_SOURCE, PRICE_SOURCE, STATS_FILE, STYLES
@@ -179,6 +180,7 @@ def analyze(
     as_of = df.index[-1].strftime("%Y-%m-%d")
     close = float(df["close"].iloc[-1])
     prev = float(df["close"].iloc[-2])
+    symbols.remember_close(symbol, close, as_of)
 
     tech = technical(df, st)
     _add_dates(tech, df)
