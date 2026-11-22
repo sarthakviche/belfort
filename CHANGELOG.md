@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Practice order ticket: picking a stock shows its last close and date, the day's change, a 3-month chart with the nearest support, and a stop idea you can use or change. "Size it" fills the quantity from your risk per trade, and the form shows the points at risk and their share of the account before you place the order.
 - Stock picker: find any NSE company by typing part of its name, its initials, a common nickname ("sbi", "l&t", "jio") or a near miss ("hdcf bank"). Used in the sidebar search, the paper order form and the prediction form, with recent picks and the last close. No symbol needed.
 - Production engineering setup: Ruff lint and format, coverage threshold, pinned dependencies, dependency audit, Windows and Linux CI, commit and PR policy checks, pre-commit hooks, Dependabot, code owners, conventions guide.
 

@@ -173,24 +173,76 @@ function renderPaper() {
           <p class="hint">Long only, end-of-day fills. Decide the stop before you buy; it is required.</p>
           <div class="fields">
             <label class="wide">Stock<input name="symbol" required maxlength="80" placeholder="Type a company, e.g. HDFC Bank" data-stock-picker></label>
+            <div class="wide ticket" id="ticket" hidden></div>
             <label>Quantity<input name="qty" type="number" min="1" step="1" required></label>
             <label>Order<select name="entry_type"><option value="market">Market, next open</option><option value="limit">Limit</option></select></label>
             <label class="wide limit-only" hidden>Limit price (₹)<input name="limit_price" type="number" min="0" step="0.05"></label>
             <label>Stop-loss (₹)<input name="stop" type="number" min="0" step="0.05" required></label>
             <label>Target (₹, optional)<input name="target" type="number" min="0" step="0.05"></label>
+            <label>Risk per trade (%)<input id="risk-pct" type="number" min="0.1" max="10" step="0.1" value="1"></label>
+            <div class="size-row"><button type="button" class="btn ghost sm" id="size-it">Size it</button></div>
+            <p class="wide hint" id="order-risk"></p>
             <label class="wide">How sure are you? <output id="conf-out">60%</output><input name="confidence" type="range" min="50" max="95" value="60"></label>
             <label class="wide">Why this trade?<textarea name="thesis" rows="3" maxlength="600" required placeholder="e.g. Pullback to the 20-day average in an uptrend; stop below the last swing low."></textarea></label>
           </div>
           <div class="row"><button type="submit" class="btn">Place practice order</button></div>
           <p class="hint" id="order-msg"></p>
-          <p class="src">Size it first: open the stock in Research and use the position-size calculator with your account value.</p>
+          <p class="src">Pick a stock to see its last close and a stop idea. "Size it" fills the quantity so the trade risks no more than your chosen share of the account.</p>
         </form>
         <div class="panel glass"><h3>How practice works</h3><p class="hint">${esc(d.note)}</p><p class="hint">${esc(st.expectancy_note)}</p></div>
       </aside>
     </div>`;
   glossify(document.querySelector("#practice-body .cards")); glossify(document.querySelector("#practice-body aside .panel:last-child"));
 }
+/* ---- order ticket: quote, mini chart, stop idea, sizing ---- */
+async function loadTicket(symbol) {
+  const box = $("ticket"); if (!box) return;
+  box.hidden = false; box.innerHTML = '<p class="hint">Loading the last close…</p>'; P.quote = null;
+  try {
+    const q = await api("/api/practice/quote?symbol=" + encodeURIComponent(symbol));
+    P.quote = q;
+    box.innerHTML = `<div class="ticket-head"><b>${inr(q.last_close)}</b> ${signed(q.change_pct, 2)} <span class="src">close of ${esc(q.as_of)}, end of day</span></div>
+      <div class="ticket-chart" id="ticket-chart"></div>
+      <p class="src">${q.support ? `Nearest support ${inr(q.support.price)} (${q.support.touches} touch${q.support.touches === 1 ? "" : "es"}). ` : "No support level below the last close. "}
+        Stop idea ${inr(q.suggested_stop)}: ${esc(q.stop_basis)}. <button type="button" class="linkish" id="use-stop">Use this stop</button></p>
+      <p class="src">${esc(q.note)} Source: ${esc(q.source)}.</p>`;
+    const c = candleChart($("ticket-chart"), q.candles, { locked: true });
+    if (c && q.support) c.series.createPriceLine({ price: q.support.price, color: "#16c47f", lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: "support" });
+    $("risk-pct").value = q.default_risk_pct;
+    updateRisk();
+  } catch (e) { box.innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
+}
+function ticketEntry() {
+  const f = $("order-form"); if (!f) return null;
+  return f.entry_type.value === "limit" && +f.limit_price.value > 0 ? +f.limit_price.value : P.quote ? P.quote.last_close : null;
+}
+function updateRisk() {
+  const f = $("order-form"), out = $("order-risk"); if (!f || !out) return;
+  const entry = ticketEntry(), qty = +f.qty.value, stop = +f.stop.value;
+  if (!entry || !qty || !stop) { out.textContent = ""; return; }
+  if (stop >= entry) { out.innerHTML = `<span class="down">The stop must be below the entry (about ${inr(entry)}).</span>`; return; }
+  const risk = qty * (entry - stop), share = P.pf && P.pf.equity > 0 ? (risk / P.pf.equity) * 100 : null;
+  const max = P.quote ? P.quote.max_risk_pct : 2;
+  out.innerHTML = `This order risks <b>${num(risk, 0)} points</b>${share == null ? "" : `, <b class="${share > max ? "down" : ""}">${share.toFixed(2)}%</b> of the account`}, and uses ${num(qty * entry, 0)} points.`
+    + (share != null && share > max ? ` <span class="down">That is more than ${max}% on one trade.</span>` : "");
+}
+async function sizeIt() {
+  const f = $("order-form"), sym = f.querySelector('input[type="hidden"][name="symbol"]');
+  const msg = $("order-msg"); msg.textContent = "";
+  if (!sym || !sym.value) { msg.textContent = "Pick a stock first."; return; }
+  if (!+f.stop.value) { msg.textContent = "Set the stop first: the size depends on how far away it is."; return; }
+  const entry = ticketEntry();
+  try {
+    const s = await api(`/api/practice/size?symbol=${encodeURIComponent(sym.value)}&stop=${+f.stop.value}&risk_pct=${+$("risk-pct").value || 1}${entry ? "&entry=" + entry : ""}`);
+    f.qty.value = s.quantity || "";
+    if (s.message) msg.textContent = s.message;
+    else if (s.capped_by_points) msg.textContent = "Capped by the points you have available.";
+    updateRisk();
+  } catch (e) { msg.textContent = e.message; }
+}
+$("practice-body").addEventListener("stock-pick", (e) => { if (e.target.closest("#order-form")) loadTicket(e.detail.symbol); });
 $("practice-body").addEventListener("input", (e) => {
+  if (e.target.closest("#order-form") && ["qty", "stop", "limit_price", "entry_type"].includes(e.target.name)) updateRisk();
   if (e.target.name === "confidence") $("conf-out").textContent = e.target.value + "%";
   if (e.target.name === "pconf") $("pconf-out").textContent = e.target.value + "%";
   if (e.target.name === "entry_type") document.querySelector(".limit-only").hidden = e.target.value !== "limit";
@@ -204,6 +256,8 @@ $("practice-body").addEventListener("click", async (e) => {
     try { await post(`/api/practice/trades/${r.dataset.saveReview}/review`, { review: v }); r.textContent = "Saved"; } catch (err) { status(err.message, true); } return; }
   const dir = e.target.closest("button[data-dir]");
   if (dir) { document.querySelectorAll("button[data-dir]").forEach((b) => b.classList.toggle("on", b === dir)); return; }
+  if (e.target.closest("#use-stop") && P.quote) { $("order-form").stop.value = P.quote.suggested_stop; updateRisk(); return; }
+  if (e.target.closest("#size-it")) return sizeIt();
   if (e.target.closest("#replay-start")) return replayStart();
   if (e.target.closest("#replay-long")) return replayDecide("long");
   if (e.target.closest("#replay-skip")) return replayDecide("skip");

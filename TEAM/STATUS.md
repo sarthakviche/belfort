@@ -19,7 +19,6 @@
 
 | Area | Limitation | Task |
 |---|---|---|
-| Practice | The order form shows no price, chart or sizing help | T04 |
 | Practice | Each portfolio load fetches bars for every open symbol | T05 |
 | Practice | The replay trainer sends hidden bars to the browser before the decision | T06 |
 | Practice | Long only, one account, end-of-day fills, no trailing stops or partial exits | T07 |
