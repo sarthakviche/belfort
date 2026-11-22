@@ -64,6 +64,12 @@ MIGRATIONS = [
     ALTER TABLE trades ADD COLUMN setup TEXT;
     ALTER TABLE trades ADD COLUMN mistakes TEXT NOT NULL DEFAULT '[]';
     """,
+    # 6: one account-value snapshot per settled trading day, for the equity curve (T11)
+    """
+    CREATE TABLE IF NOT EXISTS equity_snapshots (
+        account_id INTEGER NOT NULL, day TEXT NOT NULL, equity REAL NOT NULL, PRIMARY KEY (account_id, day)
+    );
+    """,
 ]
 
 _lock = threading.Lock()

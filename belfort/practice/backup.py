@@ -156,7 +156,7 @@ def import_backup(backup: dict) -> dict:
 
 def _replace(backup: dict) -> None:
     with db.connect() as con:
-        for table in ("trades", "predictions", "replays", "replay_sessions", "accounts"):
+        for table in ("trades", "predictions", "replays", "replay_sessions", "equity_snapshots", "accounts"):
             con.execute(f"DELETE FROM {table}")  # noqa: S608 (fixed names)
         for account in backup["accounts"]:
             cols = [c for c in ACCOUNT_COLUMNS if c in account]
