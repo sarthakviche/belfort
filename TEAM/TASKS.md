@@ -16,7 +16,7 @@
 | T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | In progress |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Done ([#10](https://github.com/sarthakviche/belfort/pull/10)) |
-| T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Ready |
+| T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | In progress |
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Ready |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Ready |
 | T08 | Journal analytics | 1 Practice | P1 | M | Ready |
@@ -91,7 +91,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** Tests cover the endpoint (never risks more than the limit, capped by available points); the ticket works in the app.
 
 ### T05 · Faster portfolio: bar cache and daily settlement
-- **P1 · M · Status:** Ready · **Area:** practice, data
+- **Owner:** Devansh · **P1 · M · Status:** In progress · **Area:** practice, data
 - **Why:** Every portfolio load fetches bars for every open symbol.
 - **Do:** Cache daily bars per symbol until the next market close; settle at most once per new trading day; store last settled date. Do not change the rules in `belfort/practice/engine.py`.
 - **Done when:** With 20 open symbols the portfolio loads in under a second on the second visit; tests cover cache expiry and the once-per-day settlement.
