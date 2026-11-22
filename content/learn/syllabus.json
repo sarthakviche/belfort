@@ -74,9 +74,9 @@
           "id": "business-check", "title": "A business sanity check in ten minutes",
           "why": "A good chart on a weak business is a trap more often than a chance.",
           "lessons": [
-            {"id": "five-numbers", "title": "The five numbers that matter", "minutes": 8, "status": "planned"},
-            {"id": "pe-vs-peers", "title": "P/E only means something against peers", "minutes": 6, "status": "planned"},
-            {"id": "red-flags", "title": "Red flags: debt, pledges, falling cash flow", "minutes": 7, "status": "planned"}
+            {"id": "five-numbers", "title": "The five numbers that matter", "minutes": 8},
+            {"id": "pe-vs-peers", "title": "P/E only means something against peers", "minutes": 6},
+            {"id": "red-flags", "title": "Red flags: debt, pledges, falling cash flow", "minutes": 7}
           ]
         },
         {
