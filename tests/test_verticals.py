@@ -285,6 +285,61 @@ def test_chat_key_comes_from_headers(monkeypatch):
     assert r.status_code == 200 and got["p"].key == "user-key" and got["p"].kind == "gemini"
 
 
+class _ErrorReply:
+    def __init__(self, status_code, message):
+        self.status_code, self._message = status_code, message
+
+    def json(self):
+        return {"error": {"message": self._message}}
+
+
+@pytest.mark.parametrize(
+    ("kind", "status", "message", "expected"),
+    [
+        ("gemini", 400, "API key not valid. Please pass a valid API key.", "did not accept your key"),
+        ("openai", 401, "Incorrect API key provided: sk-secret-123.", "did not accept your key"),
+        ("openai", 403, "Forbidden", "did not accept your key"),
+        ("gemini", 404, "models/x is not found", 'model "test-model" was not found'),
+        ("gemini", 429, "Resource has been exhausted", "rate or quota limit"),
+        ("openai", 503, "overloaded", "having trouble right now"),
+    ],
+)
+def test_chat_provider_errors_tell_the_user_what_to_do(monkeypatch, kind, status, message, expected):
+    p = chat.Provider(kind, "sk-secret-123", "test-model", "https://api.example.com/v1")
+    monkeypatch.setattr(chat.httpx, "post", lambda *a, **k: _ErrorReply(status, message))
+    with pytest.raises(chat.ChatError) as caught:
+        chat.ask("What is support?", provider=p)
+    assert expected in str(caught.value)
+    assert "sk-secret-123" not in str(caught.value)
+
+
+def test_chat_other_errors_never_echo_the_key(monkeypatch):
+    p = chat.Provider("openai", "sk-secret-123", "m", "https://api.example.com/v1")
+    monkeypatch.setattr(chat.httpx, "post", lambda *a, **k: _ErrorReply(418, "Key sk-secret-123 is a teapot"))
+    with pytest.raises(chat.ChatError) as caught:
+        chat.ask("Hi", provider=p)
+    assert "(418)" in str(caught.value) and "sk-secret-123" not in str(caught.value) and "[your key]" in str(caught.value)
+
+
+def test_chat_network_failures_name_the_fix(monkeypatch):
+    def offline(*a, **k):
+        raise chat.httpx.ConnectError("no route")
+
+    def slow(*a, **k):
+        raise chat.httpx.ReadTimeout("slow")
+
+    local = chat.Provider("openai", "", "llama3", "http://localhost:11434/v1")
+    hosted = chat.Provider("gemini", "k", "m", "")
+    monkeypatch.setattr(chat.httpx, "post", offline)
+    with pytest.raises(chat.ChatError, match="Start Ollama"):
+        chat.ask("Hi", provider=local)
+    with pytest.raises(chat.ChatError, match="internet connection"):
+        chat.ask("Hi", provider=hosted)
+    monkeypatch.setattr(chat.httpx, "post", slow)
+    with pytest.raises(chat.ChatError, match="took too long"):
+        chat.ask("Hi", provider=hosted)
+
+
 def test_db_migrations_are_idempotent(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "DB_FILE", tmp_path / "m.db")
     with db.connect() as con:

@@ -69,4 +69,9 @@ EDU_LAG_DAYS = 30
 # Practice: virtual points only. 1 point stands for 1 rupee. Never redeemable for anything.
 PAPER_START_POINTS = 1_000_000
 PAPER_COST_PCT = 0.0005  # rough cost per side (brokerage, taxes) so practice is not cost-free
+# ---------------- Ask Belfort (assistant) ----------------
+AI_TIMEOUT_SECONDS = {"gemini": 40.0, "openai": 60.0}  # local models can be slow on the first answer
+AI_MAX_OUTPUT_TOKENS = 800
+AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
+
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}

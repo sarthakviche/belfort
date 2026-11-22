@@ -13,7 +13,7 @@
 | ID | Task | Phase | P | Size | Status |
 |---|---|---|---|---|---|
 | T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) |
-| T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | Ready |
+| T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | In progress |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Ready |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Blocked on T03 |
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Ready |
@@ -64,7 +64,7 @@
 - **Done when:** Merged PR `docs: fix onboarding steps (T01)`, or a PR that only marks the task Done if nothing needed fixing.
 
 ### T02 · Try Ask Belfort with a real key
-- **Owner:** Devansh · **P0 · S · Status:** Ready · **Area:** assistant
+- **Owner:** Devansh · **P0 · S · Status:** In progress · **Area:** assistant
 - **Do:** Use a free Gemini key and, if possible, a local Ollama (`OpenAI-compatible`, base URL `http://localhost:11434/v1`). Ask about a report, a lesson and a news story ("Explain this"). Try a wrong key and no internet.
 - **Done when:** All three contexts work with at least one provider, every error message tells the user what to do, and anything broken is fixed in this PR or filed as a new task.
 
