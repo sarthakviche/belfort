@@ -117,6 +117,18 @@ G = [
         ["pulled back", "pullback"],
     ),
     (
+        "Trailing stop",
+        "Basics",
+        "A stop that rises as price rises, set a percentage or a number of ATRs below each close. It never moves down.",
+        ["trailing stop", "trailing stops"],
+    ),
+    (
+        "Time stop",
+        "Basics",
+        "An exit planned for a trade that has not moved after a set number of sessions, so capital and attention are freed.",
+        ["time stop", "time stops"],
+    ),
+    (
         "Stretched",
         "Chart",
         "Price has run far above its average in a short time. Entries here need a wide stop and often see a pullback first.",

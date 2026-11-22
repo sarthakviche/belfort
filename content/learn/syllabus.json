@@ -64,10 +64,10 @@
           "id": "setups", "title": "Setups for swing and positional trades",
           "why": "A setup is a repeatable reason to enter with a defined stop. Without one, every trade is a guess.",
           "lessons": [
-            {"id": "pullback-setup", "title": "The pullback in an uptrend", "minutes": 8, "status": "planned"},
-            {"id": "breakout-setup", "title": "Breakouts and why volume matters", "minutes": 8, "status": "planned"},
-            {"id": "exits", "title": "Exits: targets, trailing stops and time stops", "minutes": 8, "status": "planned"},
-            {"id": "results-season", "title": "Results dates and holding through events", "minutes": 5, "status": "planned"}
+            {"id": "pullback-setup", "title": "The pullback in an uptrend", "minutes": 8},
+            {"id": "breakout-setup", "title": "Breakouts and why volume matters", "minutes": 8},
+            {"id": "exits", "title": "Exits: targets, trailing stops and time stops", "minutes": 8},
+            {"id": "results-season", "title": "Results dates and holding through events", "minutes": 5}
           ]
         },
         {
