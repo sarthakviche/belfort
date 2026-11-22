@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Content checker in CI (`scripts/ci/check_content.py`): every lesson needs front matter, a quiz of three or more valid questions, known chart symbols, no banned wording and a length that fits its minutes, and the syllabus must match the lesson files.
 - Practice equity curve: the paper account's value at the end of each trading day you open Belfort, drawn against the starting points, with the largest drawdown so far.
 - Practice data export: download trades, predictions and replays as CSV, or one JSON backup, from Settings, and restore a backup later. A file that is not a valid backup is refused and nothing changes.
 - Open-source release preparation: MIT licence, public README, contributing guide for outside contributors, Code of Conduct, security policy with private reporting; the task board and status page moved to `docs/`.
