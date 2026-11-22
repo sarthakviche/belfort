@@ -15,7 +15,7 @@
 | T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) |
 | T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | In progress |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) |
-| T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Ready |
+| T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | In progress |
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Ready |
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Ready |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Ready |
@@ -86,7 +86,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** You can place a paper trade and log a prediction without ever typing a symbol, in the running app.
 
 ### T04 · Trade ticket: quote, mini chart, position-size helper
-- **Owner:** Devansh · **P0 · M · Status:** Ready · **Area:** practice, ui
+- **Owner:** Devansh · **P0 · M · Status:** In progress · **Area:** practice, ui
 - **Do:** When a stock is picked in the order form, show last close and date, day change, a 3-month mini chart with the nearest support, and a suggested stop. Add "Size it": a risk % field that fills the quantity with `floor(account value × risk % ÷ (entry − stop))`, reusing `belfort/research/analysis/sizing.py` through `GET /api/practice/size`. Show the rupee risk and the share of the account it uses before the order is placed.
 - **Done when:** Tests cover the endpoint (never risks more than the limit, capped by available points); the ticket works in the app.
 
