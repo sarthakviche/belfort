@@ -150,7 +150,8 @@ function renderPaper() {
     <div class="cards">${stat("Account value", num(d.equity, 0), `${d.return_pct >= 0 ? "+" : ""}${d.return_pct}% since start`, true)}
       ${stat("Available points", num(d.available, 0), d.reserved ? `${num(d.reserved, 0)} held for pending orders` : "ready to use")}
       ${stat("Win rate", st.win_rate == null ? "n/a" : pctTxt(st.win_rate), `${st.closed} closed trades`)}
-      ${stat("Average R", st.avg_r == null ? "n/a" : (st.avg_r >= 0 ? "+" : "") + st.avg_r, "result per trade, in units of risk")}</div>
+      ${stat("Average R", st.avg_r == null ? "n/a" : (st.avg_r >= 0 ? "+" : "") + st.avg_r, "result per trade, in units of risk")}
+      ${stat("Open risk", d.risk.total_pct == null ? "n/a" : `<span class="${d.risk.over_limit ? "down" : ""}">${d.risk.total_pct}%</span>`, `${num(d.risk.total_points, 0)} points if every stop is hit · limit ${d.risk.limit_pct}%`)}</div>
     <div class="layout practice-layout">
       <div class="col-main">
         <div class="panel glass"><h3>Open positions</h3>${d.open.length ? `<div class="scroll"><table><thead><tr><th>Stock</th><th class="num">Qty</th><th class="num">Entry</th><th class="num">Last close</th><th class="num">Stop</th><th class="num">Target</th><th class="num">P&amp;L</th><th class="num">Now</th><th></th></tr></thead><tbody>
@@ -222,10 +223,13 @@ function updateRisk() {
   const entry = ticketEntry(), qty = +f.qty.value, stop = +f.stop.value;
   if (!entry || !qty || !stop) { out.textContent = ""; return; }
   if (stop >= entry) { out.innerHTML = `<span class="down">The stop must be below the entry (about ${inr(entry)}).</span>`; return; }
-  const risk = qty * (entry - stop), share = P.pf && P.pf.equity > 0 ? (risk / P.pf.equity) * 100 : null;
-  const max = P.quote ? P.quote.max_risk_pct : 2;
+  const risk = qty * (entry - stop), equity = P.pf ? P.pf.equity : 0, share = equity > 0 ? (risk / equity) * 100 : null;
+  const max = P.pf ? P.pf.risk.trade_limit_pct : 2, limit = P.pf ? P.pf.risk.limit_pct : 6;
+  const after = equity > 0 && P.pf ? ((P.pf.risk.total_points + risk) / equity) * 100 : null;
   out.innerHTML = `This order risks <b>${num(risk, 0)} points</b>${share == null ? "" : `, <b class="${share > max ? "down" : ""}">${share.toFixed(2)}%</b> of the account`}, and uses ${num(qty * entry, 0)} points.`
-    + (share != null && share > max ? ` <span class="down">That is more than ${max}% on one trade.</span>` : "");
+    + (after == null ? "" : ` Open risk after it: <b class="${after > limit ? "down" : ""}">${after.toFixed(2)}%</b> (limit ${limit}%).`)
+    + (share != null && share > max ? ` <span class="down">That is more than ${max}% on one trade.</span>` : "")
+    + (after != null && after > limit ? ` <span class="down">Together your open trades would risk more than ${limit}% of the account.</span>` : "");
 }
 async function sizeIt() {
   const f = $("order-form"), sym = f.querySelector('input[type="hidden"][name="symbol"]');

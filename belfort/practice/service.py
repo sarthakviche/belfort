@@ -14,6 +14,7 @@ from ..settings import (
     EDU_LAG_DAYS,
     PAPER_COST_PCT,
     PAPER_DEFAULT_RISK_PCT,
+    PAPER_MAX_OPEN_RISK_PCT,
     PAPER_MAX_RISK_PCT,
     PAPER_START_POINTS,
     PREDICTION_HORIZONS,
@@ -111,6 +112,7 @@ def portfolio() -> dict:
     trades = _trades(acc["id"])
     marks = _last_closes({t["symbol"] for t in trades if t["status"] in ("open", "pending")})
     cash, reserved, invested, market_value = acc["start_points"], 0.0, 0.0, 0.0
+    open_risk, pending_risk = 0.0, 0.0
     open_rows, pending_rows, closed_rows = [], [], []
     for t in trades:
         if t["status"] in ("open", "closed"):
@@ -125,6 +127,7 @@ def portfolio() -> dict:
             last, as_of = marks.get(t["symbol"], (t["entry_price"], t["entry_date"]))
             invested += buy
             market_value += last * t["qty"]
+            open_risk += max(0.0, last - current_stop(t)) * t["qty"]
             open_rows.append(
                 {
                     **t,
@@ -138,6 +141,7 @@ def portfolio() -> dict:
         elif t["status"] == "pending":
             est = (t["limit_price"] or marks.get(t["symbol"], (0, None))[0]) * t["qty"]
             reserved += est + _cost(est)
+            pending_risk += max(0.0, est / t["qty"] - t["stop"]) * t["qty"] if t["qty"] else 0.0
             pending_rows.append(t)
     wins = [t for t in closed_rows if t["pnl"] > 0]
     rs = [t["r"] for t in closed_rows if t["r"] is not None]
@@ -151,6 +155,7 @@ def portfolio() -> dict:
         "market_value": round(market_value, 2),
         "equity": round(equity, 2),
         "return_pct": round((equity / acc["start_points"] - 1) * 100, 2),
+        "risk": risk_summary(open_risk, pending_risk, equity),
         "open": open_rows,
         "pending": pending_rows,
         "closed": closed_rows[:50],
@@ -239,6 +244,42 @@ def size(symbol: str, risk_pct: float, stop: float, entry: float | None = None) 
     }
 
 
+def risk_summary(open_risk: float, pending_risk: float, equity: float) -> dict:
+    """Points that would be lost if every open position and waiting order hit its stop, and their share of the account."""
+    total = open_risk + pending_risk
+    pct = round(total / equity * 100, 2) if equity > 0 else None
+    return {
+        "open_points": round(open_risk, 2),
+        "pending_points": round(pending_risk, 2),
+        "total_points": round(total, 2),
+        "total_pct": pct,
+        "limit_pct": PAPER_MAX_OPEN_RISK_PCT,
+        "trade_limit_pct": PAPER_MAX_RISK_PCT,
+        "over_limit": pct is not None and pct > PAPER_MAX_OPEN_RISK_PCT,
+        "note": "Open risk is the distance from the last close to the stop, times the shares, for every open position, plus "
+        "the same for orders still waiting to fill. It is what you would lose if every stop were hit.",
+    }
+
+
+def risk_warnings(order_risk: float, risk: dict, equity: float) -> list[str]:
+    """Plain warnings for an order that risks too much on its own or pushes the account's open risk over the limit."""
+    out = []
+    if equity <= 0:
+        return out
+    share = order_risk / equity * 100
+    if share > PAPER_MAX_RISK_PCT:
+        out.append(
+            f"This order risks {share:.1f}% of the account, more than the {PAPER_MAX_RISK_PCT:g}% per trade the lessons suggest."
+        )
+    after = (risk["total_points"] + order_risk) / equity * 100
+    if after > PAPER_MAX_OPEN_RISK_PCT:
+        out.append(
+            f"With this order, open risk would be {after:.1f}% of the account, above the {PAPER_MAX_OPEN_RISK_PCT:g}% limit. "
+            "A run of stopped trades would hurt more than you planned."
+        )
+    return out
+
+
 def place_trade(
     symbol: str,
     qty: int,
@@ -294,11 +335,14 @@ def place_trade(
         )
         tid = cur.lastrowid
     db.touch_activity("practice")
+    warnings = risk_warnings((ref - float(stop)) * qty, pf["risk"], pf["equity"])
     return {
         "id": tid,
         "symbol": symbol,
         "status": "pending",
-        "message": f"Order saved. It fills at the open of the next session after {df.index[-1].strftime('%Y-%m-%d')}.",
+        "warnings": warnings,
+        "message": f"Order saved. It fills at the open of the next session after {df.index[-1].strftime('%Y-%m-%d')}."
+        + (" " + " ".join(warnings) if warnings else ""),
     }
 
 
