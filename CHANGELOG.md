@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Practice: an Open risk card shows how many points you would lose if every stop were hit, as a share of the account. The order form warns before you place an order that risks more than 2% on its own or pushes open risk above 6%.
 - Practice: manage an open position. Raise its stop (it never moves down), set a trailing stop as a percentage or an ATR multiple below each close, or sell part of it at the next open. R is still measured against the original stop.
 - Practice order ticket: picking a stock shows its last close and date, the day's change, a 3-month chart with the nearest support, and a stop idea you can use or change. "Size it" fills the quantity from your risk per trade, and the form shows the points at risk and their share of the account before you place the order.
 - Stock picker: find any NSE company by typing part of its name, its initials, a common nickname ("sbi", "l&t", "jio") or a near miss ("hdcf bank"). Used in the sidebar search, the paper order form and the prediction form, with recent picks and the last close. No symbol needed.
