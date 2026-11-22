@@ -19,7 +19,7 @@
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Done ([#11](https://github.com/sarthakviche/belfort/pull/11)) |
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Done ([#12](https://github.com/sarthakviche/belfort/pull/12)) |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Done ([#13](https://github.com/sarthakviche/belfort/pull/13)) |
-| T08 | Journal analytics | 1 Practice | P1 | M | Ready |
+| T08 | Journal analytics | 1 Practice | P1 | M | In progress |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Done ([#14](https://github.com/sarthakviche/belfort/pull/14)) |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Ready |
 | T11 | Equity curve | 1 Practice | P2 | M | Ready |
@@ -107,7 +107,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** Settlement rules for trailing and partial exits are documented in the engine docstring and covered by tests.
 
 ### T08 · Journal analytics
-- **P1 · M · Status:** Ready · **Area:** practice
+- **Owner:** Devansh · **P1 · M · Status:** In progress · **Area:** practice
 - **Do:** Mistake tags on closed trades (moved stop, no plan, chased, sized too big, exited early), R distribution chart, results by setup tag and by holding time, and best and worst habits.
 - **Done when:** Analytics come from a tested pure module; the review screen shows them.
 
