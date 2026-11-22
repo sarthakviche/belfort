@@ -10,7 +10,7 @@
 
 ## Not verified yet
 
-- **Ask Belfort with a real AI key.** Only simulated replies have been tested (T02).
+- **Ask Belfort with a real AI key.** Error paths were checked live on 22 November 2026 (wrong Gemini key, wrong OpenAI key, local Ollama not running) and now say what to do. A successful answer from a real provider for a report, a lesson and a news story is still untested (T02).
 - **Small windows and keyboard-only use** (T32).
 - **The Windows desktop launcher** (`run.bat`, `run_desktop.py`) was carried over from Belfort AI with renamed paths but not re-run. It is replaced by T36.
 - **Platforms.** Launching for Windows only; macOS and Linux are not targets for 1.0.
