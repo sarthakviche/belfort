@@ -22,7 +22,7 @@ Belfort finds eight classic patterns automatically. To see whether they add anyt
 | Head and shoulders | 77 | 17% | 13% |
 | Inverse head and shoulders | 56 | 32% | 32% |
 | Ascending triangle | 34 | 32% | 30% |
-| Descending triangle | 39 | 18% | 21% |
+| Descending triangle | 39 | 18% | 22% |
 | Symmetrical triangle | 42 | 19% | 14% |
 
 ## How to read it
