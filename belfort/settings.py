@@ -76,7 +76,13 @@ PAPER_MAX_RISK_PCT = 2.0  # one trade risking more than this gets a warning
 REPLAY_WINDOW_BARS = 200  # one replay chart: what you see plus what is revealed
 REPLAY_VISIBLE_BARS = 140  # sessions shown before the decision; the other 60 stay on the server
 REPLAY_MIN_HISTORY_BARS = 260  # skip symbols with less lagged history than this
-TICKET_CHART_BARS = 63  # about three months of sessions on the order ticket's mini chart
+TICKET_CHART_BARS = 63
+TRAIL_ATR_PERIOD = 14  # sessions in the ATR a trailing stop can use
+TRAIL_PCT_RANGE = (1.0, 25.0)  # allowed trailing distance in percent of the close
+TRAIL_ATR_RANGE = (
+    0.5,
+    6.0,
+)  # allowed trailing distance in ATR multiples  # about three months of sessions on the order ticket's mini chart
 # ---------------- Stock search (the picker) ----------------
 SEARCH_LIMIT = 8  # rows in the picker dropdown
 SEARCH_MIN_INITIALS = 2  # "hul" matches Hindustan Unilever from two letters up

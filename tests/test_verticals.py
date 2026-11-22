@@ -85,6 +85,113 @@ def test_close_request_exits_next_open():
     assert f.exit_price == 102 and f.exit_reason == "closed by you"
 
 
+# ---------------- T07: raised stops, trailing stops, partial exits ----------------
+
+
+def _opened(**kw):
+    """A trade that filled at 100 on 2026-01-02 with the stop at 95."""
+    return trade(status="open", entry_price=100.0, entry_date="2026-01-02", target=None, **kw)
+
+
+def test_raised_stop_applies_from_the_next_session():
+    df = bars([("2026-01-02", 100, 101, 99, 100), ("2026-01-05", 100, 103, 97.5, 102), ("2026-01-06", 102, 103, 97, 99)])
+    f = engine.settle_trade(_opened(stop_moves='[{"on": "2026-01-05", "stop": 98}]'), df)
+    assert f.exit_date == "2026-01-06" and f.exit_price == 98.0  # on the 5th the low of 97.5 was still above the old 95
+    assert f.exit_reason == "raised stop hit at ₹98.00"
+
+
+def test_raised_stop_gap_exits_at_the_open():
+    df = bars([("2026-01-02", 100, 101, 99, 100), ("2026-01-05", 101, 102, 100, 101), ("2026-01-06", 97, 98, 96, 97)])
+    f = engine.settle_trade(_opened(stop_moves='[{"on": "2026-01-02", "stop": 99}]'), df)
+    assert f.exit_price == 97 and f.exit_reason == "gapped below the raised stop"
+
+
+def test_a_lower_stop_move_never_lowers_the_stop():
+    df = bars([("2026-01-02", 100, 101, 99, 100), ("2026-01-05", 100, 101, 95.5, 100)])
+    f = engine.settle_trade(_opened(stop_moves='[{"on": "2026-01-02", "stop": 90}]'), df)
+    assert f.status == "open" and f.stop == 95.0
+
+
+def test_percent_trailing_stop_ratchets_on_closes_and_never_falls():
+    rows = [
+        ("2026-01-02", 100, 101, 99, 100),
+        ("2026-01-05", 100, 106, 100, 105),  # close 105 -> trail 99.75
+        ("2026-01-06", 105, 111, 104, 110),  # close 110 -> trail 104.50
+        ("2026-01-07", 110, 110, 105, 106),  # close 106 -> candidate 100.70, the stop stays 104.50
+    ]
+    f = engine.settle_trade(_opened(trail_kind="pct", trail_value=5, trail_from="2026-01-02"), bars(rows))
+    assert f.status == "open" and f.stop == 104.5
+    rows.append(("2026-01-08", 105, 106, 104, 105))
+    hit = engine.settle_trade(_opened(trail_kind="pct", trail_value=5, trail_from="2026-01-02"), bars(rows))
+    assert hit.exit_date == "2026-01-08" and hit.exit_price == 104.5 and "raised stop" in hit.exit_reason
+
+
+def test_atr_trailing_stop_uses_the_atr_at_each_close():
+    df = bars([(f"2026-02-{d:02d}", 100 + d, 102 + d, 99 + d, 101 + d) for d in range(2, 12)])
+    t = trade(
+        status="open",
+        entry_price=103.0,
+        entry_date="2026-02-02",
+        target=None,
+        trail_kind="atr",
+        trail_value=2,
+        trail_from="2026-02-02",
+    )
+    f = engine.settle_trade(t, df)
+    ranges = engine.atr(df)
+    expected = round(float(df["close"].iloc[-1]) - 2 * float(ranges.iloc[-1]), 2)
+    assert f.status == "open" and f.stop == expected
+
+
+def test_trail_waits_for_the_session_after_it_was_set():
+    df = bars([("2026-01-02", 100, 101, 99, 100), ("2026-01-05", 100, 121, 100, 120)])
+    f = engine.settle_trade(_opened(trail_kind="pct", trail_value=5, trail_from="2026-01-05"), df)
+    assert f.stop == 95.0  # the close on the day it was set does not count
+
+
+def _filled_trade(qty=10):
+    acc = service.account()
+    with db.connect() as con:
+        cur = con.execute(
+            "INSERT INTO trades (account_id, symbol, qty, entry_type, stop, thesis, placed_on, status, entry_price, entry_date) "
+            "VALUES (?, 'TCS', ?, 'market', 50, 'managed position', '2026-01-02', 'open', 100, '2026-01-05')",
+            (acc["id"], qty),
+        )
+        return cur.lastrowid
+
+
+def test_manage_api_raises_trails_and_sells_part(fresh_db):
+    c = TestClient(app)
+    tid = _filled_trade()
+    last = float(price_frame(n=400, drift=0.001)["close"].iloc[-1])
+    lower = c.post(f"/api/practice/trades/{tid}/stop", json={"stop": 40})
+    assert lower.status_code == 400 and "only moves up" in lower.json()["detail"]
+    above = c.post(f"/api/practice/trades/{tid}/stop", json={"stop": last + 1})
+    assert above.status_code == 400 and "below the last close" in above.json()["detail"]
+    assert c.post(f"/api/practice/trades/{tid}/stop", json={"stop": 60}).status_code == 200
+    assert service.current_stop(dict(next(t for t in service._trades(service.account()["id"]) if t["id"] == tid))) == 60
+    bad_trail = c.post(f"/api/practice/trades/{tid}/trail", json={"kind": "pct", "value": 40})
+    assert bad_trail.status_code == 400 and "between" in bad_trail.json()["detail"]
+    assert "Trailing stop on" in c.post(f"/api/practice/trades/{tid}/trail", json={"kind": "atr", "value": 2}).json()["message"]
+    assert c.post(f"/api/practice/trades/{tid}/sell", json={"qty": 10}).status_code == 400  # all of it is an Exit
+    assert "The other 6 stay open" in c.post(f"/api/practice/trades/{tid}/sell", json={"qty": 4}).json()["message"]
+    rows = service._trades(service.account()["id"])
+    child = next(t for t in rows if t["parent_id"] == tid)
+    parent = next(t for t in rows if t["id"] == tid)
+    assert (parent["qty"], child["qty"]) == (6, 4) and child["close_requested_on"] and child["entry_price"] == 100
+    assert child["trail_kind"] == "atr" and child["stop"] == 50  # the part sold keeps the plan and the original risk
+    assert c.post(f"/api/practice/trades/{tid}/trail", json={"kind": "off"}).status_code == 200
+
+
+def test_manage_api_refuses_pending_and_closing_trades(fresh_db):
+    c = TestClient(app)
+    tid = _filled_trade()
+    c.post(f"/api/practice/trades/{tid}/close")
+    again = c.post(f"/api/practice/trades/{tid}/stop", json={"stop": 60})
+    assert again.status_code == 400 and "already requested" in again.json()["detail"]
+    assert c.post("/api/practice/trades/99999/sell", json={"qty": 1}).status_code == 400
+
+
 def test_brier_rewards_honest_confidence():
     assert engine.brier(0.5, True) == engine.brier(0.5, False) == 0.25
     assert engine.forecast_points(engine.brier(0.5, True)) == 0

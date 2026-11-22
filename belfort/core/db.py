@@ -50,6 +50,15 @@ MIGRATIONS = [
         visible INTEGER NOT NULL, created TEXT NOT NULL DEFAULT (datetime('now')), scored_on TEXT
     );
     """,
+    # 4: managing open trades: raised stops, trailing stops, partial exits (T07)
+    """
+    ALTER TABLE trades ADD COLUMN stop_moves TEXT NOT NULL DEFAULT '[]';
+    ALTER TABLE trades ADD COLUMN current_stop REAL;
+    ALTER TABLE trades ADD COLUMN trail_kind TEXT;
+    ALTER TABLE trades ADD COLUMN trail_value REAL;
+    ALTER TABLE trades ADD COLUMN trail_from TEXT;
+    ALTER TABLE trades ADD COLUMN parent_id INTEGER;
+    """,
 ]
 
 _lock = threading.Lock()

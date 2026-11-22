@@ -1,5 +1,6 @@
 """Practice vertical: a paper account, a prediction journal and a chart-replay trainer. Virtual points only."""
 
+import json
 import random
 import secrets
 from datetime import date
@@ -21,6 +22,8 @@ from ..settings import (
     REPLAY_WINDOW_BARS,
     STYLES,
     TICKET_CHART_BARS,
+    TRAIL_ATR_RANGE,
+    TRAIL_PCT_RANGE,
 )
 from . import engine
 
@@ -74,12 +77,13 @@ def settle_all(force: bool = False) -> None:
             complete = False
             continue
         f = engine.settle_trade(t, df)
-        if f.status != t["status"] or f.entry_price != t["entry_price"]:
+        current = f.stop if f.stop is not None else t.get("current_stop")
+        if f.status != t["status"] or f.entry_price != t["entry_price"] or current != t.get("current_stop"):
             with db.connect() as con:
                 con.execute(
-                    "UPDATE trades SET status=?, entry_price=?, entry_date=?, exit_price=?, exit_date=?, exit_reason=? "
-                    "WHERE id=?",
-                    (f.status, f.entry_price, f.entry_date, f.exit_price, f.exit_date, f.exit_reason, t["id"]),
+                    "UPDATE trades SET status=?, entry_price=?, entry_date=?, exit_price=?, exit_date=?, exit_reason=?, "
+                    "current_stop=? WHERE id=?",
+                    (f.status, f.entry_price, f.entry_date, f.exit_price, f.exit_date, f.exit_reason, current, t["id"]),
                 )
     if complete:
         with db.connect() as con:
@@ -124,6 +128,7 @@ def portfolio() -> dict:
             open_rows.append(
                 {
                     **t,
+                    "current_stop": current_stop(t),
                     "last": last,
                     "as_of": as_of,
                     "pnl": round((last - t["entry_price"]) * t["qty"], 2),
@@ -309,6 +314,79 @@ def close_trade(trade_id: int) -> dict:
             raise PracticeError("This trade is already finished.")
         con.execute("UPDATE trades SET close_requested_on=? WHERE id=?", (_today(), trade_id))
     return {"message": "Exit requested. It fills at the next session's open."}
+
+
+def _open_trade(con, trade_id: int):
+    t = con.execute("SELECT * FROM trades WHERE id=?", (trade_id,)).fetchone()
+    if not t:
+        raise PracticeError("No such trade.")
+    if t["status"] != "open":
+        raise PracticeError("Only an open position can be managed. Orders still waiting to fill can be cancelled.")
+    if t["close_requested_on"]:
+        raise PracticeError("An exit is already requested for this position.")
+    return dict(t)
+
+
+def current_stop(t: dict) -> float:
+    """The stop that applies now: the latest raise, or what the last settlement trailed it to."""
+    moves = engine.stop_moves(t)
+    return max([float(t["stop"]), t.get("current_stop") or 0.0] + [float(m["stop"]) for m in moves])
+
+
+def raise_stop(trade_id: int, new_stop: float) -> dict:
+    """Move an open position's stop up. It never moves down, and it applies from the next session."""
+    with db.connect() as con:
+        t = _open_trade(con, trade_id)
+    now = current_stop(t)
+    if new_stop <= now:
+        raise PracticeError(f"A stop only moves up. The stop is ₹{now:.2f}; set a higher one, or leave it.")
+    last = _last_closes({t["symbol"]}).get(t["symbol"], (None, None))[0]
+    if last is not None and new_stop >= last:
+        raise PracticeError(f"The stop must stay below the last close (₹{last:.2f}). To leave now, use Exit.")
+    moves = engine.stop_moves(t) + [{"on": _today(), "stop": round(float(new_stop), 2)}]
+    with db.connect() as con:
+        con.execute("UPDATE trades SET stop_moves=?, current_stop=? WHERE id=?", (json.dumps(moves), new_stop, trade_id))
+    return {"message": f"Stop raised to ₹{new_stop:.2f}. It applies from the next session."}
+
+
+def set_trail(trade_id: int, kind: str, value: float | None) -> dict:
+    """Turn a trailing stop on (a percentage or an ATR multiple below each close) or off."""
+    if kind == "off":
+        with db.connect() as con:
+            _open_trade(con, trade_id)
+            con.execute("UPDATE trades SET trail_kind=NULL, trail_value=NULL, trail_from=NULL WHERE id=?", (trade_id,))
+        return {"message": "Trailing stop turned off. The stop stays where it is now."}
+    limits = {"pct": TRAIL_PCT_RANGE, "atr": TRAIL_ATR_RANGE}
+    if kind not in limits:
+        raise PracticeError("A trailing stop is a percentage (pct) or an ATR multiple (atr).")
+    low, high = limits[kind]
+    if value is None or not low <= value <= high:
+        unit = "%" if kind == "pct" else " x ATR"
+        raise PracticeError(f"Choose a trailing distance between {low:g}{unit} and {high:g}{unit}.")
+    with db.connect() as con:
+        _open_trade(con, trade_id)
+        con.execute("UPDATE trades SET trail_kind=?, trail_value=?, trail_from=? WHERE id=?", (kind, value, _today(), trade_id))
+    what = f"{value:g}% below" if kind == "pct" else f"{value:g} x ATR below"
+    return {"message": f"Trailing stop on: {what} each close, ratcheting up only, from the next session."}
+
+
+def sell_part(trade_id: int, qty: int) -> dict:
+    """Sell part of an open position at the next open; the rest keeps its plan."""
+    with db.connect() as con:
+        t = _open_trade(con, trade_id)
+        if not 1 <= qty < t["qty"]:
+            raise PracticeError(f"Sell between 1 and {t['qty'] - 1} shares. To sell all {t['qty']}, use Exit.")
+        con.execute("UPDATE trades SET qty=? WHERE id=?", (t["qty"] - qty, trade_id))
+        columns = (
+            "account_id, symbol, entry_type, limit_price, stop, target, thesis, confidence, placed_on, status, "
+            "entry_price, entry_date, stop_moves, current_stop, trail_kind, trail_value, trail_from"
+        )
+        con.execute(
+            f"INSERT INTO trades ({columns}, qty, close_requested_on, parent_id) "
+            f"SELECT {columns}, ?, ?, id FROM trades WHERE id=?",
+            (qty, _today(), trade_id),
+        )
+    return {"message": f"Selling {qty} of {t['qty']} shares at the next session's open. The other {t['qty'] - qty} stay open."}
 
 
 def review_trade(trade_id: int, review: str) -> dict:
