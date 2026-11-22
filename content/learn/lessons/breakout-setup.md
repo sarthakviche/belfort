@@ -18,7 +18,7 @@ Two details matter. It must be a **close** above the level, not just a touch dur
 
 ## Why volume decides it
 
-A close above resistance on thin volume means few people took part. Those breakouts often slip back under the level within days. A close on heavy volume shows many buyers acted at the new price. That is why the report labels a breakout on volume below 1.5 times average as "Partly met", with the reason spelled out.
+A close above resistance on thin volume means few people took part. Those breakouts often slip back under the level within days. A close on heavy volume shows many buyers acted at the new price. That is why, on volume below 1.5 times average, the report marks the entry-area check as not met and says the volume was thin.
 
 ## Planning the trade
 
@@ -38,7 +38,7 @@ A close above resistance on thin volume means few people took part. Those breako
 
 Many breakouts fail. Price closes above the high, then falls back below it in the next few sessions. The stop limits that loss to about 1R. Expecting failures, and keeping each one small, is part of the setup.
 
-In this past chart, find a close above a prior high. Was volume heavy that day, and did price stay above the level?
+In this past chart, look for a close above the highest point of the previous few weeks. If you find one, was volume heavy that day, and did price stay above the level? If you find none, that is normal too: in a falling market, breakouts are rare.
 
 ::chart INFY 150
 
@@ -46,7 +46,7 @@ In this past chart, find a close above a prior high. Was volume heavy that day, 
 
 ```quiz
 [
-  {"q": "A swing-style stock closes above its 20-day high on 0.9 times average volume. How does Belfort label the entry area?", "options": ["Conditions met", "Partly met, because volume is thin", "Rule excludes, because breakouts are banned"], "answer": 1, "why": "The breakout needs at least 1.5 times average volume. On thin volume the check is not met and the reason is shown."},
+  {"q": "A swing-style stock closes above its 20-day high on 0.9 times average volume. What does Belfort's entry-area check say?", "options": ["It passes", "It is not met, because volume is thin", "It places the trade for you"], "answer": 1, "why": "The breakout needs at least 1.5 times average volume. On thin volume the check is not met and the reason is shown."},
   {"q": "Why does a breakout need a close above the level, not just a touch?", "options": ["A touch during the day can reverse before the close", "Closes are cheaper to trade", "Exchanges only report closes"], "answer": 0, "why": "Price can poke above a level intraday and fall back. A close shows the level held through the session."},
   {"q": "Capital ₹2,00,000, risk 1%, entry ₹820, stop ₹780. How many shares?", "options": ["25", "50", "100"], "answer": 1, "why": "Risk money ₹2,000 ÷ ₹40 per share = 50 shares."}
 ]

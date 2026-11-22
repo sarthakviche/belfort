@@ -46,7 +46,7 @@ Every price check passes. If the business and results checks also pass, the repo
 - Moving the stop lower when price approaches it.
 - Entering far above the level, which makes the stop wide and the size small.
 
-In this past chart, mark the dips that came back to the rising average. Where would a stop have gone each time?
+Look at this past chart. First decide whether it shows an uptrend at all: are the highs and lows rising? If not, the pullback setup does not apply, however attractive a dip looks. If it does, mark the dips that held above an earlier low and think about where a stop would have gone.
 
 ::chart TCS 200
 
