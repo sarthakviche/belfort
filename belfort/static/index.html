@@ -175,6 +175,10 @@
   <h3 style="margin-top:22px">Practice account</h3>
   <p class="hint">Start again with fresh points. Your trades and their reviews are deleted; predictions and lessons are kept.</p>
   <div class="row"><button type="button" class="btn ghost" id="paper-reset">Reset practice account</button></div>
+  <h3 style="margin-top:22px">Your practice data</h3>
+  <p class="hint">Download your journal as spreadsheets, or keep one backup file you can restore later. Everything stays on this computer.</p>
+  <div class="row wrap"><a class="btn ghost sm" href="/api/practice/export/trades.csv" download>Trades (CSV)</a><a class="btn ghost sm" href="/api/practice/export/predictions.csv" download>Predictions (CSV)</a><a class="btn ghost sm" href="/api/practice/export/replays.csv" download>Replays (CSV)</a><a class="btn ghost sm" href="/api/practice/export/backup.json" download>Backup (JSON)</a></div>
+  <div class="row"><label class="btn ghost sm" for="backup-file">Restore a backup…</label><input type="file" id="backup-file" accept=".json,application/json" hidden><span class="hint" id="backup-msg"></span></div>
   <h3 style="margin-top:22px">About</h3>
   <p class="hint" id="about"></p>
 </div>

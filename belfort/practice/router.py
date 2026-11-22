@@ -1,11 +1,11 @@
 """Practice vertical API: paper account, prediction journal, chart replay. Virtual points only."""
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Body, HTTPException, Query, Response
 from pydantic import BaseModel, Field
 
 from .. import settings
 from ..data.providers import DataError
-from . import service
+from . import backup, service
 from .service import PracticeError
 
 router = APIRouter(prefix="/api/practice", tags=["practice"])
@@ -142,6 +142,34 @@ def journal_analytics():
 @router.post("/trades/{trade_id}/review")
 def review(trade_id: int, body: ReviewIn):
     return _guard(service.review_trade, trade_id, body.review)
+
+
+@router.get("/export/backup.json")
+def export_backup():
+    import json
+
+    return Response(
+        json.dumps(backup.export_backup(), indent=1),
+        media_type="application/json",
+        headers={"Content-Disposition": 'attachment; filename="belfort-practice-backup.json"'},
+    )
+
+
+@router.get("/export/{table}.csv")
+def export_csv(table: str):
+    try:
+        text = backup.export_csv(table)
+    except backup.BackupError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    return Response(text, media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="belfort-{table}.csv"'})
+
+
+@router.post("/import")
+def import_backup(data: dict = Body(...)):
+    try:
+        return backup.import_backup(data)
+    except backup.BackupError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.post("/reset")
