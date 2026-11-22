@@ -22,7 +22,7 @@
 | T08 | Journal analytics | 1 Practice | P1 | M | Done ([#15](https://github.com/sarthakviche/belfort/pull/15)) |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Done ([#14](https://github.com/sarthakviche/belfort/pull/14)) |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Done ([#16](https://github.com/sarthakviche/belfort/pull/16)) |
-| T11 | Equity curve | 1 Practice | P2 | M | Ready |
+| T11 | Equity curve | 1 Practice | P2 | M | In progress |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Ready |
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Ready |
@@ -120,7 +120,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Do:** Download trades, predictions and replays as CSV and as one JSON backup; import the JSON backup with validation.
 
 ### T11 · Equity curve
-- **P2 · M · Status:** Ready · **Area:** practice
+- **Owner:** Devansh · **P2 · M · Status:** In progress · **Area:** practice
 - **Do:** Snapshot account value each settled day; draw the curve and the largest drawdown.
 
 ## Phase 2: Learn (finish the syllabus)
