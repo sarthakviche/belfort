@@ -5,9 +5,23 @@ and never offers anything of money value for predictions. See docs/COMPLIANCE.md
 """
 
 BANNED_PHRASES = [
-    "guaranteed", "guarantee", "sure shot", "sure-shot", "buy now", "sell now", "strong buy", "strong sell",
-    "will definitely", "can't lose", "cannot lose", "risk-free", "risk free", "multibagger", "target hit guaranteed",
-    "jackpot", "double your money",
+    "guaranteed",
+    "guarantee",
+    "sure shot",
+    "sure-shot",
+    "buy now",
+    "sell now",
+    "strong buy",
+    "strong sell",
+    "will definitely",
+    "can't lose",
+    "cannot lose",
+    "risk-free",
+    "risk free",
+    "multibagger",
+    "target hit guaranteed",
+    "jackpot",
+    "double your money",
 ]
 
 DISCLAIMER = (
@@ -17,8 +31,10 @@ DISCLAIMER = (
     "no money value. Markets carry risk and you can lose money. Belfort never places orders."
 )
 
-AI_NOTICE = ("Answers come from the AI provider you chose, using your own key. The assistant explains; it does not give "
-             "buy or sell advice, and it can be wrong.")
+AI_NOTICE = (
+    "Answers come from the AI provider you chose, using your own key. The assistant explains; it does not give "
+    "buy or sell advice, and it can be wrong."
+)
 
 
 def find_banned(text: str) -> list[str]:

@@ -1,4 +1,5 @@
 """Settings, style presets and thresholds. Every number a rule uses lives here, so it can be read and changed."""
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -31,16 +32,16 @@ class Style:
     key: str
     name: str
     holds: str
-    k: int                 # bars each side of a pivot
-    fast: int              # fast moving average
-    slow: int              # slow moving average
+    k: int  # bars each side of a pivot
+    fast: int  # fast moving average
+    slow: int  # slow moving average
     min_bars: int
-    atr_stop: float        # fallback stop in ATRs
-    max_stop_pct: float    # widest acceptable stop distance
-    breakout_n: int        # bars for a breakout high
+    atr_stop: float  # fallback stop in ATRs
+    max_stop_pct: float  # widest acceptable stop distance
+    breakout_n: int  # bars for a breakout high
     fib_lookback: int
     earnings_blackout: int  # trading days; 0 = flag only
-    horizon: int           # bars used when judging patterns in the backtest
+    horizon: int  # bars used when judging patterns in the backtest
 
 
 STYLES = {
@@ -49,7 +50,7 @@ STYLES = {
 }
 
 MIN_REWARD_TO_RISK = 1.5
-BREAKOUT_VOLUME = 1.5      # times the 20-day average
+BREAKOUT_VOLUME = 1.5  # times the 20-day average
 TICK = 0.05
 
 # Labels describe whether a fixed rule's conditions hold. They are not buy or sell words.
@@ -67,5 +68,5 @@ EDU_LAG_DAYS = 30
 
 # Practice: virtual points only. 1 point stands for 1 rupee. Never redeemable for anything.
 PAPER_START_POINTS = 1_000_000
-PAPER_COST_PCT = 0.0005          # rough cost per side (brokerage, taxes) so practice is not cost-free
+PAPER_COST_PCT = 0.0005  # rough cost per side (brokerage, taxes) so practice is not cost-free
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}

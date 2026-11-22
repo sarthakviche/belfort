@@ -1,4 +1,5 @@
 """Trend, support/resistance, Fibonacci and volume reads."""
+
 import numpy as np
 import pandas as pd
 
@@ -48,10 +49,20 @@ def trend_state(df: pd.DataFrame, pivots: list[Pivot], st: Style) -> dict:
     if slow and len(df) >= st.slow + 10:
         slow_rising = bool(slow > float(slow_s.iloc[-11]))
     return {
-        "direction": direction, "phase": phase, "structure": structure, "ma_alignment": align,
-        "broke_above_last_high": bool(broke_up), "broke_below_last_low": bool(broke_down),
-        "last_swing_high": last_h, "last_swing_low": last_l, "recent": recent,
-        "close": close, "fast": fast, "slow": slow, "fast_n": st.fast, "slow_n": st.slow,
+        "direction": direction,
+        "phase": phase,
+        "structure": structure,
+        "ma_alignment": align,
+        "broke_above_last_high": bool(broke_up),
+        "broke_below_last_low": bool(broke_down),
+        "last_swing_high": last_h,
+        "last_swing_low": last_l,
+        "recent": recent,
+        "close": close,
+        "fast": fast,
+        "slow": slow,
+        "fast_n": st.fast,
+        "slow_n": st.slow,
         "slow_rising": slow_rising,
         "swing_highs": [{"idx": p.idx, "price": p.price} for p in highs],
         "swing_lows": [{"idx": p.idx, "price": p.price} for p in lows],
@@ -71,12 +82,17 @@ def find_levels(pivots: list[Pivot], close: float, atr: float, n_bars: int, look
     levels = []
     for c in clusters:
         price = float(np.mean([p.price for p in c]))
-        levels.append({
-            "price": round(price, 2), "touches": len(c), "last_touch_idx": max(p.idx for p in c),
-            "bars": [p.idx for p in c], "distance_pct": round((price - close) / close * 100, 2),
-        })
-    sup = sorted([l for l in levels if l["price"] < close], key=lambda l: -l["price"])
-    res = sorted([l for l in levels if l["price"] >= close], key=lambda l: l["price"])
+        levels.append(
+            {
+                "price": round(price, 2),
+                "touches": len(c),
+                "last_touch_idx": max(p.idx for p in c),
+                "bars": [p.idx for p in c],
+                "distance_pct": round((price - close) / close * 100, 2),
+            }
+        )
+    sup = sorted([lv for lv in levels if lv["price"] < close], key=lambda lv: -lv["price"])
+    res = sorted([lv for lv in levels if lv["price"] >= close], key=lambda lv: lv["price"])
     return {"supports": sup[:5], "resistances": res[:5]}
 
 
@@ -94,8 +110,14 @@ def fibonacci(df: pd.DataFrame, lookback: int) -> dict | None:
     up = lo_i < hi_i  # low came first: an up-swing, so retracements sit below the high
     off = len(df) - len(w)
     levels = [{"ratio": r, "price": round(hi - r * (hi - lo) if up else lo + r * (hi - lo), 2)} for r in FIB_RATIOS]
-    return {"direction": "up" if up else "down", "high": hi, "low": lo,
-            "high_idx": off + hi_i, "low_idx": off + lo_i, "levels": levels}
+    return {
+        "direction": "up" if up else "down",
+        "high": hi,
+        "low": lo,
+        "high_idx": off + hi_i,
+        "low_idx": off + lo_i,
+        "levels": levels,
+    }
 
 
 def volume_read(df: pd.DataFrame, st: Style) -> dict:
@@ -112,16 +134,24 @@ def volume_read(df: pd.DataFrame, st: Style) -> dict:
         for back in range(0, 3):  # breakout today or in the last two bars
             i = len(df) - 1 - back
             if c.iloc[i] > prior_high.iloc[i] and c.iloc[i - 1] <= prior_high.iloc[i - 1]:
-                base = float(v.iloc[i - 20:i].mean())
+                base = float(v.iloc[i - 20 : i].mean())
                 rv = float(v.iloc[i] / base) if base else None
-                breakout = {"bars_ago": back, "idx": i, "level": round(float(prior_high.iloc[i]), 2),
-                            "rel_volume": round(rv, 2) if rv else None,
-                            "confirmed": bool(rv and rv >= BREAKOUT_VOLUME),
-                            "still_above": bool(c.iloc[-1] > prior_high.iloc[i])}
+                breakout = {
+                    "bars_ago": back,
+                    "idx": i,
+                    "level": round(float(prior_high.iloc[i]), 2),
+                    "rel_volume": round(rv, 2) if rv else None,
+                    "confirmed": bool(rv and rv >= BREAKOUT_VOLUME),
+                    "still_above": bool(c.iloc[-1] > prior_high.iloc[i]),
+                }
                 break
     return {
-        "last_volume": float(v.iloc[-1]), "avg20": avg20, "rel_volume": round(rel, 2) if rel else None,
-        "up_day_avg": up_v, "down_day_avg": dn_v,
+        "last_volume": float(v.iloc[-1]),
+        "avg20": avg20,
+        "rel_volume": round(rel, 2) if rel else None,
+        "up_day_avg": up_v,
+        "down_day_avg": dn_v,
         "up_down_ratio": round(up_v / dn_v, 2) if dn_v else None,
-        "breakout": breakout, "breakout_n": n,
+        "breakout": breakout,
+        "breakout_n": n,
     }

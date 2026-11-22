@@ -1,4 +1,5 @@
 """Practice vertical API: paper account, prediction journal, chart replay. Virtual points only."""
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -12,9 +13,9 @@ def _guard(fn, *a, **k):
     try:
         return fn(*a, **k)
     except PracticeError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 class TradeIn(BaseModel):
@@ -57,11 +58,13 @@ def portfolio():
 @router.post("/trades")
 def place(body: TradeIn):
     from ..data.providers import DataError
+
     try:
-        return service.place_trade(body.symbol, body.qty, body.stop, body.target, body.thesis, body.confidence,
-                                   body.entry_type, body.limit_price)
+        return service.place_trade(
+            body.symbol, body.qty, body.stop, body.target, body.thesis, body.confidence, body.entry_type, body.limit_price
+        )
     except (PracticeError, DataError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.post("/trades/{trade_id}/close")
@@ -87,19 +90,21 @@ def predictions():
 @router.post("/predictions")
 def predict(body: PredictionIn):
     from ..data.providers import DataError
+
     try:
         return service.add_prediction(body.symbol, body.direction, body.horizon, body.confidence, body.reason)
     except (PracticeError, DataError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/replay/new")
 def replay_new(symbol: str | None = None):
     from ..data.providers import DataError
+
     try:
         return service.replay_new(symbol)
     except (PracticeError, DataError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.post("/replay/score")

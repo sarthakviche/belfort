@@ -6,6 +6,7 @@
 
 Company-size bands use approximate market-value cut-offs, stated in the output.
 """
+
 import threading
 import time
 import warnings
@@ -15,29 +16,152 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from .analysis.pivots import find_pivots
-from .analysis.structure import trend_state
-from ..settings import STYLES
 from ..data.cache import cached
 from ..data.providers import YahooProvider
+from ..settings import STYLES
+from .analysis.pivots import find_pivots
+from .analysis.structure import trend_state
 
 warnings.filterwarnings("ignore")
 
-NIFTY = ["ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV",
-         "BEL", "BHARTIARTL", "CIPLA", "COALINDIA", "DRREDDY", "EICHERMOT", "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE",
-         "HEROMOTOCO", "HINDALCO", "HINDUNILVR", "ICICIBANK", "INDUSINDBK", "INFY", "ITC", "JIOFIN", "JSWSTEEL",
-         "KOTAKBANK", "LT", "M&M", "MARUTI", "NESTLEIND", "NTPC", "ONGC", "POWERGRID", "RELIANCE", "SBILIFE", "SBIN",
-         "SHRIRAMFIN", "SUNPHARMA", "TATACONSUM", "TATASTEEL", "TCS", "TECHM", "TITAN", "TRENT", "ULTRACEMCO", "WIPRO"]
+NIFTY = [
+    "ADANIENT",
+    "ADANIPORTS",
+    "APOLLOHOSP",
+    "ASIANPAINT",
+    "AXISBANK",
+    "BAJAJ-AUTO",
+    "BAJFINANCE",
+    "BAJAJFINSV",
+    "BEL",
+    "BHARTIARTL",
+    "CIPLA",
+    "COALINDIA",
+    "DRREDDY",
+    "EICHERMOT",
+    "GRASIM",
+    "HCLTECH",
+    "HDFCBANK",
+    "HDFCLIFE",
+    "HEROMOTOCO",
+    "HINDALCO",
+    "HINDUNILVR",
+    "ICICIBANK",
+    "INDUSINDBK",
+    "INFY",
+    "ITC",
+    "JIOFIN",
+    "JSWSTEEL",
+    "KOTAKBANK",
+    "LT",
+    "M&M",
+    "MARUTI",
+    "NESTLEIND",
+    "NTPC",
+    "ONGC",
+    "POWERGRID",
+    "RELIANCE",
+    "SBILIFE",
+    "SBIN",
+    "SHRIRAMFIN",
+    "SUNPHARMA",
+    "TATACONSUM",
+    "TATASTEEL",
+    "TCS",
+    "TECHM",
+    "TITAN",
+    "TRENT",
+    "ULTRACEMCO",
+    "WIPRO",
+]
 
-BROADER = ["PERSISTENT", "COFORGE", "MPHASIS", "LTTS", "KPITTECH", "TATAELXSI", "DIXON", "POLYCAB", "KEI", "CUMMINSIND",
-           "ABB", "SIEMENS", "BHEL", "HAL", "BDL", "MAZDOCK", "COCHINSHIP", "IRCTC", "IRFC", "RVNL", "NHPC", "SJVN",
-           "SUZLON", "TATAPOWER", "JSWENERGY", "FEDERALBNK", "IDFCFIRSTB", "AUBANK", "BANKBARODA", "PNB", "CANBK",
-           "MUTHOOTFIN", "CHOLAFIN", "LICHSGFIN", "LUPIN", "AUROPHARMA", "ALKEM", "TORNTPHARM", "LAURUSLABS", "GLENMARK",
-           "ASHOKLEY", "TVSMOTOR", "BALKRISIND", "MRF", "APOLLOTYRE", "EXIDEIND", "PIIND", "UPL", "DEEPAKNTR", "SRF",
-           "AARTIIND", "TATACHEM", "VOLTAS", "HAVELLS", "CROMPTON", "PAGEIND", "JUBLFOOD", "MARICO", "DABUR", "COLPAL",
-           "GODREJCP", "INDHOTEL", "PVRINOX", "SAIL", "NMDC", "JINDALSTEL", "NATIONALUM", "VEDL", "OBEROIRLTY", "DLF",
-           "GODREJPROP", "PRESTIGE", "CDSL", "BSE", "CAMS", "ANGELONE", "KAYNES", "IEX", "NBCC", "IREDA", "HUDCO",
-           "IOC", "BPCL", "DIVISLAB", "BRITANNIA"]
+BROADER = [
+    "PERSISTENT",
+    "COFORGE",
+    "MPHASIS",
+    "LTTS",
+    "KPITTECH",
+    "TATAELXSI",
+    "DIXON",
+    "POLYCAB",
+    "KEI",
+    "CUMMINSIND",
+    "ABB",
+    "SIEMENS",
+    "BHEL",
+    "HAL",
+    "BDL",
+    "MAZDOCK",
+    "COCHINSHIP",
+    "IRCTC",
+    "IRFC",
+    "RVNL",
+    "NHPC",
+    "SJVN",
+    "SUZLON",
+    "TATAPOWER",
+    "JSWENERGY",
+    "FEDERALBNK",
+    "IDFCFIRSTB",
+    "AUBANK",
+    "BANKBARODA",
+    "PNB",
+    "CANBK",
+    "MUTHOOTFIN",
+    "CHOLAFIN",
+    "LICHSGFIN",
+    "LUPIN",
+    "AUROPHARMA",
+    "ALKEM",
+    "TORNTPHARM",
+    "LAURUSLABS",
+    "GLENMARK",
+    "ASHOKLEY",
+    "TVSMOTOR",
+    "BALKRISIND",
+    "MRF",
+    "APOLLOTYRE",
+    "EXIDEIND",
+    "PIIND",
+    "UPL",
+    "DEEPAKNTR",
+    "SRF",
+    "AARTIIND",
+    "TATACHEM",
+    "VOLTAS",
+    "HAVELLS",
+    "CROMPTON",
+    "PAGEIND",
+    "JUBLFOOD",
+    "MARICO",
+    "DABUR",
+    "COLPAL",
+    "GODREJCP",
+    "INDHOTEL",
+    "PVRINOX",
+    "SAIL",
+    "NMDC",
+    "JINDALSTEL",
+    "NATIONALUM",
+    "VEDL",
+    "OBEROIRLTY",
+    "DLF",
+    "GODREJPROP",
+    "PRESTIGE",
+    "CDSL",
+    "BSE",
+    "CAMS",
+    "ANGELONE",
+    "KAYNES",
+    "IEX",
+    "NBCC",
+    "IREDA",
+    "HUDCO",
+    "IOC",
+    "BPCL",
+    "DIVISLAB",
+    "BRITANNIA",
+]
 
 LARGE_CR, MID_CR = 100000, 30000  # approximate market-value bands in ₹ crore
 CR = 1e7
@@ -48,8 +172,10 @@ _yp = YahooProvider()
 
 def _download(symbols: list[str]) -> dict[str, pd.DataFrame]:
     import yfinance as yf
-    raw = yf.download([s + ".NS" for s in symbols], period="1y", auto_adjust=False, group_by="ticker",
-                      threads=True, progress=False)
+
+    raw = yf.download(
+        [s + ".NS" for s in symbols], period="1y", auto_adjust=False, group_by="ticker", threads=True, progress=False
+    )
     out = {}
     for s in symbols:
         try:
@@ -75,17 +201,23 @@ def _row(sym: str, df: pd.DataFrame, info: dict | None) -> dict:
     de = info.get("debtToEquity")
     sma200 = float(c.iloc[-200:].mean()) if len(c) >= 200 else None
     return {
-        "symbol": sym, "name": info.get("shortName") or info.get("longName") or sym, "sector": info.get("sector"),
-        "close": round(close, 2), "as_of": df.index[-1].strftime("%Y-%m-%d"),
+        "symbol": sym,
+        "name": info.get("shortName") or info.get("longName") or sym,
+        "sector": info.get("sector"),
+        "close": round(close, 2),
+        "as_of": df.index[-1].strftime("%Y-%m-%d"),
         "chg_1d": round((close / float(c.iloc[-2]) - 1) * 100, 2),
         "chg_1m": round((close / float(c.iloc[-22]) - 1) * 100, 1),
         "chg_3m": round((close / float(c.iloc[-64]) - 1) * 100, 1),
         "from_high": round((close / float(df["high"].max()) - 1) * 100, 1),
         "range_60": round((float(w["high"].max()) / float(w["low"].min()) - 1) * 100, 1),
         "above_200": None if sma200 is None else bool(close >= sma200),
-        "trend": trend["direction"], "phase": trend["phase"],
-        "size": size, "mcap_cr": None if cap_cr is None else round(cap_cr),
-        "pe": info.get("trailingPE"), "roe": None if info.get("returnOnEquity") is None else round(info["returnOnEquity"] * 100, 1),
+        "trend": trend["direction"],
+        "phase": trend["phase"],
+        "size": size,
+        "mcap_cr": None if cap_cr is None else round(cap_cr),
+        "pe": info.get("trailingPE"),
+        "roe": None if info.get("returnOnEquity") is None else round(info["returnOnEquity"] * 100, 1),
         "sales_growth": None if info.get("revenueGrowth") is None else round(info["revenueGrowth"] * 100, 1),
         "de": None if de is None else round(de / 100, 2),
         "lender": info.get("sector") == "Financial Services",
@@ -96,7 +228,7 @@ def build() -> dict:
     symbols = sorted(set(NIFTY + BROADER))
     frames = _download(symbols)
     with ThreadPoolExecutor(max_workers=6) as ex:
-        infos = dict(zip(frames, ex.map(lambda s: _safe_info(s), frames)))
+        infos = dict(zip(frames, ex.map(lambda s: _safe_info(s), frames), strict=False))
     rows = {s: _row(s, df, infos.get(s)) for s, df in frames.items()}
     with_info = [r for r in rows.values() if r["mcap_cr"]]
 
@@ -105,12 +237,21 @@ def build() -> dict:
     for r in nifty:
         r["why"] = f"Trend {r['trend']}{' (recent)' if r['phase'] == 'early' else ''}; {r['from_high']}% from its 1-year high."
 
-    risky = [r for r in with_info if r["size"] in ("Mid cap", "Small cap") and r["trend"] == "up"
-             and (r["sales_growth"] or 0) >= 10 and (r["roe"] or 0) >= 12 and (r["lender"] or (r["de"] is not None and r["de"] < 1.5))]
+    risky = [
+        r
+        for r in with_info
+        if r["size"] in ("Mid cap", "Small cap")
+        and r["trend"] == "up"
+        and (r["sales_growth"] or 0) >= 10
+        and (r["roe"] or 0) >= 12
+        and (r["lender"] or (r["de"] is not None and r["de"] < 1.5))
+    ]
     risky.sort(key=lambda r: -r["chg_3m"])
     for r in risky:
-        r["why"] = (f"{r['size']}; uptrend; sales up {r['sales_growth']}% (latest quarter, year on year); "
-                    f"return on equity {r['roe']}%" + ("" if r["lender"] else f"; debt to equity {r['de']}") + ".")
+        r["why"] = (
+            f"{r['size']}; uptrend; sales up {r['sales_growth']}% (latest quarter, year on year); "
+            f"return on equity {r['roe']}%" + ("" if r["lender"] else f"; debt to equity {r['de']}") + "."
+        )
 
     med = {}
     for sec in {r["sector"] for r in with_info if r["sector"]}:
@@ -120,37 +261,60 @@ def build() -> dict:
     safer = []
     for r in with_info:
         m = med.get(r["sector"])
-        if (r["size"] in ("Large cap", "Mid cap") and m and r["pe"] and 0 < r["pe"] < 0.9 * m and (r["roe"] or 0) >= 10
-                and (r["lender"] or (r["de"] is not None and r["de"] < 1.0)) and r["range_60"] <= 18 and r["above_200"]):
+        if (
+            r["size"] in ("Large cap", "Mid cap")
+            and m
+            and r["pe"]
+            and 0 < r["pe"] < 0.9 * m
+            and (r["roe"] or 0) >= 10
+            and (r["lender"] or (r["de"] is not None and r["de"] < 1.0))
+            and r["range_60"] <= 18
+            and r["above_200"]
+        ):
             r = dict(r)
             r["sector_pe"] = round(m, 1)
-            r["why"] = (f"{r['size']}; P/E {r['pe']:.1f} against {m:.1f} for its sector here; return on equity {r['roe']}%; "
-                        f"price held inside a {r['range_60']}% range for 60 sessions and is above its 200-day average.")
+            r["why"] = (
+                f"{r['size']}; P/E {r['pe']:.1f} against {m:.1f} for its sector here; return on equity {r['roe']}%; "
+                f"price held inside a {r['range_60']}% range for 60 sessions and is above its 200-day average."
+            )
             safer.append(r)
     safer.sort(key=lambda r: r["range_60"])
 
     as_of = max(r["as_of"] for r in rows.values()) if rows else None
     return {
-        "status": "ready", "generated": datetime.now().strftime("%Y-%m-%d %H:%M"), "as_of": as_of,
+        "status": "ready",
+        "generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "as_of": as_of,
         "source": "Yahoo Finance daily prices and key ratios",
         "coverage": f"{len(rows)} of {len(symbols)} built-in stocks returned prices; {len(with_info)} returned company ratios.",
-        "note": ("These screens apply fixed criteria to end-of-day data. They are filters for your own study, not "
-                 "recommendations, and every stock on them can fall."),
+        "note": (
+            "These screens apply fixed criteria to end-of-day data. They are filters for your own study, not "
+            "recommendations, and every stock on them can fall."
+        ),
         "lists": {
-            "large": {"title": "Large caps", "subtitle": "Companies from the built-in Nifty 50 list",
-                      "criteria": "All built-in Nifty 50 stocks, uptrends first. Large caps are usually steadier than smaller companies and "
-                                  "have recovered from past falls more often, but they still fall. Index membership changes; this built-in list can be out of date.",
-                      "rows": nifty},
-            "growth": {"title": "Growth screen", "subtitle": "Mid and small caps with growing figures and an uptrend",
-                      "criteria": f"Market value under ₹{LARGE_CR:,} cr (approximate mid and small cap band), price in an uptrend, sales up at least 10% "
-                                  "in the latest quarter, return on equity at least 12%, debt to equity under 1.5 (lenders exempt). "
-                                  "Smaller companies can rise fast and fall just as fast. Keep position sizes small.",
-                      "rows": risky[:20]},
-            "value": {"title": "Value screen", "subtitle": "Below their sector on P/E and trading in a narrow range",
-                      "criteria": f"Market value above ₹{MID_CR:,} cr, P/E at least 10% below the median of its sector within this app's stock list, return on equity at least 10%, "
-                                  "debt to equity under 1 (lenders exempt), price inside an 18% range for 60 sessions and above its 200-day average. "
-                                  "A narrow range can break upward or downward. Lower P/E than peers is not the same as low risk.",
-                      "rows": safer[:20]},
+            "large": {
+                "title": "Large caps",
+                "subtitle": "Companies from the built-in Nifty 50 list",
+                "criteria": "All built-in Nifty 50 stocks, uptrends first. Large caps are usually steadier than smaller companies and "
+                "have recovered from past falls more often, but they still fall. Index membership changes; this built-in list can be out of date.",
+                "rows": nifty,
+            },
+            "growth": {
+                "title": "Growth screen",
+                "subtitle": "Mid and small caps with growing figures and an uptrend",
+                "criteria": f"Market value under ₹{LARGE_CR:,} cr (approximate mid and small cap band), price in an uptrend, sales up at least 10% "
+                "in the latest quarter, return on equity at least 12%, debt to equity under 1.5 (lenders exempt). "
+                "Smaller companies can rise fast and fall just as fast. Keep position sizes small.",
+                "rows": risky[:20],
+            },
+            "value": {
+                "title": "Value screen",
+                "subtitle": "Below their sector on P/E and trading in a narrow range",
+                "criteria": f"Market value above ₹{MID_CR:,} cr, P/E at least 10% below the median of its sector within this app's stock list, return on equity at least 10%, "
+                "debt to equity under 1 (lenders exempt), price inside an 18% range for 60 sessions and above its 200-day average. "
+                "A narrow range can break upward or downward. Lower P/E than peers is not the same as low risk.",
+                "rows": safer[:20],
+            },
         },
     }
 

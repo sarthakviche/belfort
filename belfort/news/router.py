@@ -1,4 +1,5 @@
 """News vertical API."""
+
 from fastapi import APIRouter
 
 from . import feeds

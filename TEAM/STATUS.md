@@ -1,32 +1,35 @@
 # Status and known limitations
 
-> Temporary file for the founders. Last updated 21 November 2026.
+> Temporary file for the founders. Last updated 22 November 2026. Update it in any PR that changes what is true here.
 
 ## Verified
 
-- 68 automated tests pass, offline (`python -m pytest -q`).
+- 81 automated tests pass offline, with 74% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
 - Each section was clicked through in a browser against live data on 21 November 2026: a research report, a lesson with its example chart and quiz, a paper order, a chart replay, the news page with tip filtering.
 
 ## Not verified yet
 
-- **Ask Belfort with a real AI key.** Only simulated replies have been tested (task T02).
-- **Phones and tablets.** The new screens were checked only at desktop width (task T11).
-- **macOS and Linux.** Developed and run on Windows only.
-- **The Windows desktop launcher** (`run.bat`, `run_desktop.py`) was carried over from Belfort AI with renamed paths but not re-run.
+- **Ask Belfort with a real AI key.** Only simulated replies have been tested (T02).
+- **Small windows and keyboard-only use** (T32).
+- **The Windows desktop launcher** (`run.bat`, `run_desktop.py`) was carried over from Belfort AI with renamed paths but not re-run. It is replaced by T36.
+- **Platforms.** Launching for Windows only; macOS and Linux are not targets for 1.0.
 
 ## Known limitations
 
 | Area | Limitation | Task |
 |---|---|---|
-| Data | Yahoo Finance and NSE archive files are unofficial sources and can change or block access. Statements cover about four years. | D4 |
-| Practice | Each portfolio load fetches bars for every open symbol. | T08 |
-| Practice | The replay trainer sends hidden bars to the browser before the decision. | T09 |
-| Practice | Long only, one account, end-of-day fills, no trailing stops. | Roadmap v0.4 |
-| Learn | 8 of 38 lessons written. | T03 to T05 |
-| News | Company tags cover only about 130 built-in stocks. The tip filter is a list of patterns and will miss some phrasing. | T14 |
-| Research | Rule thresholds can be changed only in code. | T13 |
-| Front end | No browser tests; JavaScript is checked only by clicking through. | T10 |
-| Brand | The sidebar still says "Belfort AI". | D2 |
+| Practice | You must type an exact NSE symbol; no fuzzy picker | T03 |
+| Practice | The order form shows no price, chart or sizing help | T04 |
+| Practice | Each portfolio load fetches bars for every open symbol | T05 |
+| Practice | The replay trainer sends hidden bars to the browser before the decision | T06 |
+| Practice | Long only, one account, end-of-day fills, no trailing stops or partial exits | T07 |
+| Learn | 8 of 38 lessons written | T13 to T22 |
+| News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
+| Research | Rule thresholds can be changed only in code | T25 |
+| Front end | No browser tests; JavaScript is checked only by syntax check and clicking through | T31 |
+| Packaging | Needs Python; data is stored next to the code; fonts and the chart library load from CDNs | T35 to T38 |
+| Data | Yahoo Finance and NSE archive files are unofficial and can change or block access | D4 |
+| Brand | The sidebar still says "Belfort AI" | D2, T41 |
 
 ## Where things came from
 

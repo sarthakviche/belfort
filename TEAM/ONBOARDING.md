@@ -9,13 +9,17 @@ Welcome. This page gets you from clone to your first pull request in about an ho
 ```powershell
 git clone https://github.com/sarthakviche/belfort.git
 cd belfort
+git config user.name "Your Name"            # commits go out under your own name
 python -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python -m pytest -q
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\pre-commit install --hook-type pre-commit --hook-type commit-msg
+.venv\Scripts\python -m pytest --cov
 .venv\Scripts\python -m uvicorn belfort.main:app --port 8765 --reload
 ```
 
-Open <http://localhost:8765>. You need Python 3.12 and an internet connection (prices and news are fetched live; the tests are not).
+Open <http://localhost:8765>. You need Python 3.12 (exactly 3.12, as in CI), Node.js for the JavaScript syntax check, the GitHub CLI (`gh`) for pull requests, and an internet connection (prices and news are fetched live; the tests are not).
+
+The pre-commit hooks format and lint every commit and reject commit messages that are not Conventional Commits or that carry AI-tool attribution. Read [docs/CONVENTIONS.md](../docs/CONVENTIONS.md) before your first commit.
 
 Optional: open **Settings** in the sidebar and paste a free Gemini key from <https://aistudio.google.com/apikey> to try **Ask Belfort**.
 
@@ -34,7 +38,9 @@ Optional: open **Settings** in the sidebar and paste a free Gemini key from <htt
 2. [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md): how the pieces fit, with a diagram.
 3. [docs/COMPLIANCE.md](../docs/COMPLIANCE.md): the rules we design around. This shapes almost every feature decision.
 4. [docs/SYLLABUS.md](../docs/SYLLABUS.md): how we choose what to teach.
-5. [CONTRIBUTING.md](../CONTRIBUTING.md): our branch, PR and review flow.
+5. [CONTRIBUTING.md](../CONTRIBUTING.md): roles, and the branch, PR, CI and merge flow you own.
+6. [docs/CONVENTIONS.md](../docs/CONVENTIONS.md): naming, Conventional Commits, versions.
+7. [CLAUDE.md](../CLAUDE.md): the rules any AI assistant you use must follow here.
 
 ## 4. Map of the code
 
@@ -63,4 +69,6 @@ Optional: open **Settings** in the sidebar and paste a free Gemini key from <htt
 
 ## 6. Your first week
 
-Start with **T01** and **T02** in [TASKS.md](TASKS.md). They are small, touch most of the codebase, and end in a merged PR. Then take any task marked `Ready`.
+Start with **T01** and **T02** in [TASKS.md](TASKS.md). They are small, touch most of the codebase, and end in a merged PR. Then **T03, the stock picker**, which is the most visible fix in the app. After that, work through the phases in order: the goal is Belfort 1.0 as a Windows installer (T40).
+
+If you use an AI coding assistant, paste the prompt in [START_PROMPT.md](START_PROMPT.md) into it.

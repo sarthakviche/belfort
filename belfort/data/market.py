@@ -3,6 +3,7 @@
 Practice and learning call `bars()`; tests replace it. The providers live in the research pipeline so one
 substitution (pipeline.prices / pipeline.nse) changes the data for every vertical.
 """
+
 from datetime import date, timedelta
 
 import pandas as pd
@@ -10,11 +11,15 @@ import pandas as pd
 
 def bars(symbol: str, years: int = 5) -> pd.DataFrame:
     from ..research.analysis import pipeline
+
     df = pipeline.prices.history(symbol, years)
     try:
         extra = pipeline.nse.recent_bars(symbol, df.index[-1].date())
-        if isinstance(extra, pd.DataFrame) and len(extra) and \
-                abs(float(extra["close"].iloc[0]) / float(df["close"].iloc[-1]) - 1) < 0.25:
+        if (
+            isinstance(extra, pd.DataFrame)
+            and len(extra)
+            and abs(float(extra["close"].iloc[0]) / float(df["close"].iloc[-1]) - 1) < 0.25
+        ):
             df = pd.concat([df, extra])
     except Exception:
         pass

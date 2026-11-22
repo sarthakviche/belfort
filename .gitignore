@@ -12,3 +12,7 @@ data/*.log
 .DS_Store
 .vscode/
 .idea/
+
+.claude/settings.local.json
+coverage.xml
+.coverage

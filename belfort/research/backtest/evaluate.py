@@ -1,4 +1,5 @@
 """Measure the pattern detectors: detection quality on synthetic charts, outcome on real history."""
+
 import numpy as np
 import pandas as pd
 
@@ -28,8 +29,12 @@ def synthetic_report(n_pos: int = 120, n_neg: int = 400, k: int = 5, seed: int =
         for _ in range(n_pos):
             names = {p.name for p in detect_all(_ctx(make_positive(kind, rng), k), lines=False)}
             hit += kind in names
-        out[kind] = {"labelled_examples": n_pos, "hit_rate": round(hit / n_pos, 3),
-                     "no_pattern_charts": n_neg, "false_positive_rate": round(neg_hits[kind] / n_neg, 3)}
+        out[kind] = {
+            "labelled_examples": n_pos,
+            "hit_rate": round(hit / n_pos, 3),
+            "no_pattern_charts": n_neg,
+            "false_positive_rate": round(neg_hits[kind] / n_neg, 3),
+        }
     return out
 
 
@@ -50,8 +55,9 @@ def _outcome(high, low, close, t, direction, target, inval, horizon):
     return "neither", end
 
 
-def historical_report(frames: dict[str, pd.DataFrame], k: int, horizon: int, step: int = 3,
-                      warmup: int = 250, seed: int = 11) -> dict:
+def historical_report(
+    frames: dict[str, pd.DataFrame], k: int, horizon: int, step: int = 3, warmup: int = 250, seed: int = 11
+) -> dict:
     """Walk each stock forward. Record every newly confirmed pattern and what price did next.
 
     Baseline: random entry bars in the same stock, using the same target and stop distances in
@@ -59,7 +65,7 @@ def historical_report(frames: dict[str, pd.DataFrame], k: int, horizon: int, ste
     """
     rng = np.random.default_rng(seed)
     rows = []
-    for sym, df in frames.items():
+    for _sym, df in frames.items():
         if len(df) < warmup + horizon + 20:
             continue
         hi, lo, cl, vo = (df[c].values.astype(float) for c in ("high", "low", "close", "volume"))
@@ -69,7 +75,7 @@ def historical_report(frames: dict[str, pd.DataFrame], k: int, horizon: int, ste
         for t in range(warmup, len(df) - horizon, step):
             s0 = max(0, t + 1 - 400)
             piv = [type(p)(p.idx - s0, p.price, p.kind) for p in confirmed_pivots(raw, k, t) if p.idx >= s0]
-            ctx = Ctx(hi[s0:t + 1], lo[s0:t + 1], cl[s0:t + 1], vo[s0:t + 1], piv, k, float(atr_all[t]))
+            ctx = Ctx(hi[s0 : t + 1], lo[s0 : t + 1], cl[s0 : t + 1], vo[s0 : t + 1], piv, k, float(atr_all[t]))
             for p in detect_all(ctx, lines=False):
                 if p.status != "confirmed" or p.direction not in ("bullish", "bearish"):
                     continue
@@ -90,8 +96,16 @@ def historical_report(frames: dict[str, pd.DataFrame], k: int, horizon: int, ste
                     e2 = cl[t2]
                     r2, _ = _outcome(hi, lo, cl, int(t2), p.direction, e2 * (1 + tp), e2 * (1 + sl), horizon)
                     base.append(r2 == "target")
-                rows.append({"pattern": p.name, "direction": p.direction, "result": res, "fwd": fwd,
-                             "baseline": float(np.mean(base)), "rr": abs(tp / sl)})
+                rows.append(
+                    {
+                        "pattern": p.name,
+                        "direction": p.direction,
+                        "result": res,
+                        "fwd": fwd,
+                        "baseline": float(np.mean(base)),
+                        "rr": abs(tp / sl),
+                    }
+                )
     out = {}
     if not rows:
         return out

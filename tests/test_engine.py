@@ -27,8 +27,8 @@ def test_sizing_never_exceeds_limit():
         stop = entry * (1 - rng.uniform(0.002, 0.3))
         s = sizing.position_size(cap, risk, entry, stop)
         budget, per = cap * risk / 100, entry - stop
-        assert s["quantity"] * per <= budget + 1e-6          # never over the limit
-        assert s["quantity"] * entry <= cap + 1e-6           # never over capital
+        assert s["quantity"] * per <= budget + 1e-6  # never over the limit
+        assert s["quantity"] * entry <= cap + 1e-6  # never over capital
         if not s["capped_by_capital"]:
             assert (s["quantity"] + 1) * per > budget - 1e-6  # and one more share would break it
 
@@ -65,7 +65,7 @@ def test_pivots_have_no_lookahead():
         known = confirmed_pivots(raw, 5, t)
         assert all(p.idx + 5 <= t for p in known)
         # the same pivots come out when the future bars are cut off entirely
-        cut = find_pivots(hi[:t + 1], lo[:t + 1], 5)
+        cut = find_pivots(hi[: t + 1], lo[: t + 1], 5)
         assert [(p.idx, p.kind) for p in cut] == [(p.idx, p.kind) for p in known]
 
 
@@ -89,13 +89,16 @@ def test_healthy_company_is_not_flagged():
     assert any(c["severity"] == "info" and "pledge" in c["title"].lower() for c in f["concerns"])
 
 
-@pytest.mark.parametrize("kwargs,expect", [
-    (dict(debt=(500, 900, 1600, 2600), eq=(1000, 1050, 1100, 1150), interest=(40, 80, 150, 260)), "Debt is high and rising"),
-    (dict(interest=(40, 80, 150, 260)), "Profit barely covers interest"),
-    (dict(recv=(200, 260, 420, 700)), "Money owed by customers is growing faster than sales"),
-    (dict(cfo=(100, 60, 10, -50)), "Profit is not turning into cash"),
-    (dict(ni=(120, 60, -40, -150)), "The company made a net loss"),
-])
+@pytest.mark.parametrize(
+    "kwargs,expect",
+    [
+        (dict(debt=(500, 900, 1600, 2600), eq=(1000, 1050, 1100, 1150), interest=(40, 80, 150, 260)), "Debt is high and rising"),
+        (dict(interest=(40, 80, 150, 260)), "Profit barely covers interest"),
+        (dict(recv=(200, 260, 420, 700)), "Money owed by customers is growing faster than sales"),
+        (dict(cfo=(100, 60, 10, -50)), "Profit is not turning into cash"),
+        (dict(ni=(120, 60, -40, -150)), "The company made a net loss"),
+    ],
+)
 def test_serious_red_flags_are_caught(kwargs, expect):
     f = fundamentals.analyse(statements(**kwargs), is_lender=False)
     assert expect in _titles(f, "high"), _titles(f)
@@ -113,7 +116,9 @@ def test_moderate_flags():
 
 
 def test_every_concern_has_figure_period_and_source():
-    f = fundamentals.analyse(statements(debt=(500, 900, 1600, 2600), eq=(1000, 1050, 1100, 1150), recv=(200, 260, 420, 700)), False)
+    f = fundamentals.analyse(
+        statements(debt=(500, 900, 1600, 2600), eq=(1000, 1050, 1100, 1150), recv=(200, 260, 420, 700)), False
+    )
     for c in f["concerns"]:
         assert c["detail"] and c["source"]
         if c["severity"] != "info":
@@ -133,8 +138,14 @@ def test_missing_statements_are_reported_not_invented():
 
 # ---------- the label ----------
 def _inputs(direction="up", close=100.0):
-    trend = {"direction": direction, "structure": direction if direction != "sideways" else "mixed",
-             "ma_alignment": "up" if direction == "up" else "mixed", "close": close, "fast": 99.0, "slow": 95.0}
+    trend = {
+        "direction": direction,
+        "structure": direction if direction != "sideways" else "mixed",
+        "ma_alignment": "up" if direction == "up" else "mixed",
+        "close": close,
+        "fast": 99.0,
+        "slow": 95.0,
+    }
     levels = {"supports": [{"price": 98.0, "touches": 3}], "resistances": [{"price": 112.0, "touches": 2}]}
     vol = {"breakout": None}
     return trend, levels, vol
@@ -144,36 +155,42 @@ CLEAN = {"available": True, "verdict": "constructive", "concerns": []}
 
 
 def test_label_valid_when_everything_is_met():
-    t, l, v = _inputs()
-    out = verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, CLEAN, None)
+    t, lv, v = _inputs()
+    out = verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, CLEAN, None)
     assert out["label"] == LABEL_VALID and not out["unmet"]
 
 
 def test_label_avoid_in_downtrend_or_with_serious_concern():
-    t, l, v = _inputs("down")
-    assert verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_AVOID
-    t, l, v = _inputs("up")
-    bad = {"available": True, "verdict": "cautious", "concerns": [{"severity": "high", "title": "Debt is high and rising", "detail": "x"}]}
-    out = verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, bad, None)
+    t, lv, v = _inputs("down")
+    assert verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_AVOID
+    t, lv, v = _inputs("up")
+    bad = {
+        "available": True,
+        "verdict": "cautious",
+        "concerns": [{"severity": "high", "title": "Debt is high and rising", "detail": "x"}],
+    }
+    out = verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, bad, None)
     assert out["label"] == LABEL_AVOID and "Debt" in out["main_risk"]
 
 
 def test_label_watch_cases():
-    t, l, v = _inputs("sideways")
-    assert verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_WATCH
-    t, l, v = _inputs("up")
+    t, lv, v = _inputs("sideways")
+    assert verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_WATCH
+    t, lv, v = _inputs("up")
     # fundamentals missing: capped at Watch
-    assert verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, {"available": False, "concerns": []}, None)["label"] == LABEL_WATCH
+    assert (
+        verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, {"available": False, "concerns": []}, None)["label"] == LABEL_WATCH
+    )
     # results due inside a swing holding window
-    assert verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, CLEAN, 2)["label"] == LABEL_WATCH
+    assert verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, CLEAN, 2)["label"] == LABEL_WATCH
     # resistance too close for the stop distance
-    l["resistances"] = [{"price": 102.0, "touches": 2}]
-    assert verdict.decide(SWING, 300, t, l, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_WATCH
+    lv["resistances"] = [{"price": 102.0, "touches": 2}]
+    assert verdict.decide(SWING, 300, t, lv, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_WATCH
 
 
 def test_label_insufficient_data():
-    t, l, v = _inputs()
-    assert verdict.decide(SWING, 60, t, l, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_NODATA
+    t, lv, v = _inputs()
+    assert verdict.decide(SWING, 60, t, lv, v, 2.0, 100.0, 96.0, CLEAN, None)["label"] == LABEL_NODATA
 
 
 def test_agreement_states():
@@ -191,12 +208,16 @@ def test_banned_phrase_finder():
 def test_sharp_recovery_is_read_as_a_new_uptrend_not_as_down():
     """A fall followed by a fast rally past the last swing high must not be called 'no trend' (HDFC Bank, Nov 2026)."""
     import pandas as pd
+
     from belfort.research.analysis.structure import trend_state
+
     path = np.r_[np.linspace(100, 80, 150), np.linspace(80, 84, 12), np.linspace(84, 78, 12), np.linspace(78, 95, 12)]
     rng = np.random.default_rng(5)
     close = path * (1 + rng.normal(0, 0.002, len(path)))
-    df = pd.DataFrame({"open": close, "high": close * 1.004, "low": close * 0.996, "close": close, "volume": 1e6},
-                      index=pd.bdate_range(end="2026-11-13", periods=len(path)))
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.004, "low": close * 0.996, "close": close, "volume": 1e6},
+        index=pd.bdate_range(end="2026-11-13", periods=len(path)),
+    )
     t = trend_state(df, find_pivots(df["high"].values, df["low"].values, 5), SWING)
     assert t["direction"] == "up" and t["phase"] == "early" and t["broke_above_last_high"]
     assert "turned up" in explain.trend_sentence(t)
