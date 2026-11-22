@@ -16,3 +16,5 @@ data/*.log
 .claude/settings.local.json
 coverage.xml
 .coverage
+build/
+dist/
