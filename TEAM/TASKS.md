@@ -16,13 +16,13 @@
 | T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | In progress |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Done ([#10](https://github.com/sarthakviche/belfort/pull/10)) |
-| T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | In progress |
+| T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Done ([#11](https://github.com/sarthakviche/belfort/pull/11)) |
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Ready |
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Ready |
 | T08 | Journal analytics | 1 Practice | P1 | M | Ready |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Ready |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Ready |
-| T11 | Equity curve | 1 Practice | P2 | M | Blocked on T05 |
+| T11 | Equity curve | 1 Practice | P2 | M | Ready |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Ready |
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Ready |
@@ -91,7 +91,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** Tests cover the endpoint (never risks more than the limit, capped by available points); the ticket works in the app.
 
 ### T05 · Faster portfolio: bar cache and daily settlement
-- **Owner:** Devansh · **P1 · M · Status:** In progress · **Area:** practice, data
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#11](https://github.com/sarthakviche/belfort/pull/11)) · **Area:** practice, data
 - **Why:** Every portfolio load fetches bars for every open symbol.
 - **Do:** Cache daily bars per symbol until the next market close; settle at most once per new trading day; store last settled date. Do not change the rules in `belfort/practice/engine.py`.
 - **Done when:** With 20 open symbols the portfolio loads in under a second on the second visit; tests cover cache expiry and the once-per-day settlement.
@@ -120,7 +120,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Do:** Download trades, predictions and replays as CSV and as one JSON backup; import the JSON backup with validation.
 
 ### T11 · Equity curve
-- **P2 · M · Status:** Blocked on T05 · **Area:** practice
+- **P2 · M · Status:** Ready · **Area:** practice
 - **Do:** Snapshot account value each settled day; draw the curve and the largest drawdown.
 
 ## Phase 2: Learn (finish the syllabus)
@@ -256,3 +256,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T01 Onboarding steps checked on a clean clone and fixed ([#7](https://github.com/sarthakviche/belfort/pull/7)).
 - T03 Fuzzy stock picker in search, paper orders and predictions ([#9](https://github.com/sarthakviche/belfort/pull/9)).
 - T04 Order ticket with quote, mini chart, stop idea and sizing ([#10](https://github.com/sarthakviche/belfort/pull/10)).
+- T05 Bar cache until the next end-of-day release; settlement once per trading day ([#11](https://github.com/sarthakviche/belfort/pull/11)).

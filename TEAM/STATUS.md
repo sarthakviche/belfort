@@ -19,7 +19,6 @@
 
 | Area | Limitation | Task |
 |---|---|---|
-| Practice | Each portfolio load fetches bars for every open symbol | T05 |
 | Practice | The replay trainer sends hidden bars to the browser before the decision | T06 |
 | Practice | Long only, one account, end-of-day fills, no trailing stops or partial exits | T07 |
 | Learn | 8 of 38 lessons written | T13 to T22 |
