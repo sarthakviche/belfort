@@ -39,6 +39,10 @@ MIGRATIONS = [
         r_multiple REAL, outcome TEXT NOT NULL, created TEXT NOT NULL DEFAULT (datetime('now'))
     );
     """,
+    # 2: settle the paper account at most once per trading day (T05)
+    """
+    ALTER TABLE accounts ADD COLUMN settled_for TEXT;
+    """,
 ]
 
 _lock = threading.Lock()

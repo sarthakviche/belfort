@@ -68,6 +68,8 @@ EDU_LAG_DAYS = 30
 
 # Practice: virtual points only. 1 point stands for 1 rupee. Never redeemable for anything.
 PAPER_START_POINTS = 1_000_000
+# End-of-day data for a session is complete by this time (IST) on weekdays; cached bars stay valid until the next one.
+MARKET_DATA_READY_IST = (18, 0)
 PAPER_COST_PCT = 0.0005  # rough cost per side (brokerage, taxes) so practice is not cost-free
 PAPER_DEFAULT_RISK_PCT = 1.0  # the "Size it" helper starts at the 1% rule taught in Learn
 PAPER_MAX_RISK_PCT = 2.0  # one trade risking more than this gets a warning
