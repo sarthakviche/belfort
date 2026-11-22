@@ -385,6 +385,18 @@ G = [
         ["contract note"],
     ),
     (
+        "Pre-open session",
+        "Market",
+        "The first minutes of the day (9:00 to 9:08 on NSE) when orders are collected and matched at one opening price.",
+        ["pre-open session", "pre-open"],
+    ),
+    (
+        "Market-wide circuit breaker",
+        "Market",
+        "A halt in all equity trading when the Nifty 50 or Sensex moves 10%, 15% or 20% in a day.",
+        ["market-wide circuit", "circuit breaker"],
+    ),
+    (
         "Circuit limit",
         "Market",
         "The most a stock may move in one day before trading is capped or paused.",

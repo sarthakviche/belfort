@@ -24,7 +24,7 @@
 | T10 | Export and import the journal | 1 Practice | P2 | S | Done ([#16](https://github.com/sarthakviche/belfort/pull/16)) |
 | T11 | Equity curve | 1 Practice | P2 | M | Done ([#18](https://github.com/sarthakviche/belfort/pull/18)) |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
-| T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Ready |
+| T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Done ([#20](https://github.com/sarthakviche/belfort/pull/20)) |
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Ready |
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Ready |
 | T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Ready |
@@ -133,7 +133,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Done when:** CI fails on a deliberately broken lesson and passes on main.
 
 ### T13 · Lessons: market hours and circuits, moving averages, volume
-- **P1 · M · Status:** Ready · Lesson ids: `circuits-and-sessions`, `moving-averages`, `volume`. Check NSE session times and circuit rules at the source and cite them.
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#20](https://github.com/sarthakviche/belfort/pull/20)) · Lesson ids: `circuits-and-sessions`, `moving-averages`, `volume`. Check NSE session times and circuit rules at the source and cite them.
 
 ### T14 · Lessons: R multiples, losing streaks
 - **P1 · M · Status:** Ready · Lesson ids: `r-multiples`, `risk-of-ruin`. Tie them to the Practice stats (average R, win rate).
@@ -263,3 +263,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T09 Total open risk and size warnings ([#14](https://github.com/sarthakviche/belfort/pull/14)).
 - T10 Journal export (CSV, JSON) and backup restore ([#16](https://github.com/sarthakviche/belfort/pull/16)).
 - T11 Equity curve with largest drawdown ([#18](https://github.com/sarthakviche/belfort/pull/18)).
+- T13 Lessons: market hours and circuits, moving averages, volume ([#20](https://github.com/sarthakviche/belfort/pull/20)).
