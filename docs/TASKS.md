@@ -28,10 +28,10 @@
 | T14 | Lessons: R multiples, losing streaks | 2 Learn | P1 | M | Done ([#21](https://github.com/sarthakviche/belfort/pull/21)) |
 | T15 | Lessons: Setups module (4) | 2 Learn | P1 | L | Done ([#22](https://github.com/sarthakviche/belfort/pull/22)) |
 | T16 | Lessons: Business check module (3) | 2 Learn | P1 | M | Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) |
-| T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Ready |
-| T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Ready |
-| T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Ready |
-| T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Ready |
+| T17 | Lessons: Indicators and patterns module (3) | 2 Learn | P1 | M | Done ([#24](https://github.com/sarthakviche/belfort/pull/24)) |
+| T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
+| T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) |
+| T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) |
 | T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Ready |
 | T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | Ready |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
@@ -145,16 +145,16 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#23](https://github.com/sarthakviche/belfort/pull/23)) · `five-numbers`, `pe-vs-peers`, `red-flags`. Match the figures the Research business section shows.
 
 ### T17 · Lessons: Indicators and patterns module
-- **P1 · M · Status:** Ready · `atr`, `rsi-macd`, `pattern-evidence` (use the backtest figures from `data/pattern_stats.json`).
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#24](https://github.com/sarthakviche/belfort/pull/24)) · `atr`, `rsi-macd`, `pattern-evidence` (use the backtest figures from `data/pattern_stats.json`).
 
 ### T18 · Lessons: Journal module
-- **P1 · M · Status:** Ready · `trade-journal`, `expectancy`, `calibration`. Point at the Practice journal and prediction scores.
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) · `trade-journal`, `expectancy`, `calibration`. Point at the Practice journal and prediction scores.
 
 ### T19 · Lessons: Market context module
-- **P1 · M · Status:** Ready · `index-trend`, `sectors`, `flows-and-events`.
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) · `index-trend`, `sectors`, `flows-and-events`.
 
 ### T20 · Lessons: Portfolio and Psychology modules
-- **P1 · M · Status:** Ready · `open-risk`, `drawdown-rules`, `biases`, `rules`.
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) · `open-risk`, `drawdown-rules`, `biases`, `rules`.
 
 ### T21 · Lessons: Taxes and records module
 - **P1 · M · Status:** Ready · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
@@ -268,3 +268,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T14 Lessons: R multiples, losing streaks and risk of ruin ([#21](https://github.com/sarthakviche/belfort/pull/21)).
 - T15 Lessons: Setups module, pullbacks, breakouts, exits and results dates ([#22](https://github.com/sarthakviche/belfort/pull/22)).
 - T16 Lessons: Business check module, five numbers, P/E against peers and red flags ([#23](https://github.com/sarthakviche/belfort/pull/23)).
+- T17 Lessons: Indicators and patterns module, ATR, RSI and MACD, pattern evidence ([#24](https://github.com/sarthakviche/belfort/pull/24)).
+- T18 Lessons: Journal module, trade journal, expectancy and calibration ([#25](https://github.com/sarthakviche/belfort/pull/25)).
+- T19 Lessons: Market context module, index trend and breadth, sectors, flows and events ([#26](https://github.com/sarthakviche/belfort/pull/26)).
+- T20 Lessons: Portfolio and Psychology modules, open risk, drawdown rules, biases and rules ([#27](https://github.com/sarthakviche/belfort/pull/27)).

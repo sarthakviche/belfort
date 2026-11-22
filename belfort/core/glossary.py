@@ -434,6 +434,12 @@ G = [
     ),
     # --- economy and flows ---
     (
+        "Market breadth",
+        "Market",
+        "How many stocks are taking part in a move, such as the share of stocks above their 50-day average. A rise led by few stocks is narrow.",
+        ["market breadth", "breadth"],
+    ),
+    (
         "FII and DII",
         "Economy",
         "Foreign institutional investors and domestic institutional investors (mutual funds, insurers). Their daily buying and selling moves the market.",

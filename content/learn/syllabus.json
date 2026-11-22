@@ -83,18 +83,18 @@
           "id": "indicators", "title": "Indicators and patterns, honestly",
           "why": "Learn what RSI, MACD, ATR and chart patterns measure, and what the evidence says they do not.",
           "lessons": [
-            {"id": "atr", "title": "ATR: how far a stock normally moves", "minutes": 5, "status": "planned"},
-            {"id": "rsi-macd", "title": "RSI and MACD: momentum, not prophecy", "minutes": 7, "status": "planned"},
-            {"id": "pattern-evidence", "title": "Chart patterns and what the backtest shows", "minutes": 8, "status": "planned"}
+            {"id": "atr", "title": "ATR: how far a stock normally moves", "minutes": 5},
+            {"id": "rsi-macd", "title": "RSI and MACD: momentum, not prophecy", "minutes": 7},
+            {"id": "pattern-evidence", "title": "Chart patterns and what the backtest shows", "minutes": 8}
           ]
         },
         {
           "id": "journal", "title": "The journal and the review",
           "why": "Improvement comes from reviewing decisions, not from more trades.",
           "lessons": [
-            {"id": "trade-journal", "title": "What to write before and after every trade", "minutes": 6, "status": "planned"},
-            {"id": "expectancy", "title": "Win rate is not the score: expectancy", "minutes": 7, "status": "planned"},
-            {"id": "calibration", "title": "Calibration: are your 70% calls right 70% of the time?", "minutes": 6, "status": "planned"}
+            {"id": "trade-journal", "title": "What to write before and after every trade", "minutes": 6},
+            {"id": "expectancy", "title": "Win rate is not the score: expectancy", "minutes": 7},
+            {"id": "calibration", "title": "Calibration: are your 70% calls right 70% of the time?", "minutes": 6}
           ]
         }
       ]
@@ -107,25 +107,25 @@
           "id": "context", "title": "Market context",
           "why": "Most stocks move with the index and their sector. Context decides how many setups to take.",
           "lessons": [
-            {"id": "index-trend", "title": "Index trend and market breadth", "minutes": 7, "status": "planned"},
-            {"id": "sectors", "title": "Sector strength and rotation", "minutes": 7, "status": "planned"},
-            {"id": "flows-and-events", "title": "FII and DII flows, RBI policy and the event calendar", "minutes": 7, "status": "planned"}
+            {"id": "index-trend", "title": "Index trend and market breadth", "minutes": 7},
+            {"id": "sectors", "title": "Sector strength and rotation", "minutes": 7},
+            {"id": "flows-and-events", "title": "FII and DII flows, RBI policy and the event calendar", "minutes": 7}
           ]
         },
         {
           "id": "portfolio", "title": "Running several trades",
           "why": "Five correlated trades are one big trade.",
           "lessons": [
-            {"id": "open-risk", "title": "Total open risk and correlation", "minutes": 7, "status": "planned"},
-            {"id": "drawdown-rules", "title": "Drawdown rules: when to stop trading", "minutes": 6, "status": "planned"}
+            {"id": "open-risk", "title": "Total open risk and correlation", "minutes": 7},
+            {"id": "drawdown-rules", "title": "Drawdown rules: when to stop trading", "minutes": 6}
           ]
         },
         {
           "id": "psychology", "title": "Psychology and discipline",
           "why": "Plans fail at the moment of fear or greed. Name the traps before they arrive.",
           "lessons": [
-            {"id": "biases", "title": "FOMO, revenge trading and overconfidence", "minutes": 7, "status": "planned"},
-            {"id": "rules", "title": "Writing your own trading rules", "minutes": 6, "status": "planned"}
+            {"id": "biases", "title": "FOMO, revenge trading and overconfidence", "minutes": 7},
+            {"id": "rules", "title": "Writing your own trading rules", "minutes": 6}
           ]
         },
         {
