@@ -37,9 +37,9 @@ An app for beginner and intermediate traders who want to swing or positional tra
 
 | Area | Built | Notes |
 |---|---|---|
-| **Research** | Per-stock report, three screens, pattern reliability backtest, position sizing | Carried over from the earlier Belfort AI project. Labels are now descriptive: "Conditions met", "Partly met", "Rule excludes". |
+| **Research** | Fuzzy company search (names, initials, nicknames, typos), per-stock report, three screens, pattern reliability backtest, position sizing | Carried over from the earlier Belfort AI project. Labels are now descriptive: "Conditions met", "Partly met", "Rule excludes". |
 | **Learn** | Syllabus of 3 tracks, 12 modules, 38 lessons; **8 lessons written** with quizzes; quiz grading on the server; progress and streaks; example charts | Lesson charts only use prices at least 30 days old (SEBI education norm from July 2026). |
-| **Practice: paper account** | Market and limit orders, required stop, optional target, end-of-day fills, gaps, costs, exits, trade reviews, win rate, average R | Long only. Virtual points, never redeemable. |
+| **Practice: paper account** | Stock picker by company name (no symbol needed), market and limit orders, required stop, optional target, end-of-day fills, gaps, costs, exits, trade reviews, win rate, average R | Long only. Virtual points, never redeemable. |
 | **Practice: predictions** | Log a call with direction, horizon and confidence; auto-resolution; Brier score, points, calibration chart, badges | |
 | **Practice: chart replay** | Random hidden past chart, plan a stop and target, animated reveal, R result, running record | |
 | **News** | Six RSS sources, de-duplication, categories, company tags, hover definitions, "Explain this", tip-style headlines hidden | Headlines and feed descriptions only; links out. |
