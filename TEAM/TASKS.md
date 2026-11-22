@@ -21,7 +21,7 @@
 | T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Done ([#13](https://github.com/sarthakviche/belfort/pull/13)) |
 | T08 | Journal analytics | 1 Practice | P1 | M | Done ([#15](https://github.com/sarthakviche/belfort/pull/15)) |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Done ([#14](https://github.com/sarthakviche/belfort/pull/14)) |
-| T10 | Export and import the journal | 1 Practice | P2 | S | In progress |
+| T10 | Export and import the journal | 1 Practice | P2 | S | Done ([#16](https://github.com/sarthakviche/belfort/pull/16)) |
 | T11 | Equity curve | 1 Practice | P2 | M | Ready |
 | T12 | Content checker in CI | 2 Learn | P0 | S | Ready |
 | T13 | Lessons: sessions, moving averages, volume | 2 Learn | P1 | M | Ready |
@@ -116,7 +116,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Do:** Show total rupee risk across open positions (sum of distance to stop × quantity) as a share of the account, and warn on an order that pushes it above a threshold in `settings.py` or risks over 2% on one trade.
 
 ### T10 · Export and import the journal
-- **Owner:** Devansh · **P2 · S · Status:** In progress · **Area:** practice
+- **Owner:** Devansh · **P2 · S · Status:** Done ([#16](https://github.com/sarthakviche/belfort/pull/16)) · **Area:** practice
 - **Do:** Download trades, predictions and replays as CSV and as one JSON backup; import the JSON backup with validation.
 
 ### T11 · Equity curve
@@ -261,3 +261,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T07 Raised stops, trailing stops and partial exits ([#13](https://github.com/sarthakviche/belfort/pull/13)).
 - T08 Journal analytics with setup and mistake tags ([#15](https://github.com/sarthakviche/belfort/pull/15)).
 - T09 Total open risk and size warnings ([#14](https://github.com/sarthakviche/belfort/pull/14)).
+- T10 Journal export (CSV, JSON) and backup restore ([#16](https://github.com/sarthakviche/belfort/pull/16)).
