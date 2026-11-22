@@ -50,8 +50,8 @@
           "lessons": [
             {"id": "position-sizing", "title": "Position sizing: the 1% rule", "minutes": 8},
             {"id": "stop-loss", "title": "Where the stop goes, and why it never moves down", "minutes": 7},
-            {"id": "r-multiples", "title": "Thinking in R: results as multiples of risk", "minutes": 6, "status": "planned"},
-            {"id": "risk-of-ruin", "title": "Losing streaks and risk of ruin", "minutes": 6, "status": "planned"}
+            {"id": "r-multiples", "title": "Thinking in R: results as multiples of risk", "minutes": 6},
+            {"id": "risk-of-ruin", "title": "Losing streaks and risk of ruin", "minutes": 6}
           ]
         }
       ]
