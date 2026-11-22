@@ -18,7 +18,7 @@
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Done ([#10](https://github.com/sarthakviche/belfort/pull/10)) |
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Done ([#11](https://github.com/sarthakviche/belfort/pull/11)) |
 | T06 | Replay: keep hidden bars on the server | 1 Practice | P1 | M | Done ([#12](https://github.com/sarthakviche/belfort/pull/12)) |
-| T07 | Trailing stops and partial exits | 1 Practice | P1 | M | In progress |
+| T07 | Trailing stops and partial exits | 1 Practice | P1 | M | Done ([#13](https://github.com/sarthakviche/belfort/pull/13)) |
 | T08 | Journal analytics | 1 Practice | P1 | M | Ready |
 | T09 | Total open risk and size warnings | 1 Practice | P1 | S | Ready |
 | T10 | Export and import the journal | 1 Practice | P2 | S | Ready |
@@ -102,7 +102,7 @@ The paper account works but is hard to use: you must already know the NSE symbol
 - **Done when:** No response contains hidden bars before the decision; tests prove it.
 
 ### T07 · Trailing stops and partial exits
-- **Owner:** Devansh · **P1 · M · Status:** In progress · **Area:** practice
+- **Owner:** Devansh · **P1 · M · Status:** Done ([#13](https://github.com/sarthakviche/belfort/pull/13)) · **Area:** practice
 - **Do:** Let the user raise a stop (never lower it, per the lesson), add an optional trailing stop (percentage or ATR multiple, ratcheting on closes), and sell part of a position. Extend `engine.py` with pure functions and full tests; add a migration.
 - **Done when:** Settlement rules for trailing and partial exits are documented in the engine docstring and covered by tests.
 
@@ -258,3 +258,4 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - T04 Order ticket with quote, mini chart, stop idea and sizing ([#10](https://github.com/sarthakviche/belfort/pull/10)).
 - T05 Bar cache until the next end-of-day release; settlement once per trading day ([#11](https://github.com/sarthakviche/belfort/pull/11)).
 - T06 Replay hidden bars kept on the server; reveal date fixed ([#12](https://github.com/sarthakviche/belfort/pull/12)).
+- T07 Raised stops, trailing stops and partial exits ([#13](https://github.com/sarthakviche/belfort/pull/13)).
