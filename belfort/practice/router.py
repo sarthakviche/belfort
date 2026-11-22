@@ -31,6 +31,19 @@ class TradeIn(BaseModel):
     limit_price: float | None = Field(default=None, gt=0)
 
 
+class StopIn(BaseModel):
+    stop: float = Field(gt=0)
+
+
+class TrailIn(BaseModel):
+    kind: str = Field(pattern="^(pct|atr|off)$")
+    value: float | None = Field(default=None, gt=0)
+
+
+class SellIn(BaseModel):
+    qty: int = Field(gt=0, le=10_000_000)
+
+
 class ReviewIn(BaseModel):
     review: str = Field(max_length=2000)
 
@@ -85,6 +98,21 @@ def place(body: TradeIn):
 @router.post("/trades/{trade_id}/close")
 def close(trade_id: int):
     return _guard(service.close_trade, trade_id)
+
+
+@router.post("/trades/{trade_id}/stop")
+def raise_stop(trade_id: int, body: StopIn):
+    return _guard(service.raise_stop, trade_id, body.stop)
+
+
+@router.post("/trades/{trade_id}/trail")
+def trail(trade_id: int, body: TrailIn):
+    return _guard(service.set_trail, trade_id, body.kind, body.value)
+
+
+@router.post("/trades/{trade_id}/sell")
+def sell_part(trade_id: int, body: SellIn):
+    return _guard(service.sell_part, trade_id, body.qty)
 
 
 @router.post("/trades/{trade_id}/review")

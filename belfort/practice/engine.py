@@ -7,11 +7,24 @@ End-of-day model, long only (the cash market most beginners start in):
   - Stop and target are checked every session from the fill day. If the open gaps past either, the exit is at
     the open. If one session touches both, the stop is assumed first (the cautious reading).
   - A close request exits at the open of the next session.
+
+Managing an open trade (every change acts from the session after the day it was made):
+  - Raising the stop: the stop can only move up. Each raise is kept as {"on": day, "stop": price} in the trade's
+    stop_moves, so a replay of old bars uses the stop that applied on each day.
+  - Trailing stop: after each session's close, a candidate stop is the close minus a fixed percentage, or minus a
+    multiple of the 14-session ATR at that close. The stop ratchets up to the candidate and never moves down. The new
+    level applies from the next session.
+  - Selling part: the service splits the trade into two rows with the same entry and plan; the part sold carries a
+    close request and exits at the next open by the rule above, the rest stays open.
+  - The original stop stays as the trade's risk, so R multiples always measure against the risk taken at entry.
 """
 
+import json
 from dataclasses import dataclass
 
 import pandas as pd
+
+from ..settings import TRAIL_ATR_PERIOD
 
 LIMIT_EXPIRY_SESSIONS = 5
 
@@ -24,6 +37,32 @@ class Fill:
     exit_price: float | None = None
     exit_date: str | None = None
     exit_reason: str | None = None
+    stop: float | None = None  # the stop that applies from the next session
+
+
+def stop_moves(t: dict) -> list[dict]:
+    """The trade's stop raises, oldest first."""
+    raw = t.get("stop_moves") or "[]"
+    moves = json.loads(raw) if isinstance(raw, str) else list(raw)
+    return sorted(moves, key=lambda m: m["on"])
+
+
+def atr(df: pd.DataFrame, period: int = TRAIL_ATR_PERIOD) -> pd.Series:
+    """Average true range: the average daily range including gaps, over `period` sessions."""
+    prev = df["close"].shift(1)
+    true_range = pd.concat([df["high"] - df["low"], (df["high"] - prev).abs(), (df["low"] - prev).abs()], axis=1).max(axis=1)
+    return true_range.rolling(period, min_periods=1).mean()
+
+
+def trail_candidate(kind: str | None, value: float | None, close: float, atr_now: float | None) -> float | None:
+    """Where a trailing stop would sit after a session closed at `close`."""
+    if not kind or not value:
+        return None
+    if kind == "pct":
+        return round(close * (1 - value / 100), 2)
+    if kind == "atr" and atr_now is not None:
+        return round(close - value * atr_now, 2)
+    return None
 
 
 def _after(df: pd.DataFrame, day: str, inclusive: bool = False) -> pd.DataFrame:
@@ -58,23 +97,40 @@ def settle_trade(t: dict, df: pd.DataFrame) -> Fill:
             else:
                 return f
 
-    stop, target = float(t["stop"]), t.get("target")
+    initial = float(t["stop"])
+    stop, target = initial, t.get("target")
     target = float(target) if target else None
     close_req = t.get("close_requested_on")
+    moves = stop_moves(t)
+    kind, value, trail_from = t.get("trail_kind"), t.get("trail_value"), t.get("trail_from")
+    ranges = atr(df) if kind == "atr" else None
+    trailed = None
     for ts, bar in _after(df, f.entry_date, inclusive=True).iterrows():
         day = ts.strftime("%Y-%m-%d")
-        o, h, lo = float(bar["open"]), float(bar["high"]), float(bar["low"])
+        o, h, lo, c = float(bar["open"]), float(bar["high"]), float(bar["low"]), float(bar["close"])
         first = day == f.entry_date
+        for m in moves:
+            if m["on"] < day:
+                stop = max(stop, float(m["stop"]))
+        if trailed is not None:
+            stop = max(stop, trailed)
+        f.stop = stop
+        raised = stop > initial
         if close_req and day > close_req:
             return _exit(f, o, day, "closed by you")
         if not first and o <= stop:
-            return _exit(f, o, day, "gapped below the stop")
+            return _exit(f, o, day, "gapped below the raised stop" if raised else "gapped below the stop")
         if not first and target and o >= target:
             return _exit(f, o, day, "gapped above the target")
         if lo <= stop:
-            return _exit(f, stop, day, "stop-loss hit")
+            return _exit(f, stop, day, f"raised stop hit at ₹{stop:.2f}" if raised else "stop-loss hit")
         if target and h >= target:
             return _exit(f, target, day, "target reached")
+        if trail_from and day > trail_from:
+            candidate = trail_candidate(kind, value, c, float(ranges.loc[ts]) if ranges is not None else None)
+            if candidate is not None and candidate < c:
+                trailed = candidate if trailed is None else max(trailed, candidate)
+    f.stop = max(stop, trailed) if trailed is not None else stop
     return f
 
 

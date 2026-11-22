@@ -154,9 +154,10 @@ function renderPaper() {
     <div class="layout practice-layout">
       <div class="col-main">
         <div class="panel glass"><h3>Open positions</h3>${d.open.length ? `<div class="scroll"><table><thead><tr><th>Stock</th><th class="num">Qty</th><th class="num">Entry</th><th class="num">Last close</th><th class="num">Stop</th><th class="num">Target</th><th class="num">P&amp;L</th><th class="num">Now</th><th></th></tr></thead><tbody>
-          ${d.open.map((t) => tr([`<b>${esc(t.symbol)}</b><div class="src">${esc(t.thesis)}</div>`, num(t.qty, 0), inr(t.entry_price), inr(t.last), inr(t.stop), t.target ? inr(t.target) : "n/a",
+          ${d.open.map((t) => tr([`<b>${esc(t.symbol)}</b><div class="src">${esc(t.thesis)}</div>`, num(t.qty, 0), inr(t.entry_price), inr(t.last), stopCell(t), t.target ? inr(t.target) : "n/a",
             `<span class="${t.pnl >= 0 ? "up" : "down"}">${num(t.pnl, 0)}</span>`, rTxt(t.open_r),
-            t.close_requested_on ? '<span class="hint">exit at next open</span>' : `<button type="button" class="btn ghost sm" data-close="${t.id}">Exit</button>`])).join("")}</tbody></table></div>`
+            t.close_requested_on ? '<span class="hint">exit at next open</span>' : `<div class="row-actions"><button type="button" class="btn ghost sm" data-manage="${t.id}">Manage</button><button type="button" class="btn ghost sm" data-close="${t.id}">Exit</button></div>`])
+            + (t.close_requested_on ? "" : manageRow(t))).join("")}</tbody></table></div>`
           : '<p class="missing">No open positions.</p>'}</div>
         ${d.pending.length ? `<div class="panel glass"><h3>Waiting to fill</h3><div class="scroll"><table><thead><tr><th>Stock</th><th>Order</th><th class="num">Qty</th><th class="num">Stop</th><th>Placed</th><th></th></tr></thead><tbody>
           ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? "limit " + inr(t.limit_price) : "market, next open", num(t.qty, 0), inr(t.stop), esc(t.placed_on),
@@ -241,6 +242,26 @@ async function sizeIt() {
   } catch (e) { msg.textContent = e.message; }
 }
 $("practice-body").addEventListener("stock-pick", (e) => { if (e.target.closest("#order-form")) loadTicket(e.detail.symbol); });
+/* ---- managing an open position: raise the stop, trail it, sell part ---- */
+function stopCell(t) {
+  const raised = t.current_stop > t.stop;
+  const trail = t.trail_kind ? `<div class="src">trailing ${t.trail_kind === "pct" ? t.trail_value + "%" : t.trail_value + " x ATR"}</div>` : "";
+  return `${inr(t.current_stop)}${raised ? `<div class="src">raised from ${inr(t.stop)}</div>` : ""}${trail}`;
+}
+function manageRow(t) {
+  return `<tr class="manage-row" id="manage-${t.id}" hidden><td colspan="9"><div class="manage">
+    <label>Raise stop to (₹)<span class="inline"><input type="number" step="0.05" min="${t.current_stop}" data-raise-input="${t.id}" placeholder="above ${num(t.current_stop)}"><button type="button" class="btn ghost sm" data-raise="${t.id}">Raise</button></span></label>
+    <label>Trailing stop<span class="inline"><select data-trail-kind="${t.id}"><option value="pct" ${t.trail_kind === "pct" ? "selected" : ""}>% below close</option><option value="atr" ${t.trail_kind === "atr" ? "selected" : ""}>x ATR below close</option></select>
+      <input type="number" step="0.1" min="0.5" data-trail-value="${t.id}" value="${t.trail_value || ""}" placeholder="e.g. 8 or 2"><button type="button" class="btn ghost sm" data-trail="${t.id}">Set</button>
+      ${t.trail_kind ? `<button type="button" class="btn ghost sm" data-trail-off="${t.id}">Off</button>` : ""}</span></label>
+    <label>Sell part (shares)<span class="inline"><input type="number" step="1" min="1" max="${t.qty - 1}" data-sell-input="${t.id}" placeholder="1 to ${t.qty - 1}"><button type="button" class="btn ghost sm" data-sell="${t.id}">Sell at next open</button></span></label>
+    <p class="hint">Changes apply from the next session. A stop only moves up; R is still measured against the original stop of ${inr(t.stop)}.</p>
+  </div></td></tr>`;
+}
+async function manage(path, body) {
+  try { status((await post(path, body)).message); loadPractice(); } catch (err) { status(err.message, true); }
+}
+
 $("practice-body").addEventListener("input", (e) => {
   if (e.target.closest("#order-form") && ["qty", "stop", "limit_price", "entry_type"].includes(e.target.name)) updateRisk();
   if (e.target.name === "confidence") $("conf-out").textContent = e.target.value + "%";
@@ -256,6 +277,16 @@ $("practice-body").addEventListener("click", async (e) => {
     try { await post(`/api/practice/trades/${r.dataset.saveReview}/review`, { review: v }); r.textContent = "Saved"; } catch (err) { status(err.message, true); } return; }
   const dir = e.target.closest("button[data-dir]");
   if (dir) { document.querySelectorAll("button[data-dir]").forEach((b) => b.classList.toggle("on", b === dir)); return; }
+  const m = e.target.closest("button[data-manage]");
+  if (m) { const row = $("manage-" + m.dataset.manage); row.hidden = !row.hidden; return; }
+  const mb = e.target.closest("button[data-raise],button[data-trail],button[data-trail-off],button[data-sell]");
+  if (mb) {
+    const d = mb.dataset, q = (sel) => document.querySelector(sel);
+    if (d.raise) return manage(`/api/practice/trades/${d.raise}/stop`, { stop: +q(`[data-raise-input="${d.raise}"]`).value });
+    if (d.trail) return manage(`/api/practice/trades/${d.trail}/trail`, { kind: q(`[data-trail-kind="${d.trail}"]`).value, value: +q(`[data-trail-value="${d.trail}"]`).value });
+    if (d.trailOff) return manage(`/api/practice/trades/${d.trailOff}/trail`, { kind: "off" });
+    if (d.sell) return manage(`/api/practice/trades/${d.sell}/sell`, { qty: +q(`[data-sell-input="${d.sell}"]`).value });
+  }
   if (e.target.closest("#use-stop") && P.quote) { $("order-form").stop.value = P.quote.suggested_stop; updateRisk(); return; }
   if (e.target.closest("#size-it")) return sizeIt();
   if (e.target.closest("#replay-start")) return replayStart();
