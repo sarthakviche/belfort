@@ -43,6 +43,13 @@ MIGRATIONS = [
     """
     ALTER TABLE accounts ADD COLUMN settled_for TEXT;
     """,
+    # 3: replay sessions, so hidden bars stay on the server until the decision (T06)
+    """
+    CREATE TABLE IF NOT EXISTS replay_sessions (
+        id TEXT PRIMARY KEY, symbol TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL,
+        visible INTEGER NOT NULL, created TEXT NOT NULL DEFAULT (datetime('now')), scored_on TEXT
+    );
+    """,
 ]
 
 _lock = threading.Lock()

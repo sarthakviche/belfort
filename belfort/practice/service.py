@@ -1,6 +1,7 @@
 """Practice vertical: a paper account, a prediction journal and a chart-replay trainer. Virtual points only."""
 
 import random
+import secrets
 from datetime import date
 
 from ..core import db
@@ -15,6 +16,9 @@ from ..settings import (
     PAPER_MAX_RISK_PCT,
     PAPER_START_POINTS,
     PREDICTION_HORIZONS,
+    REPLAY_MIN_HISTORY_BARS,
+    REPLAY_VISIBLE_BARS,
+    REPLAY_WINDOW_BARS,
     STYLES,
     TICKET_CHART_BARS,
 )
@@ -421,9 +425,27 @@ def badges(ps: list[dict], done: list[dict]) -> list[dict]:
 # ---------------- chart replay trainer ----------------
 
 
+def _candles(df) -> list[dict]:
+    return [
+        {
+            "time": ts.strftime("%Y-%m-%d"),
+            "open": round(float(r["open"]), 2),
+            "high": round(float(r["high"]), 2),
+            "low": round(float(r["low"]), 2),
+            "close": round(float(r["close"]), 2),
+        }
+        for ts, r in df.iterrows()
+    ]
+
+
+def _replay_window(symbol: str, start_date: str, end_date: str) -> list[dict]:
+    df = market.lagged(market.bars(symbol, 5), EDU_LAG_DAYS)
+    return _candles(df[(df.index >= start_date) & (df.index <= end_date)])
+
+
 def replay_new(symbol: str | None = None, seed: int | None = None) -> dict:
-    """A historical window that ends at least EDU_LAG_DAYS ago. The page hides the symbol and the future bars until
-    the user decides; they travel with the response because this is a local practice tool, not a contest."""
+    """A historical window that ends at least EDU_LAG_DAYS ago. Only the visible bars leave the server; the symbol
+    and the future bars are kept in a replay session until the user decides."""
     rnd = random.Random(seed)
     for _ in range(6):
         sym = clean_symbol(symbol) if symbol else rnd.choice(ALL_SYMBOLS)
@@ -433,31 +455,55 @@ def replay_new(symbol: str | None = None, seed: int | None = None) -> dict:
             if symbol:
                 raise PracticeError("Price history for that symbol could not be loaded.") from None
             continue
-        if len(df) < 260:
+        if len(df) < REPLAY_MIN_HISTORY_BARS:
             continue
-        start = rnd.randint(0, len(df) - 200)
-        win = df.iloc[start : start + 200]
-        candles = [
-            {
-                "time": ts.strftime("%Y-%m-%d"),
-                "open": round(float(r["open"]), 2),
-                "high": round(float(r["high"]), 2),
-                "low": round(float(r["low"]), 2),
-                "close": round(float(r["close"]), 2),
-            }
-            for ts, r in win.iterrows()
-        ]
+        start = rnd.randint(0, len(df) - REPLAY_WINDOW_BARS)
+        candles = _candles(df.iloc[start : start + REPLAY_WINDOW_BARS])
+        session_id = secrets.token_urlsafe(12)
+        with db.connect() as con:
+            con.execute(
+                "INSERT INTO replay_sessions (id, symbol, start_date, end_date, visible) VALUES (?,?,?,?,?)",
+                (session_id, sym, candles[0]["time"], candles[-1]["time"], REPLAY_VISIBLE_BARS),
+            )
         return {
-            "symbol": sym,
-            "visible": 140,
-            "candles": candles,
+            "id": session_id,
+            "visible": REPLAY_VISIBLE_BARS,
+            "candles": candles[:REPLAY_VISIBLE_BARS],
             "note": f"A real past chart, chosen at random, ending at least {EDU_LAG_DAYS} days ago. The name is hidden "
             "until you decide, so you judge the chart and not the company.",
         }
     raise PracticeError("Could not load a practice chart right now (the price source may be offline).")
 
 
-def replay_score(candles: list[dict], visible: int, decision: str, stop: float | None, target: float | None) -> dict:
+def replay_score(session_id: str, decision: str, stop: float | None, target: float | None) -> dict:
+    """Score the user's plan for a replay session, then reveal the hidden bars, the company and the dates."""
+    with db.connect() as con:
+        row = con.execute("SELECT * FROM replay_sessions WHERE id = ?", (session_id,)).fetchone()
+    if not row:
+        raise PracticeError("That practice chart has expired. Start a new chart.")
+    if row["scored_on"]:
+        raise PracticeError("This chart was already played. Start a new chart.")
+    try:
+        candles = _replay_window(row["symbol"], row["start_date"], row["end_date"])
+    except DataError as e:
+        raise PracticeError(str(e)) from e
+    if len(candles) <= row["visible"]:
+        raise PracticeError("The rest of this chart could not be loaded. Start a new chart.")
+    res = score_plan(candles, row["visible"], decision, stop, target)
+    with db.connect() as con:
+        con.execute("UPDATE replay_sessions SET scored_on = datetime('now') WHERE id = ?", (session_id,))
+    replay_save(row["symbol"], row["start_date"], decision, res.get("r"), res["outcome"])
+    return {
+        **res,
+        "symbol": row["symbol"],
+        "start_date": row["start_date"],
+        "end_date": row["end_date"],
+        "hidden": candles[row["visible"] :],
+        "stats": replay_stats(),
+    }
+
+
+def score_plan(candles: list[dict], visible: int, decision: str, stop: float | None, target: float | None) -> dict:
     """Play the hidden bars forward against the user's plan."""
     if decision not in ("long", "skip"):
         raise PracticeError("Decision must be long or skip.")

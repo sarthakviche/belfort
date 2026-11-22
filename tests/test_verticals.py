@@ -196,10 +196,37 @@ def test_replay_uses_only_lagged_data_and_scores(fresh_db):
     r = service.replay_new(seed=3)
     cutoff = (pd.Timestamp.today() - pd.Timedelta(days=settings.EDU_LAG_DAYS)).strftime("%Y-%m-%d")
     assert r["candles"][-1]["time"] <= cutoff
-    entry = r["candles"][r["visible"] - 1]["close"]
-    s = service.replay_score(r["candles"], r["visible"], "long", entry * 0.95, entry * 1.1)
-    assert s["outcome"] in {"stop", "target", "open"}
-    assert service.replay_score(r["candles"], r["visible"], "skip", None, None)["outcome"] == "skipped"
+    entry = r["candles"][-1]["close"]
+    s = service.replay_score(r["id"], "long", entry * 0.95, entry * 1.1)
+    assert s["outcome"] in {"stop", "target", "open"} and s["end_date"] <= cutoff
+    skipped = service.replay_new(seed=4)
+    assert service.replay_score(skipped["id"], "skip", None, None)["outcome"] == "skipped"
+
+
+def test_replay_never_sends_hidden_bars_before_the_decision(fresh_db):
+    c = TestClient(app)
+    new = c.get("/api/practice/replay/new").json()
+    assert len(new["candles"]) == new["visible"] == settings.REPLAY_VISIBLE_BARS
+    assert "symbol" not in new and "end_date" not in new
+    entry = new["candles"][-1]["close"]
+    scored = c.post(
+        "/api/practice/replay/score", json={"id": new["id"], "decision": "long", "stop": entry * 0.9, "target": entry * 1.2}
+    )
+    body = scored.json()
+    assert scored.status_code == 200 and body["symbol"] and body["stats"]["count"] == 1
+    assert len(body["hidden"]) == settings.REPLAY_WINDOW_BARS - settings.REPLAY_VISIBLE_BARS
+    assert body["hidden"][0]["time"] > new["candles"][-1]["time"] and body["end_date"] == body["hidden"][-1]["time"]
+    assert isinstance(body["start_date"], str) and body["start_date"] == new["candles"][0]["time"]
+
+
+def test_replay_session_scores_once_and_rejects_unknown_ids(fresh_db):
+    c = TestClient(app)
+    new = c.get("/api/practice/replay/new").json()
+    assert c.post("/api/practice/replay/score", json={"id": new["id"], "decision": "skip"}).status_code == 200
+    again = c.post("/api/practice/replay/score", json={"id": new["id"], "decision": "skip"})
+    assert again.status_code == 400 and "already played" in again.json()["detail"]
+    unknown = c.post("/api/practice/replay/score", json={"id": "not-a-real-session", "decision": "skip"})
+    assert unknown.status_code == 400 and "Start a new chart" in unknown.json()["detail"]
 
 
 # ---------------- learn ----------------
