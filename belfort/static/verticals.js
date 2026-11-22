@@ -136,7 +136,7 @@ async function loadPractice() {
   const body = $("practice-body");
   body.innerHTML = '<p class="hint">Loading…</p>';
   try {
-    if (P.tab === "paper") { P.pf = await api("/api/practice/portfolio"); renderPaper(); }
+    if (P.tab === "paper") { P.pf = await api("/api/practice/portfolio"); P.an = await api("/api/practice/analytics"); renderPaper(); }
     else if (P.tab === "predict") { P.pred = await api("/api/practice/predictions"); renderPredict(); }
     else renderReplayIntro();
   } catch (e) { body.innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
@@ -163,11 +163,13 @@ function renderPaper() {
         ${d.pending.length ? `<div class="panel glass"><h3>Waiting to fill</h3><div class="scroll"><table><thead><tr><th>Stock</th><th>Order</th><th class="num">Qty</th><th class="num">Stop</th><th>Placed</th><th></th></tr></thead><tbody>
           ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? "limit " + inr(t.limit_price) : "market, next open", num(t.qty, 0), inr(t.stop), esc(t.placed_on),
             `<button type="button" class="btn ghost sm" data-close="${t.id}">Cancel</button>`])).join("")}</tbody></table></div></div>` : ""}
+        ${journalPanel()}
         <div class="panel glass"><h3>Closed trades and reviews</h3>${d.closed.length ? d.closed.map((t) => `<div class="closed">
             <div class="closed-head"><b>${esc(t.symbol)}</b><span>${esc(t.entry_date)} → ${esc(t.exit_date)}</span><span>${inr(t.entry_price)} → ${inr(t.exit_price)}</span>
               <span class="${t.pnl >= 0 ? "up" : "down"}">${num(t.pnl, 0)} points</span>${rTxt(t.r)}<span class="chip c-plain">${esc(t.exit_reason)}</span></div>
             <div class="src">Why you took it: ${esc(t.thesis)}</div>
             <div class="review"><input data-review="${t.id}" value="${esc(t.review)}" placeholder="What did you learn? Did you follow your plan?" maxlength="600"><button type="button" class="btn ghost sm" data-save-review="${t.id}">Save</button></div>
+            ${tagEditor(t)}
           </div>`).join("") : '<p class="missing">No closed trades yet. The review is where most of the learning happens.</p>'}</div>
       </div>
       <aside class="col-side">
@@ -177,6 +179,7 @@ function renderPaper() {
             <label class="wide">Stock<input name="symbol" required maxlength="80" placeholder="Type a company, e.g. HDFC Bank" data-stock-picker></label>
             <div class="wide ticket" id="ticket" hidden></div>
             <label>Quantity<input name="qty" type="number" min="1" step="1" required></label>
+            <label>Setup<select name="setup"><option value="">Not tagged</option>${Object.entries(P.an ? P.an.setups : {}).map(([k, v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join("")}</select></label>
             <label>Order<select name="entry_type"><option value="market">Market, next open</option><option value="limit">Limit</option></select></label>
             <label class="wide limit-only" hidden>Limit price (₹)<input name="limit_price" type="number" min="0" step="0.05"></label>
             <label>Stop-loss (₹)<input name="stop" type="number" min="0" step="0.05" required></label>
@@ -246,6 +249,31 @@ async function sizeIt() {
   } catch (e) { msg.textContent = e.message; }
 }
 $("practice-body").addEventListener("stock-pick", (e) => { if (e.target.closest("#order-form")) loadTicket(e.detail.symbol); });
+/* ---- journal analytics: tags on closed trades, R distribution, results by setup and holding time, habits ---- */
+function tagEditor(t) {
+  if (!P.an) return "";
+  const setups = Object.entries(P.an.setups).map(([k, v]) => `<option value="${esc(k)}" ${t.setup === k ? "selected" : ""}>${esc(v)}</option>`).join("");
+  const boxes = Object.entries(P.an.mistakes).map(([k, v]) => `<label class="tag"><input type="checkbox" data-mistake="${esc(k)}" ${(t.mistakes || []).includes(k) ? "checked" : ""}>${esc(v)}</label>`).join("");
+  return `<div class="tags" data-tags="${t.id}"><select data-setup><option value="">Setup: not tagged</option>${setups}</select>${boxes}<button type="button" class="btn ghost sm" data-save-tags="${t.id}">Save tags</button></div>`;
+}
+function journalPanel() {
+  const a = P.an;
+  if (!a || !a.closed) return "";
+  const max = Math.max(1, ...a.r_distribution.map((b) => b.count));
+  const bars = a.r_distribution.map((b) => `<div class="rbar"><span class="rl">${esc(b.label)}</span><span class="rt"><i class="${b.high != null && b.high <= 0 ? "neg" : "pos"}" style="width:${(b.count / max) * 100}%"></i></span><span class="rc">${b.count}</span></div>`).join("");
+  const row = (g, name) => `<tr><td>${esc(name)}</td><td class="num">${g.count}</td><td class="num">${g.win_rate == null ? "n/a" : pctTxt(g.win_rate)}</td><td class="num">${g.avg_r == null ? "n/a" : (g.avg_r >= 0 ? "+" : "") + g.avg_r + "R"}</td></tr>`;
+  const table = (title, rows) => `<div><h4>${esc(title)}</h4><table><thead><tr><th></th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Average R</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const list = (items, empty) => (items.length ? `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="hint">${esc(empty)}</p>`);
+  return `<div class="panel glass journal"><h3>Your journal</h3>
+    <div class="habits"><div><h4>What has worked for you</h4>${list(a.habits.best, `Needs at least ${a.habits.min_group} trades in a group.`)}</div>
+      <div><h4>What has cost you</h4>${list(a.habits.worst, "No mistake tagged often enough yet. Tag mistakes in each review below.")}</div></div>
+    <h4>Results in R</h4><div class="rdist">${bars}</div>
+    <div class="jtables">${table("By setup", a.by_setup.map((g) => row(g, g.label)).join(""))}
+      ${table("By holding time", a.by_holding.filter((g) => g.count).map((g) => row(g, g.label)).join(""))}
+      ${table("By mistake", a.by_mistake.filter((g) => g.count).map((g) => row(g, g.label)).join(""))}</div>
+    <p class="src">${esc(a.note)}</p></div>`;
+}
+
 /* ---- managing an open position: raise the stop, trail it, sell part ---- */
 function stopCell(t) {
   const raised = t.current_stop > t.stop;
@@ -281,6 +309,12 @@ $("practice-body").addEventListener("click", async (e) => {
     try { await post(`/api/practice/trades/${r.dataset.saveReview}/review`, { review: v }); r.textContent = "Saved"; } catch (err) { status(err.message, true); } return; }
   const dir = e.target.closest("button[data-dir]");
   if (dir) { document.querySelectorAll("button[data-dir]").forEach((b) => b.classList.toggle("on", b === dir)); return; }
+  const st = e.target.closest("button[data-save-tags]");
+  if (st) {
+    const box = document.querySelector(`[data-tags="${st.dataset.saveTags}"]`);
+    const mistakes = [...box.querySelectorAll("input[data-mistake]:checked")].map((x) => x.dataset.mistake);
+    return manage(`/api/practice/trades/${st.dataset.saveTags}/tags`, { setup: box.querySelector("[data-setup]").value || null, mistakes });
+  }
   const m = e.target.closest("button[data-manage]");
   if (m) { const row = $("manage-" + m.dataset.manage); row.hidden = !row.hidden; return; }
   const mb = e.target.closest("button[data-raise],button[data-trail],button[data-trail-off],button[data-sell]");
@@ -303,7 +337,7 @@ $("practice-body").addEventListener("submit", async (e) => {
   try {
     if (e.target.id === "order-form") {
       const r = await post("/api/practice/trades", { symbol: val("symbol"), qty: +val("qty"), stop: +val("stop"), target: val("target") ? +val("target") : null,
-        entry_type: val("entry_type"), limit_price: val("limit_price") ? +val("limit_price") : null, confidence: +val("confidence") / 100, thesis: val("thesis") || "" });
+        setup: val("setup"), entry_type: val("entry_type"), limit_price: val("limit_price") ? +val("limit_price") : null, confidence: +val("confidence") / 100, thesis: val("thesis") || "" });
       status(r.message); loadPractice();
     } else if (e.target.id === "predict-form") {
       const d = document.querySelector("button[data-dir].on");

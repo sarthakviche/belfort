@@ -59,6 +59,11 @@ MIGRATIONS = [
     ALTER TABLE trades ADD COLUMN trail_from TEXT;
     ALTER TABLE trades ADD COLUMN parent_id INTEGER;
     """,
+    # 5: journal analytics: a setup tag per trade and mistake tags on closed trades (T08)
+    """
+    ALTER TABLE trades ADD COLUMN setup TEXT;
+    ALTER TABLE trades ADD COLUMN mistakes TEXT NOT NULL DEFAULT '[]';
+    """,
 ]
 
 _lock = threading.Lock()

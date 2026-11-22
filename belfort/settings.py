@@ -78,6 +78,10 @@ REPLAY_WINDOW_BARS = 200  # one replay chart: what you see plus what is revealed
 REPLAY_VISIBLE_BARS = 140  # sessions shown before the decision; the other 60 stay on the server
 REPLAY_MIN_HISTORY_BARS = 260  # skip symbols with less lagged history than this
 TICKET_CHART_BARS = 63
+# Journal analytics
+ANALYTICS_MIN_GROUP = 3  # a pattern needs this many trades before it is called a habit
+ANALYTICS_R_BUCKETS = (-2, -1, 0, 1, 2, 3)  # edges of the R distribution bands
+ANALYTICS_HOLDING_BUCKETS = ((0, 2), (3, 5), (6, 10), (11, 20), (21, 10_000))  # calendar days held
 TRAIL_ATR_PERIOD = 14  # sessions in the ATR a trailing stop can use
 TRAIL_PCT_RANGE = (1.0, 25.0)  # allowed trailing distance in percent of the close
 TRAIL_ATR_RANGE = (
