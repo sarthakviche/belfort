@@ -117,6 +117,18 @@ G = [
         ["pulled back", "pullback"],
     ),
     (
+        "Trailing stop",
+        "Basics",
+        "A stop that rises as price rises, set a percentage or a number of ATRs below each close. It never moves down.",
+        ["trailing stop", "trailing stops"],
+    ),
+    (
+        "Time stop",
+        "Basics",
+        "An exit planned for a trade that has not moved after a set number of sessions, so capital and attention are freed.",
+        ["time stop", "time stops"],
+    ),
+    (
         "Stretched",
         "Chart",
         "Price has run far above its average in a short time. Entries here need a wide stop and often see a pullback first.",
@@ -482,6 +494,18 @@ G = [
         "Practice",
         "The share of trades that made money. A low win rate can still be profitable if winners are much larger than losers.",
         ["win rate", "hit rate"],
+    ),
+    (
+        "Drawdown",
+        "Practice",
+        "How far an account has fallen from its highest value, as a percentage. A 40% drawdown needs a 67% gain to recover.",
+        ["drawdown", "drawdowns"],
+    ),
+    (
+        "Risk of ruin",
+        "Practice",
+        "The chance that losses leave too little to keep trading your plan. Small risk per trade keeps it low through normal losing streaks.",
+        ["risk of ruin"],
     ),
     (
         "Brier score",

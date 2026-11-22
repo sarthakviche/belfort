@@ -358,7 +358,14 @@ def test_quiz_grading_and_progress(fresh_db):
     prog = c.get("/api/learn/syllabus").json()
     assert prog["completed"] == 1 and prog["streak_days"] == 1
     assert c.get("/api/learn/lessons/../../etc").status_code == 404
-    assert c.get("/api/learn/lessons/risk-of-ruin").status_code == 404  # on the syllabus, not written yet
+    planned = next(
+        les["id"]
+        for track in prog["syllabus"]["tracks"]
+        for module in track["modules"]
+        for les in module["lessons"]
+        if les.get("status") == "planned"
+    )
+    assert c.get(f"/api/learn/lessons/{planned}").status_code == 404  # on the syllabus, not written yet
 
 
 def test_example_chart_is_lagged(fresh_db):
