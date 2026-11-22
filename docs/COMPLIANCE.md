@@ -1,6 +1,6 @@
 # Compliance principles
 
-Belfort is software for learning and research, currently a private pre-release. These principles keep it on the right side of the rules. They are design rules, not legal advice; maintainers should get a review from a securities lawyer before major releases.
+Belfort is free, open-source software for learning and research. These principles keep it on the right side of the rules. They are design rules, not legal advice; maintainers should get a review from a securities lawyer before major releases.
 
 ## What the rules are based on (as of November 2026)
 
@@ -13,7 +13,7 @@ Belfort is software for learning and research, currently a private pre-release. 
 | Promotion and Regulation of Online Gaming Act, 2025 (rules in force from May 2026) | Online money games are banned. Belfort's points cannot be bought, sold, won or redeemed, and there are no entry fees or prizes. |
 | Data terms (Yahoo, NSE, publishers) | Data is fetched by each user's own machine for personal use. Belfort does not redistribute prices or full articles; news shows only feed-provided headlines and descriptions with a link to the source. |
 
-> **Pricing is undecided.** Most of the protection above comes from Belfort being free and local. If Belfort ever charges money, the per-stock Research labels are the part most likely to need a SEBI-registered research analyst or a redesign. Learn, Practice and News are lower risk. Decide pricing with a securities lawyer, before launch.
+> **Keep it free and local.** Most of the protection above comes from Belfort being free and local. If Belfort ever charges money, the per-stock Research labels are the part most likely to need a SEBI-registered research analyst or a redesign. Learn, Practice and News are lower risk. Decide pricing with a securities lawyer, before launch.
 
 ## Rules in code
 

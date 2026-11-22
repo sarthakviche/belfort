@@ -1,11 +1,11 @@
 # Status and known limitations
 
-> Temporary file for the founders. Last updated 22 November 2026. Update it in any PR that changes what is true here.
+> What works today and what does not. Last updated 22 November 2026. Update it in any PR that changes what is true here.
 
 ## Verified
 
 - 81 automated tests pass offline, with 74% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
-- ONBOARDING.md was followed on a clean clone on Windows 11 with Python 3.12.4 on 22 November 2026: setup, hooks, tests and the app all worked.
+- The contributor setup was followed on a clean clone on Windows 11 with Python 3.12.4 on 22 November 2026: setup, hooks, tests and the app all worked.
 - Each section was clicked through in a browser against live data on 21 November 2026: a research report, a lesson with its example chart and quiz, a paper order, a chart replay, the news page with tip filtering.
 
 ## Not verified yet

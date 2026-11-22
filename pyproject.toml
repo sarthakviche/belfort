@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Learn, practise and research Indian stocks in one app"
 requires-python = ">=3.12,<3.13"
 readme = "README.md"
-license = { text = "Proprietary: private pre-release, all rights reserved" }
+license = { text = "MIT" }
 
 [tool.ruff]
 line-length = 130
