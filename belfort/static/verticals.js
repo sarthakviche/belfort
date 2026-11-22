@@ -518,6 +518,17 @@ $("ai-save").addEventListener("click", () => {
   $("chat-log").innerHTML = "";
 });
 $("ai-clear").addEventListener("click", () => { localStorage.removeItem("belfortAI"); fillSettings(); $("ai-msg").textContent = "Key removed."; $("chat-log").innerHTML = ""; });
+$("backup-file").addEventListener("change", async (e) => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  const msg = $("backup-msg");
+  if (!confirm("Restoring replaces all your current practice trades, predictions and replays with the backup. Continue?")) return;
+  try {
+    const data = JSON.parse(await file.text());
+    msg.textContent = (await post("/api/practice/import", data)).message;
+    if (S.view === "practice") loadPractice();
+  } catch (err) { msg.textContent = err instanceof SyntaxError ? "That file is not valid JSON." : err.message; }
+});
 $("paper-reset").addEventListener("click", async () => {
   if (!confirm("Delete all practice trades and start again with fresh points?")) return;
   try { status((await post("/api/practice/reset")).message); if (S.view === "practice") loadPractice(); } catch (e) { status(e.message, true); }
