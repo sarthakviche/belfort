@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Learn: the Market context module. Index trend and market breadth, Sector strength and rotation, and FII and DII flows, RBI policy and the event calendar. Glossary adds Market breadth. Twenty-nine of 38 lessons are now written.
 - Learn: the Journal module. What to write before and after every trade (using the Practice order form, review box and mistake tags), Win rate is not the score: expectancy (read as Average R), and Calibration (the Brier score and the Calibration panel on the Predict page). Twenty-six of 38 lessons are now written.
 - Learn: the Indicators and patterns module. ATR: how far a stock normally moves; RSI and MACD: momentum, not prophecy; and Chart patterns and what the backtest shows, which walks through Belfort's own pattern backtest against a random-entry baseline. Twenty-three of 38 lessons are now written.
 - Learn: the Business check module. The five numbers that matter (sales growth, operating margin, return on equity, debt to equity, cash from operations), P/E only means something against peers, and Red flags: debt, pledges, falling cash flow. Each lesson uses the same thresholds and wording as the research report's business section. Twenty of 38 lessons are now written.

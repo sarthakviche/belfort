@@ -107,9 +107,9 @@
           "id": "context", "title": "Market context",
           "why": "Most stocks move with the index and their sector. Context decides how many setups to take.",
           "lessons": [
-            {"id": "index-trend", "title": "Index trend and market breadth", "minutes": 7, "status": "planned"},
-            {"id": "sectors", "title": "Sector strength and rotation", "minutes": 7, "status": "planned"},
-            {"id": "flows-and-events", "title": "FII and DII flows, RBI policy and the event calendar", "minutes": 7, "status": "planned"}
+            {"id": "index-trend", "title": "Index trend and market breadth", "minutes": 7},
+            {"id": "sectors", "title": "Sector strength and rotation", "minutes": 7},
+            {"id": "flows-and-events", "title": "FII and DII flows, RBI policy and the event calendar", "minutes": 7}
           ]
         },
         {
