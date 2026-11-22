@@ -1,6 +1,6 @@
 # Tasks: from v0.1 to Belfort 1.0 for Windows
 
-> Temporary file for the founders. **Devansh owns every task below** unless the Owner says otherwise. When you start a task, set Owner and Status in your first commit. When it merges, set Status to Done and add the PR link.
+> The public task board. Anyone can pick a `Ready` task: comment on its issue (or open one titled with the task id) to claim it, then follow [CONTRIBUTING.md](../CONTRIBUTING.md). When you start, set Owner and Status in your first commit; when it merges, set Status to Done with the PR link.
 >
 > Work roughly in phase order. Inside a phase, any `Ready` task can go next. Every task follows the flow in [CONTRIBUTING.md](../CONTRIBUTING.md) and the definition of done in [CLAUDE.md](../CLAUDE.md).
 
@@ -13,7 +13,7 @@
 | ID | Task | Phase | P | Size | Status |
 |---|---|---|---|---|---|
 | T01 | Run Belfort and fix setup docs | 0 Onboarding | P0 | S | Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) |
-| T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | In progress |
+| T02 | Try Ask Belfort with a real key | 0 Onboarding | P0 | S | Done ([#8](https://github.com/sarthakviche/belfort/pull/8)) |
 | T03 | Fuzzy stock picker everywhere | 1 Practice | P0 | M | Done ([#9](https://github.com/sarthakviche/belfort/pull/9)) |
 | T04 | Trade ticket: quote, mini chart, position-size helper | 1 Practice | P0 | M | Done ([#10](https://github.com/sarthakviche/belfort/pull/10)) |
 | T05 | Faster portfolio: bar cache and daily settlement | 1 Practice | P1 | M | Done ([#11](https://github.com/sarthakviche/belfort/pull/11)) |
@@ -60,11 +60,11 @@
 
 ### T01 · Run Belfort and fix setup docs
 - **Owner:** Devansh · **P0 · S · Status:** Done ([#7](https://github.com/sarthakviche/belfort/pull/7)) · **Area:** platform
-- **Do:** Follow [ONBOARDING.md](ONBOARDING.md) on a clean clone. Fix anything wrong or unclear in ONBOARDING.md, README.md or CLAUDE.md.
+- **Do:** Follow the setup in CONTRIBUTING.md on a clean clone. Fix anything wrong or unclear in it, README.md or CLAUDE.md.
 - **Done when:** Merged PR `docs: fix onboarding steps (T01)`, or a PR that only marks the task Done if nothing needed fixing.
 
 ### T02 · Try Ask Belfort with a real key
-- **Owner:** Devansh · **P0 · S · Status:** In progress · **Area:** assistant
+- **Owner:** Devansh · **P0 · S · Status:** Done ([#8](https://github.com/sarthakviche/belfort/pull/8)) · **Area:** assistant
 - **Do:** Use a free Gemini key and, if possible, a local Ollama (`OpenAI-compatible`, base URL `http://localhost:11434/v1`). Ask about a report, a lesson and a news story ("Explain this"). Try a wrong key and no internet.
 - **Done when:** All three contexts work with at least one provider, every error message tells the user what to do, and anything broken is fixed in this PR or filed as a new task.
 
@@ -231,13 +231,13 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 
 ### T40 · Ship Belfort 1.0 for Windows
 - **P0 · L · Status:** Blocked on all P0 and P1 tasks
-- **Do:** Final consolidation pass: remove dead code and temporary files (including this `TEAM/` folder, moving anything worth keeping into `docs/`), make README "What is built" true, update ARCHITECTURE and COMPLIANCE, full manual regression on a clean Windows machine using the installer, bump to 1.0.0, CHANGELOG, tag `v1.0.0`, and publish the release once D1, D3, D6 and D7 are settled.
+- **Do:** Final consolidation pass: remove dead code and temporary files, make README "What is built" true, update ARCHITECTURE and COMPLIANCE, full manual regression on a clean Windows machine using the installer, bump to 1.0.0, CHANGELOG, tag `v1.0.0`, and publish the release once D1, D3, D6 and D7 are settled.
 - **Done when:** Anyone with the download link can install and use Belfort on Windows without Python.
 
 ### T41 · Apply the brand decision
 - **P1 · S · Status:** Blocked on D2 · Rename the wordmark, window title, installer name and icon to whatever D2 decides.
 
-## Decisions (Sarthak and Devansh, not code)
+## Decisions (maintainers, not code)
 
 | ID | Decision | Why it matters | Blocks | Status |
 |---|---|---|---|---|
@@ -246,7 +246,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 | D3 | Securities lawyer review | Before any outside user sees it | T40 | Open |
 | D4 | Licensed data | Yahoo and NSE archive data are unofficial; a paid product needs a licensed feed or user-keyed broker data | T40 if paid | Open |
 | D5 | Ownership and roles | Founders' agreement, who owns what | | Open |
-| D6 | Where users download | Releases on a private repo cannot be downloaded by the public: a public releases repo, a website, or a store? | T40 | Open |
+| D6 | Where users download | GitHub Releases on this repo once it is public, or also a website or store? | T40 | Open |
 | D7 | Code signing | Unsigned installers trigger Windows SmartScreen warnings; a certificate costs money each year | T39, T40 | Open |
 
 ## Done

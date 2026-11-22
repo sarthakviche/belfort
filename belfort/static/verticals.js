@@ -531,7 +531,7 @@ function fillSettings() {
   const a = aiSettings();
   $("ai-provider").value = a.provider || "gemini"; $("ai-key").value = a.key || ""; $("ai-model").value = a.model || ""; $("ai-base").value = a.base || "";
   $("ai-base-wrap").hidden = $("ai-provider").value !== "openai";
-  $("about").textContent = `Belfort ${S.cfg ? S.cfg.version : ""}. Private pre-release build. ${S.cfg ? S.cfg.disclaimer : ""}`;
+  $("about").textContent = `Belfort ${S.cfg ? S.cfg.version : ""}. Free, open-source software (MIT licence). ${S.cfg ? S.cfg.disclaimer : ""}`;
 }
 $("settings-btn").addEventListener("click", () => { fillSettings(); $("settings").hidden = false; $("side").classList.remove("open"); });
 $("settings-x").addEventListener("click", () => { $("settings").hidden = true; });

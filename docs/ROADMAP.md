@@ -1,6 +1,6 @@
 # Roadmap
 
-Belfort is a private pre-release, shared by its two founders. Priority one is a release we are ready to show users; licence and pricing are decided before that. Dates are targets, not promises. Day-to-day work items live in [TEAM/TASKS.md](../TEAM/TASKS.md).
+Belfort is free and open source under the MIT licence. Priority one is a Windows 1.0 that anyone can install. Dates are targets, not promises. Day-to-day work items live in [docs/TASKS.md](../docs/TASKS.md).
 
 ## v0.1: foundation (done, November 2026)
 

@@ -7,16 +7,16 @@
 **Learn, practise and research Indian stocks in one app.**
 *The practice room, not the tip line.*
 
-![Status](https://img.shields.io/badge/status-private%20pre--release-facc15?style=flat-square&labelColor=0e0e10)
+![Status](https://img.shields.io/badge/licence-MIT-facc15?style=flat-square&labelColor=0e0e10)
 ![Version](https://img.shields.io/badge/version-0.1-8b8b90?style=flat-square&labelColor=0e0e10)
-![Tests](https://img.shields.io/badge/tests-81%20passing-facc15?style=flat-square&labelColor=0e0e10)
+![Tests](https://img.shields.io/badge/tests-138%20passing-facc15?style=flat-square&labelColor=0e0e10)
 ![Python](https://img.shields.io/badge/python-3.12-8b8b90?style=flat-square&labelColor=0e0e10)
 
 </div>
 
-> **Private pre-release.** This repository is shared only by its two founders, Sarthak and Devansh. Belfort is not published, not free to use, and has no licence yet (see [LICENSE](LICENSE)). Pricing and licence are decided before the first release; read the pricing note in [docs/COMPLIANCE.md](docs/COMPLIANCE.md) first, because charging changes the SEBI picture.
+Belfort is **free and open source** (MIT). It runs on your own computer: no account, no server, no tips. Windows is the first-class platform; a one-click installer is on the [roadmap](docs/ROADMAP.md).
 
-**Devansh, start here:** [TEAM/ONBOARDING.md](TEAM/ONBOARDING.md), then pick a task from [TEAM/TASKS.md](TEAM/TASKS.md).
+**Want to help?** Read [CONTRIBUTING.md](CONTRIBUTING.md) and pick a `Ready` task from [docs/TASKS.md](docs/TASKS.md). Lessons are a great first contribution.
 
 ---
 
@@ -33,7 +33,7 @@ An app for beginner and intermediate traders who want to swing or positional tra
 
 **Ask Belfort**, the explainer chat, works across all four with the user's own AI key (Gemini, or any OpenAI-compatible service, including a local Ollama model). It runs entirely on the user's computer: no Belfort server, no account.
 
-## What is built (v0.1)
+## What works today
 
 | Area | Built | Notes |
 |---|---|---|
@@ -43,22 +43,22 @@ An app for beginner and intermediate traders who want to swing or positional tra
 | **Practice: predictions** | Log a call with direction, horizon and confidence; auto-resolution; Brier score, points, calibration chart, badges | |
 | **Practice: chart replay** | Random hidden past chart, plan a stop and target, animated reveal, R result, running record | |
 | **News** | Six RSS sources, de-duplication, categories, company tags, hover definitions, "Explain this", tip-style headlines hidden | Headlines and feed descriptions only; links out. |
-| **Assistant** | Bring-your-own-key chat with Gemini or OpenAI-compatible providers; context-aware (report, lesson, story); wording filter | Not yet tried with a real key, only with simulated replies in tests. |
-| **Platform** | FastAPI app, SQLite store with migrations, static front end, Windows launcher, 81 offline tests, lint, format and coverage checks, CI on Windows and Linux | |
+| **Assistant** | Bring-your-own-key chat with Gemini or OpenAI-compatible providers; context-aware (report, lesson, story); wording filter; clear errors that never echo the key | |
+| **Platform** | FastAPI app, SQLite store with migrations, static front end, Windows launcher, 138 offline tests at 79% coverage, lint, format and audit checks, CI on Windows and Linux | |
 | **Docs** | Architecture, syllabus method, compliance, competitor landscape, roadmap | In [docs/](docs). |
 
 ## What is yet to build
 
-The full plan is in [docs/ROADMAP.md](docs/ROADMAP.md); the work ready to pick up today is in [TEAM/TASKS.md](TEAM/TASKS.md). The headlines:
+The full plan is in [docs/ROADMAP.md](docs/ROADMAP.md); the work ready to pick up today is in [docs/TASKS.md](docs/TASKS.md). The headlines:
 
-- **Decisions:** licence, pricing and brand name; a securities lawyer's review.
+- **Decisions:** brand name, download location and code signing; a securities lawyer's review.
 - **Learn:** 30 of 38 lessons, replay drills linked to lessons, a content checker in CI, Hindi.
-- **Practice:** position-size helper in the order form, faster settlement, trailing stops, journal analytics, export.
+- **Practice:** equity curve.
 - **Research:** editable rule thresholds, watchlists, market context.
 - **News:** wider company tagging, NSE announcements, events calendar.
-- **Platform:** browser tests, mobile layout pass, Windows installer, macOS and Linux.
+- **Platform:** browser tests, accessibility pass, offline assets, Windows installer and release workflow.
 
-Known limitations are listed in [TEAM/STATUS.md](TEAM/STATUS.md).
+Known limitations are listed in [docs/STATUS.md](docs/STATUS.md).
 
 ## Run it
 
@@ -83,8 +83,8 @@ A modular monolith: FastAPI and plain HTML, CSS and JavaScript with no build ste
 belfort/    research/  learn/  practice/  news/  assistant/  core/  data/  static/
 content/    learn/syllabus.json   learn/lessons/*.md   news/feeds.json
 docs/       ARCHITECTURE  CONVENTIONS  SYLLABUS  COMPLIANCE  LANDSCAPE  ROADMAP
-TEAM/       ONBOARDING  TASKS  STATUS  START_PROMPT   (temporary, for the founders)
-tests/      81 tests, no network needed
+            TASKS  STATUS  CONVENTIONS
+tests/      138 tests, no network needed
 ```
 
 ## Data
@@ -97,4 +97,4 @@ Belfort is an educational and research tool. It is **not investment advice** and
 
 ## Licence
 
-None yet: all rights reserved, private pre-release. See [LICENSE](LICENSE).
+[MIT](LICENSE). Free to use, change and share, including commercially, with the copyright notice kept. Please keep Belfort's compliance principles if you build on it: no tips, no real-money games.

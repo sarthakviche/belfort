@@ -14,7 +14,7 @@
 - [ ] Tests added or updated for the behaviour change; no network in tests
 - [ ] Exercised in the running app, as described above
 - [ ] `CHANGELOG.md` updated under Unreleased (if a user would notice)
-- [ ] `TEAM/TASKS.md` updated: task moved to Done with this PR's link
+- [ ] `docs/TASKS.md` updated: task moved to Done with this PR's link
 - [ ] Names follow `docs/CONVENTIONS.md`
 - [ ] No buy/sell/hold wording, price predictions or promises of returns
 - [ ] Practice features use virtual points only; nothing redeemable

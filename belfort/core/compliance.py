@@ -25,7 +25,7 @@ BANNED_PHRASES = [
 ]
 
 DISCLAIMER = (
-    "Belfort is software for learning and research. It is not investment advice or a recommendation "
+    "Belfort is free, open-source software for learning and research. It is not investment advice or a recommendation "
     "to buy, sell or hold any security, and its authors are not SEBI-registered research analysts or investment advisers. "
     "Labels state whether fixed, published rules are met; they do not predict returns. Practice uses virtual points with "
     "no money value. Markets carry risk and you can lose money. Belfort never places orders."
