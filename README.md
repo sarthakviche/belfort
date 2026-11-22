@@ -53,7 +53,6 @@ The full plan is in [docs/ROADMAP.md](docs/ROADMAP.md); the work ready to pick u
 
 - **Decisions:** brand name, download location and code signing; a securities lawyer's review.
 - **Learn:** 30 of 38 lessons, replay drills linked to lessons, a content checker in CI, Hindi.
-- **Practice:** equity curve.
 - **Research:** editable rule thresholds, watchlists, market context.
 - **News:** wider company tagging, NSE announcements, events calendar.
 - **Platform:** browser tests, accessibility pass, offline assets, Windows installer and release workflow.
