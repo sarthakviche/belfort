@@ -276,6 +276,36 @@ I ran the rule on all 50 Nifty stocks in both styles with today's data (26 Nov 2
 
 **Localhost stopping:** the preview servers I start are stopped by the desktop app when my turn ends. That stop is not a bug. Run the server from your own terminal to keep it up.
 
+## 11. Empty company card, and more business numbers ✅
+
+**What you saw:** the "What the company does" box was empty.
+
+**Why:** your browser loaded the new page layout, with the empty box, but still ran its old `app.js` from before section 10's fix. That old script has no code to fill the box. The API was returning the description all along.
+
+**Fix:**
+- `index.html` now links its files with a version tag (`app.js?v=2026-11-26`, and the same for the others).
+- A copy cached before the fix is no longer used, so no Ctrl+F5 is needed.
+- After this, section 10's `no-cache` keeps them current.
+
+**More fundamentals in the card:** you said the business side was too thin. The card now shows up to nine numbers, each with something to compare against:
+
+| Number | Shown beside it |
+|---|---|
+| Sales | change on the year |
+| Net profit | last year's figure |
+| Net margin, operating margin | last year's figure |
+| Return on equity | the sector's peer median (falls back to last year) |
+| Debt to equity | last year's figure |
+| P/E | the sector's peer median |
+| Price to book, market value | — |
+
+Rows the source does not have are left out. For example, banks have no operating margin or debt to equity.
+
+**Data caveat (worth checking):**
+- Yahoo gives HDFC Bank a return on equity of 8.6% for FY2026.
+- HDFC Bank's own reported figure is higher. The 2023 merger with HDFC Ltd roughly doubled its equity, and Yahoo's calculation may not match the bank's.
+- This is a source issue, not a calculation bug. It is another reason for the NSE filings idea in section 9, finding E.
+
 ---
 
 ## Open items for you

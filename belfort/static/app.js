@@ -267,10 +267,24 @@ function companyCard(d) {
   if (f.available) {
     const kind = { constructive: "ok", cautious: "no" }[f.verdict] || "plain";
     const latest = (name) => { const r = f.table.rows.find((x) => x.metric === name); return r ? r.values[r.values.length - 1] : null; };
-    const kv = [["Sales growth", latest("Sales growth %"), "%"], ["Operating margin", latest("Operating margin %"), "%"], ["Return on equity", latest("Return on equity %"), "%"],
-      ["Debt to equity", latest("Debt to equity"), ""], ["P/E", f.valuation.pe, ""], ["Market value", f.valuation.market_cap_cr, " cr"]]
-      .filter((x) => x[1] != null)
-      .map(([k, v, u]) => `<div class="stat"><div class="k">${k}</div><div class="v">${u === " cr" ? inr(v, 0) + u : num(v, u === "%" ? 1 : 2) + u}</div></div>`).join("");
+    /* Headline numbers from the latest year, each with the comparison that gives it meaning: last year's value, or
+       the sector's peer median. Rows the source did not return (banks have no operating margin) are left out. */
+    const row = (name) => f.table.rows.find((x) => x.metric === name);
+    const prev = (name) => { const r = row(name); return r && r.values.length > 1 ? r.values[r.values.length - 2] : null; };
+    const peer = f.peers && f.peers.available ? f.peers : null, yr = f.table.periods[f.table.periods.length - 2];
+    const was = (name, d, u = "") => prev(name) == null ? "" : `${esc(yr)}: ${num(prev(name), d)}${u}`;
+    const kv = [
+      ["Sales", latest("Sales (₹ cr)"), (v) => inr(v, 0) + " cr", latest("Sales growth %") == null ? "" : `${latest("Sales growth %") >= 0 ? "up" : "down"} ${num(Math.abs(latest("Sales growth %")), 1)}% on the year`],
+      ["Net profit", latest("Net profit (₹ cr)"), (v) => inr(v, 0) + " cr", prev("Net profit (₹ cr)") ? `${esc(yr)}: ${inr(prev("Net profit (₹ cr)"), 0)} cr` : ""],
+      ["Net margin", latest("Net margin %"), (v) => num(v, 1) + "%", was("Net margin %", 1, "%")],
+      ["Operating margin", latest("Operating margin %"), (v) => num(v, 1) + "%", was("Operating margin %", 1, "%")],
+      ["Return on equity", latest("Return on equity %"), (v) => num(v, 1) + "%", peer && peer.median_roe_pct != null ? `${esc(peer.sector)} median ${num(peer.median_roe_pct, 1)}%` : was("Return on equity %", 1, "%")],
+      ["Debt to equity", latest("Debt to equity"), (v) => num(v, 2), was("Debt to equity", 2)],
+      ["P/E", f.valuation.pe, (v) => num(v, 1), peer && peer.median_pe != null ? `${esc(peer.sector)} median ${num(peer.median_pe, 1)}` : ""],
+      ["Price to book", f.valuation.price_to_book, (v) => num(v, 2), ""],
+      ["Market value", f.valuation.market_cap_cr, (v) => inr(v, 0) + " cr", ""],
+    ].filter((x) => x[1] != null)
+      .map(([k, v, fmt, note]) => `<div class="stat"><div class="k">${k}</div><div class="v">${fmt(v)}</div>${note ? `<div class="n">${note}</div>` : ""}</div>`).join("");
     const top = (xs, empty) => xs.length ? `<ul class="plain">${xs.slice(0, 3).map((x) => `<li><b>${esc(x.title)}.</b> ${esc(x.detail)}</li>`).join("")}</ul>` : `<p class="muted">${empty}</p>`;
     biz = `<div class="biz-head">${chip(kind, "Business read: " + f.verdict)}<span class="muted">${esc(f.table.periods[f.table.periods.length - 1] || "")} figures · ${esc(f.source)}</span></div>
       <div class="kstats">${kv}</div>

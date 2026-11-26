@@ -429,3 +429,6 @@ details.plan[open] summary::after { content: "Close"; }
 details.plan[open] summary { margin-bottom: 8px; }
 /* Keep the last lines of the report clear of the floating Ask button. */
 #report { padding-bottom: 72px; }
+.kstats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px 20px; }
+.kstats .stat { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(0,0,0,.25); }
+.kstats .n { font-size: 12px; color: var(--muted); margin-top: 2px; }
