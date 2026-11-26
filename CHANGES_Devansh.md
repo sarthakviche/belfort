@@ -330,6 +330,22 @@ Rows the source does not have are left out. For example, banks have no operating
 
 **Checked in the app** on HDFC Bank, swing and positional.
 
+## 13. Large caps still showed 48 ✅
+
+**What you saw:** "48 · Companies from the built-in Nifty 50 list". That is the text from before section 4.
+
+**Why:**
+- Belfort builds the home-page lists once and saves them in its on-disk cache for 6 hours, under the key `screens:v4:<date>`.
+- Today's copy was built this morning, before the section 4 fix.
+- The cache is on disk, so restarting the server kept serving it.
+
+**Fix:**
+- The key now includes `SCREENS_CACHE_VERSION = 5` (`belfort/research/screens.py`), so the lists were rebuilt.
+- A comment says to raise the version whenever the lists change.
+- A test checks that the key carries the version.
+
+**Checked:** the server now returns 50 companies, "The companies in the Nifty 50 index", read from NSE Indices' current list.
+
 ---
 
 ## Open items for you
