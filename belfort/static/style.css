@@ -392,3 +392,7 @@ ul.plain, ol.plain { margin: 6px 0; padding-left: 20px; color: var(--ink2); } ul
 .tags .tag { display: inline-flex; gap: 4px; align-items: center; color: var(--muted); text-transform: none; letter-spacing: 0; font-size: 12px; }
 .jtables td:first-child { white-space: nowrap; }
 .equity-chart { height: 200px; }
+
+/* Context under a rule check: the facts behind a failed check. It never changes the check. */
+.ctx { margin-top: 6px; padding: 6px 8px; border-left: 3px solid var(--y); background: var(--bg2, rgba(0,0,0,.03)); color: var(--ink2); font-size: .92em; }
+.ctx b { display: block; font-size: .8em; text-transform: uppercase; letter-spacing: .04em; color: var(--ink3, var(--ink2)); }

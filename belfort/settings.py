@@ -57,6 +57,14 @@ LEVEL_LOOKBACK_BARS = {"swing": 260, "positional": 500}
 LEVEL_STRONG_TOUCHES = 3
 BREAKOUT_VOLUME = 1.5  # times the 20-day average
 TICK = 0.05
+# Context for the checks (research/analysis/context.py). A run is a rise of at least RUN_MIN_PCT from the lowest low of
+# the last RUN_LOOKBACK_BARS sessions; a sideways range (base) is at least BASE_MIN_BARS sessions whose high-to-low
+# range stays within BASE_MAX_RANGE_PCT, searched back up to BASE_MAX_BARS sessions.
+RUN_LOOKBACK_BARS = 40
+RUN_MIN_PCT = 8.0
+BASE_MIN_BARS = 20
+BASE_MAX_BARS = 400
+BASE_MAX_RANGE_PCT = 15.0
 PROFILE_MAX_CHARS = 420  # the company description at the top of a report, cut at a sentence
 QUARTER_STALE_DAYS = 200  # a newest quarter older than this means the fundamentals source is behind
 

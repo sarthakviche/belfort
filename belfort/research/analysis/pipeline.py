@@ -14,7 +14,7 @@ from ...data import symbols
 from ...data.providers import DataError, NseArchiveProvider, YahooProvider, clean_symbol
 from ...data.universe import LENDER_SECTORS, SECTOR_OF, peers_of
 from ...settings import FUND_SOURCE, LEVEL_LOOKBACK_BARS, PRICE_SOURCE, PROFILE_MAX_CHARS, STATS_FILE, STYLES
-from . import explain, fundamentals, sizing, verdict
+from . import context, explain, fundamentals, sizing, verdict
 from .indicators import atr as atr_series
 from .indicators import macd, rsi, sma
 from .patterns import Ctx, detect_all
@@ -266,6 +266,8 @@ def analyze(
         st, len(df), tech["trend"], tech["levels"], tech["volume"], tech["atr"], entry_px, stop_px, fund, earn_days
     )
     v["agreement"] = verdict.agreement(tech["trend"]["direction"], fund, st)
+    years = round(LEVEL_LOOKBACK_BARS[st.key] / 250, 1)
+    context.annotate(v, tech, fund, sz, st, context.recent_move(df), years)
     v["invalidation"] = {"price": stop_px, "text": f"A daily close below ₹{stop_px:.2f} ({sz['stop_basis']})."}
     tech["text"] = explain.technical_text(
         st, tech["trend"], tech["levels"], tech["volume"], tech["momentum"], tech["fib"], tech["patterns"]

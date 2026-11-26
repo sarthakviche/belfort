@@ -263,6 +263,7 @@ function verdictCard(d) {
     ${v.checks.length ? `<div class="meter">${v.checks.map((c) => `<i class="${c.passed ? "on" : ""}"></i>`).join("")}</div>` : ""}
     <p>${esc(v.summary)}</p>
     ${v.checks.length ? `<p class="muted">${met} of ${v.checks.length} conditions met. Open “Why this label” in the dossier for each one.</p>` : ""}
+    ${v.context && v.context.facts.length ? `<div class="note plain"><b>What else the numbers show</b><ul class="plain">${v.context.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul><span class="muted">${esc(v.context.note)}</span></div>` : ""}
     <div class="note ${v.label_key === "excluded" ? "bad" : ""}"><b>Main risk</b>${esc(v.main_risk)}</div>
     <div class="note plain"><b>The view is wrong if</b>${esc(v.invalidation.text)}</div>
     <div class="src">A fixed, published rule produces this label from the numbers on this page. It states which conditions hold. It is not a recommendation to buy, sell or hold.</div>`;
@@ -300,7 +301,7 @@ function overview(d) {
   const t = d.technical, v = d.verdict;
   return `<h4>The rule behind the label</h4>
     <div class="scroll"><table><thead><tr><th>Condition</th><th>Met?</th><th>What the numbers say</th></tr></thead><tbody>
-      ${v.checks.length ? v.checks.map((c) => `<tr><td>${esc(c.name)}</td><td>${chip(c.passed ? "ok" : "no", c.passed ? "yes" : "no")}</td><td>${esc(c.detail)}</td></tr>`).join("")
+      ${v.checks.length ? v.checks.map((c) => `<tr><td>${esc(c.name)}</td><td>${chip(c.passed ? "ok" : "no", c.passed ? "yes" : "no")}</td><td>${esc(c.detail)}${c.context ? `<div class="ctx"><b>Context</b>${esc(c.context)}</div>` : ""}</td></tr>`).join("")
         : `<tr><td colspan="3" class="missing">${esc(v.reasons[0] || "")}</td></tr>`}</tbody></table></div>
     <div class="src">“Conditions met” needs every condition. A downtrend or a serious business concern gives “Rule excludes”. Anything else is “Partly met”. Chart patterns are not part of the rule.</div>
     <h4>What the chart is doing</h4>
