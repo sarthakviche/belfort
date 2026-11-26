@@ -20,7 +20,7 @@ function candleChart(el, candles, opts) {
   const c = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
     grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" },
     timeScale: { borderColor: "rgba(255,255,255,.08)", visible: !(opts && opts.hideTime) }, crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    handleScroll: !(opts && opts.locked), handleScale: !(opts && opts.locked) });
+    ...(opts && opts.locked ? { handleScroll: false, handleScale: false } : CHART_POINTER) });
   const s = c.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444" });
   s.setData(candles);
   c.timeScale().fitContent();

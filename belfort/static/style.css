@@ -187,9 +187,9 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 11px; color:
 .kv .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; } .kv .n { font-size: 11.5px; color: var(--muted); }
 .kv .big { grid-column: 1 / -1; background: linear-gradient(120deg, var(--y-a14), rgba(0,0,0,.35)); border-color: var(--y-a30); } .kv .big .v { font-size: 30px; color: var(--y); }
 ul.plain { margin: 8px 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
-ul.plain li { display: flex; gap: 11px; color: var(--ink2); }
-ul.plain li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; margin-top: 8px; background: var(--y); }
-ul.plain li > * { min-width: 0; } ul.plain b { color: var(--ink); }
+ul.plain li { position: relative; padding-left: 18px; color: var(--ink2); }
+ul.plain li::before { content: ""; position: absolute; left: 0; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--y); }
+ul.plain b { color: var(--ink); }
 .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 
 /* dossier: glass folders */
