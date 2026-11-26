@@ -8,6 +8,14 @@ from ...settings import LABEL_AVOID, LABEL_KEYS, LABEL_NODATA, LABEL_VALID, LABE
 from .explain import trend_sentence
 
 
+def ratio_text(x: float, limit: float, over: bool = False) -> str:
+    """One decimal normally, two when one decimal would round across the limit, so 1.48 never reads as 1.5 and 3.04
+    never reads as 3.0. `over` is for limits a value must stay at or under (fails above), the default for at-least."""
+    side = (lambda v: v > limit) if over else (lambda v: v >= limit)
+    one = f"{x:.1f}"
+    return f"{x:.2f}" if side(x) != side(float(one)) else one
+
+
 def _check(name, passed, detail):
     return {"name": name, "passed": bool(passed), "detail": detail}
 
@@ -81,7 +89,7 @@ def decide(
             "Price is not stretched",
             ext <= 3,
             (
-                f"Price is {ext:.1f} ATR above its {st.fast}-day average (limit 3)."
+                f"Price is {ratio_text(ext, 3, over=True)} ATR above its {st.fast}-day average (limit 3)."
                 + (" After a fast run like this, a pullback is common and a sensible stop sits far away." if ext > 3 else "")
             )
             if fast
@@ -109,7 +117,7 @@ def decide(
         rr = (res["price"] - entry) / (entry - stop)
         rr_ok = rr >= MIN_REWARD_TO_RISK
         rr_txt = (
-            f"Next resistance ₹{res['price']:.2f} is {rr:.1f} times the stop distance away "
+            f"Next resistance ₹{res['price']:.2f} is {ratio_text(rr, MIN_REWARD_TO_RISK)} times the stop distance away "
             f"(the rule wants at least {MIN_REWARD_TO_RISK})."
         )
     checks.append(_check("Room to the next resistance", rr_ok, rr_txt))

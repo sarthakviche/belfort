@@ -20,6 +20,9 @@ warnings.filterwarnings("ignore")
 SYMBOL_RE = re.compile(r"^[A-Z0-9&\-]{1,20}$")
 INFO_KEYS = [
     "longName",
+    "longBusinessSummary",
+    "website",
+    "fullTimeEmployees",
     "shortName",
     "sector",
     "industry",
@@ -91,7 +94,7 @@ class YahooProvider:
             out["info"] = self._info(t)
             return out
 
-        return cached(f"fund:{symbol}", 24 * 3600, load)
+        return cached(f"fund2:{symbol}", 24 * 3600, load)
 
     @staticmethod
     def _info(t) -> dict:
@@ -102,7 +105,7 @@ class YahooProvider:
         return {k: info.get(k) for k in INFO_KEYS}
 
     def info(self, symbol: str) -> dict:
-        return cached(f"info2:{symbol}", 24 * 3600, lambda: self._info(self._ticker(symbol)))
+        return cached(f"info3:{symbol}", 24 * 3600, lambda: self._info(self._ticker(symbol)))
 
     def earnings_date(self, symbol: str) -> date | None:
         def load():

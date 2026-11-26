@@ -9,7 +9,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from ...settings import FUND_SOURCE
+from ...settings import FUND_SOURCE, QUARTER_STALE_DAYS
 
 CR = 1e7  # rupees per crore
 SEV_ORDER = {"high": 0, "medium": 1, "low": 2, "info": 3}
@@ -439,7 +439,10 @@ def analyse(raw: dict, is_lender: bool, peers: dict | None = None) -> dict:
     }
 
 
-def quarter_trend(q) -> dict:
+def quarter_trend(q, today: pd.Timestamp | None = None) -> dict:
+    """The latest quarter against the same quarter a year earlier, or against the quarter before when the year-ago
+    one is missing. `stale` is set when the newest quarter is older than QUARTER_STALE_DAYS, so the page can say the
+    source is behind instead of presenting old results as the latest."""
     rev, ni = _series(q, "Total Revenue", "Operating Revenue"), _series(q, "Net Income")
     if rev is None:
         return {"available": False, "missing_reason": "Quarterly results not returned by the source."}
@@ -447,19 +450,37 @@ def quarter_trend(q) -> dict:
     if not cols:
         return {"available": False, "missing_reason": "Quarterly results not returned by the source."}
     last = cols[-1]
-    prior = [c for c in cols if abs((pd.Timestamp(last) - pd.Timestamp(c)).days - 365) <= 10]
-    if not prior:
+    age = ((today or pd.Timestamp.today()).normalize() - pd.Timestamp(last)).days
+    stale = age > QUARTER_STALE_DAYS
+    stale_note = (
+        f"The newest quarter this source has is {pd.Timestamp(last).strftime('%b %Y')}, {age} days ago; later results "
+        "are not in it yet. Check the company's results on the NSE or BSE website."
+        if stale
+        else None
+    )
+    year_ago = [c for c in cols if abs((pd.Timestamp(last) - pd.Timestamp(c)).days - 365) <= 10]
+    previous = [c for c in cols[:-1] if 80 <= (pd.Timestamp(last) - pd.Timestamp(c)).days <= 100]
+    if year_ago:
+        p, basis = year_ago[0], "year"
+    elif previous:
+        p, basis = previous[-1], "quarter"
+    else:
         return {
             "available": False,
-            "missing_reason": "The same quarter a year earlier is missing from the source, "
-            "so no year-on-year comparison is shown.",
+            "quarter": pd.Timestamp(last).strftime("%b %Y"),
+            "stale": stale,
+            "stale_note": stale_note,
+            "missing_reason": "The source has no earlier quarter to compare with, so no change is shown.",
         }
-    p = prior[0]
     out = {
         "available": True,
         "quarter": pd.Timestamp(last).strftime("%b %Y"),
+        "compared_with": pd.Timestamp(p).strftime("%b %Y"),
+        "basis": basis,
         "as_of": pd.Timestamp(last).strftime("%Y-%m-%d"),
         "sales_growth_pct": round((_v(rev, last) / _v(rev, p) - 1) * 100, 1),
+        "stale": stale,
+        "stale_note": stale_note,
         "source": FUND_SOURCE,
     }
     a, b = _v(ni, last), _v(ni, p)

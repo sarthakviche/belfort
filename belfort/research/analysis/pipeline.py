@@ -2,6 +2,7 @@
 
 import json
 import math
+import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
@@ -12,7 +13,7 @@ from ...core.compliance import DISCLAIMER
 from ...data import symbols
 from ...data.providers import DataError, NseArchiveProvider, YahooProvider, clean_symbol
 from ...data.universe import LENDER_SECTORS, SECTOR_OF, peers_of
-from ...settings import FUND_SOURCE, PRICE_SOURCE, STATS_FILE, STYLES
+from ...settings import FUND_SOURCE, LEVEL_LOOKBACK_BARS, PRICE_SOURCE, PROFILE_MAX_CHARS, STATS_FILE, STYLES
 from . import explain, fundamentals, sizing, verdict
 from .indicators import atr as atr_series
 from .indicators import macd, rsi, sma
@@ -79,7 +80,7 @@ def technical(df: pd.DataFrame, st) -> dict:
     a = float(atr_series(df).iloc[-1])
     piv = find_pivots(hi, lo, st.k)
     trend = trend_state(df, piv, st)
-    levels = find_levels(piv, float(cl[-1]), a, len(df))
+    levels = find_levels(piv, float(cl[-1]), a, len(df), LEVEL_LOOKBACK_BARS[st.key])
     vol = volume_read(df, st)
     line, sig, hist = macd(df["close"])
     mom = {
@@ -122,6 +123,28 @@ def _add_dates(tech: dict, df: pd.DataFrame):
     bo = tech["volume"].get("breakout")
     if bo:
         bo["date"] = d(bo["idx"])
+
+
+def company_profile(info: dict) -> dict:
+    """What the company does, in the source's own words, cut to whole sentences within PROFILE_MAX_CHARS."""
+    text = " ".join(str(info.get("longBusinessSummary") or "").split())
+    summary = ""
+    for sentence in re.split(r"(?<=[.!?])\s+(?=[A-Z])", text):
+        if summary and len(summary) + len(sentence) + 1 > PROFILE_MAX_CHARS:
+            break
+        summary = f"{summary} {sentence}".strip()
+    if len(summary) > PROFILE_MAX_CHARS:
+        summary = summary[: PROFILE_MAX_CHARS - 1].rsplit(" ", 1)[0] + "…"
+    employees = info.get("fullTimeEmployees")
+    return {
+        "available": bool(summary),
+        "summary": summary or None,
+        "industry": info.get("industry"),
+        "website": info.get("website"),
+        "employees": int(employees) if isinstance(employees, int | float) and employees > 0 else None,
+        "source": FUND_SOURCE,
+        "missing_reason": None if summary else "The source has no business description for this company.",
+    }
 
 
 def resolve(query: str) -> str:
@@ -317,6 +340,7 @@ def analyze(
         "symbol": symbol,
         "name": info.get("longName") or info.get("shortName") or symbol,
         "sector": sector or info.get("sector"),
+        "profile": company_profile(info),
         "style": {"key": st.key, "name": st.name, "holds": st.holds},
         "as_of": as_of,
         "bars": len(df),

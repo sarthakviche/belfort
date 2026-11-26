@@ -332,6 +332,13 @@ function levels(d) {
     <div class="src">Source: ${esc(d.price.source)} · as of ${esc(d.as_of)}</div>`;
 }
 
+function quarterText(q) {
+  if (!q.available) return missing(q.missing_reason);
+  const vs = q.basis === "year" ? "the same quarter a year earlier" : `the quarter before (${esc(q.compared_with)}; the year-ago quarter is missing from the source)`;
+  const move = (x) => `${x >= 0 ? "up" : "down"} ${Math.abs(x)}%`;
+  return `${esc(q.quarter)}: sales ${move(q.sales_growth_pct)} on ${vs}${q.profit_growth_pct == null ? "" : `, profit ${move(q.profit_growth_pct)}`}.`;
+}
+
 function business(d) {
   const f = d.fundamental;
   if (!f.available) return `<p>${missing(f.missing_reason)}</p><p>The label is capped at Watch when the business check cannot run.</p>${src(f)}`;
@@ -352,7 +359,7 @@ function business(d) {
     </tbody></table></div>
     <div class="src">${esc(f.history_note)} “missing” means the source did not return that figure. Source: ${esc(f.source)} · latest year ends ${esc(f.as_of)}</div>
     <h4>Latest quarter</h4>
-    <p>${q.available ? `${esc(q.quarter)}: sales ${q.sales_growth_pct >= 0 ? "up" : "down"} ${Math.abs(q.sales_growth_pct)}% on the same quarter a year earlier${q.profit_growth_pct == null ? "" : `, profit ${q.profit_growth_pct >= 0 ? "up" : "down"} ${Math.abs(q.profit_growth_pct)}%`}.` : missing(q.missing_reason)}</p>
+    <p>${quarterText(q)}</p>${q.stale_note ? `<p class="missing">${esc(q.stale_note)}</p>` : ""}
     <h4>Valuation and peers</h4>
     <p>P/E: ${val.pe == null ? missing(val.missing_reason) : "<b>" + num(val.pe, 1) + "</b>"} · Market value: ${val.market_cap_cr == null ? "n/a" : inr(val.market_cap_cr, 0) + " cr"}</p>
     ${peers}`;

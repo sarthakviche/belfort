@@ -50,8 +50,15 @@ STYLES = {
 }
 
 MIN_REWARD_TO_RISK = 1.5
+# Support and resistance: swing points within this many ATRs of a zone's lowest point form one level; levels come from
+# this many recent daily bars (about one year for swing, two for positional); 3 or more swing points make a strong level.
+LEVEL_ZONE_ATR = 0.75
+LEVEL_LOOKBACK_BARS = {"swing": 260, "positional": 500}
+LEVEL_STRONG_TOUCHES = 3
 BREAKOUT_VOLUME = 1.5  # times the 20-day average
 TICK = 0.05
+PROFILE_MAX_CHARS = 420  # the company description at the top of a report, cut at a sentence
+QUARTER_STALE_DAYS = 200  # a newest quarter older than this means the fundamentals source is behind
 
 # Labels describe whether a fixed rule's conditions hold. They are not buy or sell words.
 LABEL_VALID = "Conditions met"
