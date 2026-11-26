@@ -4,7 +4,7 @@ Chart patterns are deliberately not part of this rule: their measured value on h
 (see the pattern reliability table), so they are shown as context only.
 """
 
-from ...settings import LABEL_AVOID, LABEL_KEYS, LABEL_NODATA, LABEL_VALID, LABEL_WATCH, MIN_REWARD_TO_RISK, Style
+from ...settings import LABEL_AVOID, LABEL_KEYS, LABEL_NODATA, LABEL_VALID, LABEL_WATCH, MIN_REWARD_TO_RISK, Style, level_span
 from .explain import trend_sentence
 
 
@@ -90,7 +90,7 @@ def decide(
             ext <= 3,
             (
                 f"Price is {ratio_text(ext, 3, over=True)} ATR above its {st.fast}-day average (limit 3)."
-                + (" After a fast run like this, a pullback is common and a sensible stop sits far away." if ext > 3 else "")
+                + (" A stop under recent support sits far below the price, so the loss if it is hit is large." if ext > 3 else "")
             )
             if fast
             else "Average not available.",
@@ -112,7 +112,7 @@ def decide(
     if stop_pct is None:
         rr_ok, rr_txt, rr = False, "Cannot be computed without a valid stop.", None
     elif res is None:
-        rr_ok, rr, rr_txt = True, None, "No resistance level overhead in the last year of swing highs."
+        rr_ok, rr, rr_txt = True, None, f"No resistance level overhead in {level_span(st.key)} of swing highs."
     else:
         rr = (res["price"] - entry) / (entry - stop)
         rr_ok = rr >= MIN_REWARD_TO_RISK

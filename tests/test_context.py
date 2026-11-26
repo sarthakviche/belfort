@@ -141,3 +141,10 @@ def test_context_never_uses_advice_words():
     text = " ".join(c["context"] or "" for c in v["checks"]) + " ".join(v["context"]["facts"])
     for word in ("buy", "sell", "target", "will rise", "will fall", "recommend"):
         assert word not in text.lower()
+
+
+def test_level_span_matches_each_styles_lookback():
+    from belfort.settings import level_span
+
+    assert level_span("swing") == "the last year"
+    assert level_span("positional") == "the last 2 years"

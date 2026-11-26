@@ -54,6 +54,14 @@ MIN_REWARD_TO_RISK = 1.5
 # this many recent daily bars (about one year for swing, two for positional); 3 or more swing points make a strong level.
 LEVEL_ZONE_ATR = 0.75
 LEVEL_LOOKBACK_BARS = {"swing": 260, "positional": 500}
+
+
+def level_span(style_key: str) -> str:
+    """The level lookback in words, for sentences such as "in the last year of swings"."""
+    years = round(LEVEL_LOOKBACK_BARS[style_key] / 250)
+    return "the last year" if years <= 1 else f"the last {years} years"
+
+
 LEVEL_STRONG_TOUCHES = 3
 BREAKOUT_VOLUME = 1.5  # times the 20-day average
 TICK = 0.05

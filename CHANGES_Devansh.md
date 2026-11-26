@@ -158,7 +158,7 @@ It ends with: "Context explains the numbers behind each check. It does not chang
 - `app.js`: `drawChart`.
 - Tests are in `tests/test_chart.py`.
 
-## 8. Report redesign ✅ (commit after 32f4f24, see git log)
+## 8. Report redesign ✅ (commit 018c03c)
 
 **New order, top to bottom:**
 1. **Name and price:** unchanged.
@@ -191,16 +191,77 @@ It ends with: "Context explains the numbers behind each check. It does not chang
 - the navigator steps correctly and opens on "Price is not stretched" with its context;
 - Plan a trade opens and calculates.
 
-## 9. Logic audit ⏳ (after the redesign)
+## 9. Logic audit 🔄 (findings below; two text fixes done, rule changes need your OK)
 
-I'll look for other places where the logic says something misleading, and write up what I find here before changing anything. Candidates:
-- A single swing high used as the resistance target.
-- How a "breakout" is defined: it currently uses the 20-day high, which on HDFC was only 2 days old.
-- Whether swing and positional are consistent with each other.
+I ran the rule on all 50 Nifty stocks in both styles with today's data (26 Nov 2026) and counted how each check behaves. A check that fails on nearly every stock tells the reader very little.
+
+### What the rule does today
+
+| | Swing (7 checks) | Positional (6 checks) |
+|---|---|---|
+| Conditions met | 5 | 1 |
+| Partly met | 37 | 39 |
+| Rule excludes | 8 | 10 |
+| **Room to the next resistance fails** | **42 of 50** | **46 of 50** |
+| Price is not stretched fails | 5 | **24** |
+| Entry area passes but stretched fails (contradictory) | 5 | **19** |
+| Nearest resistance is a single swing high | 19 | 14 |
+| Nearest support is a single swing low | 14 | 20 |
+
+### Finding A: "Room to the next resistance" almost never passes (needs your decision)
+
+**What happens.** The check takes the nearest swing high above price, however minor, and compares its distance with the stop distance.
+
+**Why it fails so often.**
+- The nearest "resistance" sits a median **0.76 ATR** above price, less than one normal day's move.
+- For about half the stocks, the reward-to-risk is below 0.5.
+- These are mostly small swing highs from the last few weeks, not real ceilings.
+
+**Proposal (changes labels, so not done yet).** Pick one of these:
+1. **(Recommended)** Ignore levels within 1 ATR of price and single-touch levels when choosing the target. Use the nearest level tested at least twice. The Context note already names that level. On HDFC this would give 3.90× instead of 1.45×.
+2. Keep the check as it is, but show it as information rather than a condition.
+
+### Finding B: positional "not stretched" uses the swing limit (needs your decision)
+
+**What happens.**
+- Both styles use the same limit: at most 3 ATR above the fast average.
+- Positional's fast average is the 50-day, which naturally sits further from price than the 20-day.
+- Its median distance is 2.86 ATR, so about half of all stocks fail.
+
+**Proposal.**
+- Scale the limit to the average's length, for example 5 ATR for the 50-day.
+- Or measure the distance in percent rather than in ATR.
+
+### Finding C: entry "breakout" and "stretched" contradict each other (needs your decision)
+
+**What happens.**
+- The entry check passes on a close above the 20-day (or 55-day) high on 1.5× volume.
+- After a long run, though, the 20-day high is just last week's high. HDFC's breakout level was set only 2 days earlier, after a 28.8% rise.
+- So the rule says "sensible entry area" and "stretched" at the same time. This happens on 19 of 50 positional stocks.
+
+**Proposal.** Count a breakout only when the level it clears is older than a few sessions (for example, the high was set at least 10 sessions ago), or when it clears a sideways range from section 6.
+
+### Finding D: support used for the stop is often a single swing low (information)
+
+- For 14 swing and 20 positional stocks, the nearest support has been touched only once.
+- The stop sits half an ATR under it.
+- This is not wrong, but the Context note for "Stop distance" now says what the stop is based on.
+- **Possible follow-up:** prefer a support tested at least twice when one is within the stop limit.
+
+### Finding E: quarterly data from Yahoo is thin (information)
+
+- For 28 of 50 stocks, Yahoo does not have the year-ago quarter, so the comparison falls back to the previous quarter. The page says so.
+- For HDFC Bank, the source's newest quarter is Jun 2025, and the page says the data is behind.
+- A real fix needs NSE results filings or another provider. That is a bigger task, worth considering for Belfort AI.
+
+### Fixed now (no label changes) ✅
+1. **Lookback wording.** Texts said "in the last year of swings" for both styles, but positional looks back 2 years. They now say "the last 2 years" for positional. This uses `level_span()` in `settings.py`, in `explain.py` and `verdict.py`.
+2. **Forecast wording.** The failed "not stretched" check said "After a fast run like this, a pullback is common". That reads as a forecast. It now states a fact: "A stop under recent support sits far below the price, so the loss if it is hit is large."
 
 ---
 
 ## Open items for you
 - **PR #29:** open, CI green, not merged. Merge it when you're happy with it.
-- **`feat/report-redesign-and-logic`:** contains PR #29's commits plus sections 4–7. I'll open a PR for it once you've read this file.
+- **`feat/report-redesign-and-logic`:** contains PR #29's commits plus sections 4–9. I'll open a PR for it once you've read this file.
+- **Findings A, B and C:** choose an option for each. They change which stocks show "Conditions met", so they also change the published rule in `docs/`. If Sarthak owns the rule, he should agree too.
 - **Changelog:** `CHANGELOG.md` has a line for every user-visible change above.

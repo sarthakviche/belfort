@@ -36,6 +36,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Renamed single-letter and uppercase local variables in the research engine to descriptive names; no behaviour change.
 
 ### Fixed
+- Research report: positional texts said "in the last year of swings" though positional levels look back two years; the failed "not stretched" check no longer says a pullback "is common" and states the stop distance instead.
 - Research report: the Business strengths and weaknesses lists no longer break into narrow columns where a term is underlined; chart patterns are named once each (bullish below the bars, bearish above) instead of piling up point labels; scrolling with the mouse over a chart scrolls the page instead of zooming the chart (drag to pan, pinch or drag an axis to zoom).
 - Chart replay: the company and the future bars stay inside Belfort until you decide, and the reveal shows the correct end date instead of "[object Object]".
 
