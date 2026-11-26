@@ -26,6 +26,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 
 ### Changed
 - Sidebar: "Open files" is now "Recent stocks", the stocks you opened most recently.
+- News: each story now leads with the stocks it names (full name, last close when Belfort has it, and a link to Belfort's report), then the publisher's own summary under "What happened", then a link to read the full story at the source. A new "Stocks in the news" panel lists the companies in today's stories and filters to one. Broker "(Buy)" calls are hidden with the other stock tips, and "BSE" is no longer tagged as the company when a story means the exchange or its indices.
 - README shortened to the essentials; project details moved to `docs/ABOUT.md`.
 - Practice: the portfolio opens much faster on repeat visits. Daily prices are kept until the next end-of-day release, and the paper account settles once per trading day instead of on every view.
 - Ask Belfort: errors now say what to do (wrong key, unknown model, rate limit, provider outage, slow answer, local model not running) and never show your key back to you.

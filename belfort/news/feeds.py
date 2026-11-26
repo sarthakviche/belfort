@@ -85,7 +85,8 @@ TIP_RE = re.compile(
     r"(stocks? to (buy|sell|watch|pick)|buy or sell|should you buy|buy,? sell,? hold|\bbuy\b.*\btarget\b|"
     r"\btarget price\b|\btarget,? (sl|stop)|(?-i:\bSL\b)|stop[- ]loss|multibagger|top picks?|\bpicks? for\b|"
     r"recommends? (a )?(buy|sell)|\bbrokerage(s)? (say|bet|bullish|suggest)|technical picks|trading ideas?|"
-    r"(buy|sell|accumulate)\s+(rating|call)|(upside|downside) of\s+\d)",
+    r"(buy|sell|accumulate)\s+(rating|call)|(upside|downside) of\s+\d|broker(?:[’']s|s[’'])\s+call|"
+    r"\((buy|sell|hold|accumulate|reduce|add|neutral)\))",
     re.I,
 )
 
@@ -165,6 +166,15 @@ def _aliases() -> dict[str, str]:
     return names
 
 
+# "BSE" is both a listed company and the exchange. These phrasings mean the exchange or its indices, so they are
+# removed before matching: "listed on the BSE", "filed with BSE and NSE", "BSE-listed", "BSE 100", "BSE Sensex".
+EXCHANGE_MENTION = re.compile(
+    r"\b(?:on|with|to|from)\s+(?:the\s+)?BSE\b|\bNSE\s*(?:and|&|,|/)\s*(?:the\s+)?BSE\b|\bBSE\s*(?:and|&|,|/)\s*(?:the\s+)?NSE\b"
+    r"|\bBSE[- ]listed\b|\bBSE\s+(?:\d+|sensex|small ?cap|mid ?cap|bankex|index|indices)\b",
+    re.I,
+)
+
+
 def tag(stories: list[dict]) -> None:
     al = cached("news-aliases:v1", 7 * 86400, _aliases)
     pats = [
@@ -173,7 +183,7 @@ def tag(stories: list[dict]) -> None:
         if len(k) >= 3
     ]
     for s in stories:
-        text = s["title"] + " " + s["summary"]
+        text = EXCHANGE_MENTION.sub(" ", s["title"] + " " + s["summary"])
         found = []
         for p, sym in pats:
             if sym not in found and p.search(text):
@@ -181,6 +191,24 @@ def tag(stories: list[dict]) -> None:
             if len(found) >= 4:
                 break
         s["symbols"] = found
+
+
+def companies(syms: list[str]) -> dict[str, dict]:
+    """Name and, when Belfort already has it, the last close for each tagged symbol. Nothing is fetched here."""
+    from ..data import symbols
+
+    try:
+        from ..research.analysis.pipeline import nse
+
+        listed = dict(nse.listed())
+    except Exception:
+        listed = {}
+    builtin = dict(symbols.builtin_companies())
+    out = {}
+    for sym in dict.fromkeys(syms):
+        name = listed.get(sym) or builtin.get(sym)
+        out[sym] = {"name": symbols.display_name(name) if name else sym, **symbols.known_close(sym)}
+    return out
 
 
 def build() -> dict:
