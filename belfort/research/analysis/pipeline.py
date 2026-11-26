@@ -13,7 +13,16 @@ from ...core.compliance import DISCLAIMER
 from ...data import symbols
 from ...data.providers import DataError, NseArchiveProvider, YahooProvider, clean_symbol
 from ...data.universe import LENDER_SECTORS, SECTOR_OF, peers_of
-from ...settings import FUND_SOURCE, LEVEL_LOOKBACK_BARS, PRICE_SOURCE, PROFILE_MAX_CHARS, STATS_FILE, STYLES
+from ...settings import (
+    FUND_SOURCE,
+    LEVEL_LOOKBACK_BARS,
+    PRICE_SOURCE,
+    PROFILE_MAX_CHARS,
+    STATS_FILE,
+    STYLES,
+    WEEKLY_FAST,
+    WEEKLY_SLOW,
+)
 from . import context, explain, fundamentals, sizing, verdict
 from .indicators import atr as atr_series
 from .indicators import macd, rsi, sma
@@ -123,6 +132,60 @@ def _add_dates(tech: dict, df: pd.DataFrame):
     bo = tech["volume"].get("breakout")
     if bo:
         bo["date"] = d(bo["idx"])
+
+
+def _series_payload(bars: pd.DataFrame, fast_n: int, slow_n: int) -> dict:
+    """Candles, volume and two simple averages for the chart library, one entry per bar."""
+    fast_s, slow_s = sma(bars["close"], fast_n), sma(bars["close"], slow_n)
+    ts = [d.strftime("%Y-%m-%d") for d in bars.index]
+    return {
+        "candles": [
+            {
+                "time": t,
+                "open": round(float(o), 2),
+                "high": round(float(h), 2),
+                "low": round(float(lo), 2),
+                "close": round(float(c), 2),
+            }
+            for t, o, h, lo, c in zip(ts, bars["open"], bars["high"], bars["low"], bars["close"], strict=False)
+        ],
+        "volume": [{"time": t, "value": int(x)} for t, x in zip(ts, bars["volume"], strict=False)],
+        "fast": [{"time": t, "value": round(float(x), 2)} for t, x in zip(ts, fast_s, strict=False) if not math.isnan(x)],
+        "slow": [{"time": t, "value": round(float(x), 2)} for t, x in zip(ts, slow_s, strict=False) if not math.isnan(x)],
+        "fast_n": fast_n,
+        "slow_n": slow_n,
+        "first_date": ts[0] if ts else None,
+    }
+
+
+def weekly_bars(df: pd.DataFrame) -> pd.DataFrame:
+    """Daily bars rolled up into weeks ending Friday. Each week is dated by its last trading day, so a week cut short
+    by a holiday, and the current unfinished week, carry a real session date."""
+    week = df.index.to_period("W-FRI")
+    grouped = df.groupby(week)
+    out = pd.DataFrame(
+        {
+            "open": grouped["open"].first(),
+            "high": grouped["high"].max(),
+            "low": grouped["low"].min(),
+            "close": grouped["close"].last(),
+            "volume": grouped["volume"].sum(),
+        }
+    )
+    out.index = pd.DatetimeIndex(df.index.to_series().groupby(week).max().values)
+    return out
+
+
+def chart_data(df: pd.DataFrame, st) -> dict:
+    """The whole daily history the source returned (up to CHART_YEARS), plus the same period as weekly bars.
+
+    The daily keys stay at the top level; `weekly` holds the weekly series with WEEKLY_FAST and WEEKLY_SLOW averages.
+    `years` is the span actually covered, so the page can say how much history it shows.
+    """
+    daily = _series_payload(df, st.fast, st.slow)
+    daily["weekly"] = _series_payload(weekly_bars(df), WEEKLY_FAST, WEEKLY_SLOW)
+    daily["years"] = round((df.index[-1] - df.index[0]).days / 365.25, 1) if len(df) else 0
+    return daily
 
 
 def company_profile(info: dict) -> dict:
@@ -285,19 +348,7 @@ def analyze(
         "announcements": na("Corporate announcements need an exchange feed, which is not connected. Check the NSE website."),
     }
 
-    tail = df.iloc[-(320 if st.key == "swing" else 560) :]
-    fast_s, slow_s = sma(df["close"], st.fast).loc[tail.index], sma(df["close"], st.slow).loc[tail.index]
-    ts = [d.strftime("%Y-%m-%d") for d in tail.index]
-    chart = {
-        "candles": [
-            {"time": t, "open": o, "high": h, "low": lo, "close": c}
-            for t, o, h, lo, c in zip(ts, tail["open"], tail["high"], tail["low"], tail["close"], strict=False)
-        ],
-        "volume": [{"time": t, "value": float(x)} for t, x in zip(ts, tail["volume"], strict=False)],
-        "fast": [{"time": t, "value": float(x)} for t, x in zip(ts, fast_s, strict=False) if not math.isnan(x)],
-        "slow": [{"time": t, "value": float(x)} for t, x in zip(ts, slow_s, strict=False) if not math.isnan(x)],
-        "first_date": ts[0],
-    }
+    chart = chart_data(df, st)
 
     sources = [
         {

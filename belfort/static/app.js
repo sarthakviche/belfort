@@ -407,31 +407,44 @@ function sources(d) {
   </tbody></table></div>`;
 }
 
+/* The chart shows the whole history the source returned (about five years). Daily opens on the recent months the
+   style looks at; Weekly opens on about three years. Drag the chart or the time axis to see more. Pattern markers are
+   found on daily bars, so they only appear on the daily chart. */
+let chartFrame = "daily";
 function drawChart(d) {
-  const el = $("chart"), t = d.technical;
+  const el = $("chart"), t = d.technical, weekly = chartFrame === "weekly", s = weekly ? d.chart.weekly : d.chart;
+  const unit = weekly ? "week" : "day";
   if (chart) { chart.remove(); chart = null; }
-  $("legend").innerHTML = `<span><i style="background:#facc15"></i>${t.trend.fast_n}-day average</span><span><i style="background:#f4f4f2"></i>${t.trend.slow_n}-day average</span>
-    <span><i style="background:#16c47f"></i>support</span><span><i style="background:#ef4444"></i>resistance</span><span><i style="background:#8b8b90"></i>stop</span>`;
+  document.querySelectorAll("#frame-seg button").forEach((b) => b.classList.toggle("on", b.dataset.frame === chartFrame));
+  $("legend").innerHTML = `<span><i style="background:#facc15"></i>${s.fast_n}-${unit} average</span><span><i style="background:#f4f4f2"></i>${s.slow_n}-${unit} average</span>
+    <span><i style="background:#16c47f"></i>support</span><span><i style="background:#ef4444"></i>resistance</span><span><i style="background:#8b8b90"></i>stop</span>
+    <span class="muted">${d.chart.years} years of history · drag to scroll${weekly ? " · patterns show on Daily" : ""}</span>`;
   if (!window.LightweightCharts) { el.innerHTML = '<p class="missing">The chart library could not be loaded (it needs an internet connection). All numbers on this page are unaffected.</p>'; return; }
   el.innerHTML = "";
   chart = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
     grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" }, timeScale: { borderColor: "rgba(255,255,255,.08)" },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal }, ...CHART_POINTER });
   const candles = chart.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444" });
-  candles.setData(d.chart.candles);
+  candles.setData(s.candles);
   const vol = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "vol", lastValueVisible: false, priceLineVisible: false });
   chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.84, bottom: 0 } });
-  vol.setData(d.chart.volume.map((v, i) => ({ time: v.time, value: v.value, color: d.chart.candles[i].close >= d.chart.candles[i].open ? "rgba(22,196,127,.35)" : "rgba(239,68,68,.35)" })));
-  chart.addLineSeries({ color: "#facc15", lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(d.chart.fast);
-  chart.addLineSeries({ color: "#f4f4f2", lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(d.chart.slow);
+  vol.setData(s.volume.map((v, i) => ({ time: v.time, value: v.value, color: s.candles[i].close >= s.candles[i].open ? "rgba(22,196,127,.35)" : "rgba(239,68,68,.35)" })));
+  chart.addLineSeries({ color: "#facc15", lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(s.fast);
+  chart.addLineSeries({ color: "#f4f4f2", lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(s.slow);
   const line = (price, color, title, style) => candles.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title });
   t.levels.supports.slice(0, 2).forEach((l) => line(l.price, "#16c47f", "support", 2));
   t.levels.resistances.slice(0, 2).forEach((l) => line(l.price, "#ef4444", "resistance", 2));
   line(d.sizing.stop, "#8b8b90", "stop", 0);
-  candles.setMarkers(patternMarkers(t.patterns, d.chart.candles, d.chart.first_date));
-  const n = d.chart.candles.length, show = d.style.key === "swing" ? 130 : 260;
-  chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + 14 });
+  if (!weekly) candles.setMarkers(patternMarkers(t.patterns, s.candles, s.first_date));
+  const n = s.candles.length, show = weekly ? 156 : d.style.key === "swing" ? 130 : 260;
+  chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + (weekly ? 4 : 14) });
 }
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("#frame-seg button");
+  if (!b || b.dataset.frame === chartFrame) return;
+  chartFrame = b.dataset.frame;
+  if (S.report) drawChart(S.report);
+});
 
 /* Pattern markers: one name per pattern at its last point, other points as plain dots. Bullish patterns sit below the
    bars and the rest above, and a name is dropped when another one on the same side is within LABEL_GAP bars, so labels
