@@ -396,3 +396,36 @@ ul.plain, ol.plain { margin: 6px 0; padding-left: 20px; color: var(--ink2); } ul
 /* Context under a rule check: the facts behind a failed check. It never changes the check. */
 .ctx { margin-top: 6px; padding: 6px 8px; border-left: 3px solid var(--y); background: var(--bg2, rgba(0,0,0,.03)); color: var(--ink2); font-size: .92em; }
 .ctx b { display: block; font-size: .8em; text-transform: uppercase; letter-spacing: .04em; color: var(--ink3, var(--ink2)); }
+
+/* Report order: company, chart, verdict with check navigator, then the optional trade plan. */
+.company .eyebrow { margin-bottom: 6px; }
+.company .profile { font-size: 16px; line-height: 1.55; color: var(--ink); max-width: 90ch; margin: 0 0 6px; }
+.company .facts a { color: var(--y); }
+.biz-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0 8px; }
+.kstats { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 6px 0 4px; }
+.kstats .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.kstats .v { font-size: 18px; font-weight: 600; color: var(--ink); }
+.checknav { margin: 14px 0 6px; }
+.checknav .steps { display: flex; gap: 6px; }
+.checknav .steps button { flex: 1; min-width: 0; padding: 8px 0 9px; border-radius: 10px; border: 1px solid var(--line); background: var(--s3); color: var(--muted); font-weight: 600; position: relative; }
+.checknav .steps button::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 3px; height: 3px; border-radius: 3px; background: #ef4444; }
+.checknav .steps button.ok::after { background: var(--y); }
+.checknav .steps button.on { border-color: var(--y); color: var(--ink); box-shadow: inset 0 0 0 1px var(--y); }
+.check { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-top: 8px; background: rgba(0,0,0,.25); }
+.check.no { border-left: 3px solid #ef4444; }
+.check.ok { border-left: 3px solid var(--y); }
+.check-head { display: flex; justify-content: space-between; align-items: center; }
+.check h4 { margin: 6px 0 4px; font-size: 17px; }
+.check p { margin: 0; color: var(--ink2); }
+.check-nav { display: flex; justify-content: space-between; margin-top: 10px; }
+.check-nav button { border: 1px solid var(--line); background: transparent; color: var(--ink2); border-radius: 9px; padding: 6px 12px; }
+.check-nav button:disabled { opacity: .35; cursor: default; }
+details.plan summary { cursor: pointer; list-style: none; display: flex; flex-direction: column; gap: 2px; padding-right: 60px; }
+details.plan summary::-webkit-details-marker { display: none; }
+details.plan summary b { font-size: 15px; }
+details.plan summary small { color: var(--muted); font-weight: 400; margin-left: 4px; }
+details.plan summary::after { content: "Open"; position: absolute; right: 20px; top: 20px; color: var(--y); font-size: 12px; }
+details.plan[open] summary::after { content: "Close"; }
+details.plan[open] summary { margin-bottom: 8px; }
+/* Keep the last lines of the report clear of the floating Ask button. */
+#report { padding-bottom: 72px; }

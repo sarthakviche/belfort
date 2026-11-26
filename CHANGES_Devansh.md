@@ -158,19 +158,38 @@ It ends with: "Context explains the numbers behind each check. It does not chang
 - `app.js`: `drawChart`.
 - Tests are in `tests/test_chart.py`.
 
-## 8. Report redesign ⏳ (next)
+## 8. Report redesign ✅ (commit after 32f4f24, see git log)
 
-**Planned order, top to bottom:**
-1. Name and price.
-2. **What the company does:** the profile, industry, business read, strengths and weaknesses, and key numbers.
-3. **The chart:** daily or weekly.
-4. **The verdict with a check navigator:** step through all 7 checks with previous and next. Each shows pass or fail, the numbers, and the Context note.
-5. **Plan a trade:** the position size calculator. It will be collapsed by default and labelled clearly: your amount and risk only size the trade and never change the verdict. You pointed out it currently reads like "a better suggestion".
-6. **Details tabs:** levels, business table, patterns and sources.
+**New order, top to bottom:**
+1. **Name and price:** unchanged.
+2. **What the company does** (new card, `companyCard()` in `app.js`):
+   - the company's own description from the source, cut at whole sentences;
+   - industry, employee count and website link;
+   - "Business read: constructive / neutral / cautious";
+   - headline numbers from the latest year: sales growth, operating margin, return on equity, debt to equity, P/E, market value;
+   - the top 3 strengths and weaknesses;
+   - the latest quarter, with the stale-source note when it applies.
+
+   The full table, peers and valuation stay in the dossier.
+3. **The chart:** swing or positional, daily or weekly. It is now full width.
+4. **The verdict with a check navigator** (`verdictCard()` and `showCheck()`):
+   - Numbered buttons 1–7 (1–6 for positional). A yellow bar means met and red means not met.
+   - It opens on the **first failed check**.
+   - Each check shows its name, met or not met, the numbers, and the Context note when it failed.
+   - Previous and Next buttons step through the checks.
+   - Below that: "What else the numbers show", then Main risk and "The view is wrong if" side by side.
+5. **Side column:**
+   - "Chart versus business".
+   - **Plan a trade (optional)**, collapsed by default. It says: "Your capital and risk only decide how many shares fit your loss limit if the stop is hit. They never change the label or the checks."
+6. **Dossier:** unchanged.
 
 **Also:**
-- Fix the duplicated "5 of 7 conditions" line.
-- Keep the floating "Ask a question" button from covering content.
+- The duplicated "5 of 7 conditions met" line is gone.
+- The report has extra bottom space, so the floating "Ask a question" button doesn't cover the last lines.
+
+**Checked in the app** on HDFCBANK, in both swing and positional:
+- the navigator steps correctly and opens on "Price is not stretched" with its context;
+- Plan a trade opens and calculates.
 
 ## 9. Logic audit ⏳ (after the redesign)
 

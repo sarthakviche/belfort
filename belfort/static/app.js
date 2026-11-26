@@ -239,7 +239,7 @@ $("dback").addEventListener("click", () => { S.tab = null; dossier(S.report); $(
 
 function render(d) {
   document.querySelectorAll("#style-seg button").forEach((b) => b.classList.toggle("on", b.dataset.style === d.style.key));
-  quote(d); verdictCard(d); calc(d); agreeCard(d); dossier(d); drawChart(d);
+  quote(d); companyCard(d); verdictCard(d); calc(d); agreeCard(d); dossier(d); drawChart(d);
   scrollTo(0, 0);
 }
 
@@ -256,19 +256,72 @@ function quote(d) {
         <div class="ends"><span>${num(q.low_52w)}</span><span>${num(q.high_52w)}</span></div></div></div>`;
 }
 
+/* What the company does, before any chart: the source's own description, then the business read, its strengths and
+   weaknesses, and a few headline numbers from the latest year. */
+function companyCard(d) {
+  const p = d.profile || {}, f = d.fundamental, el = $("company");
+  const site = p.website ? p.website.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
+  const facts = [p.industry && esc(p.industry), p.employees && `${Number(p.employees).toLocaleString("en-IN")} employees`,
+    p.website && `<a href="${esc(p.website)}" target="_blank" rel="noopener noreferrer">${esc(site)} ↗</a>`].filter(Boolean);
+  let biz = `<p>${missing(f.missing_reason || "Business figures not available.")}</p>`;
+  if (f.available) {
+    const kind = { constructive: "ok", cautious: "no" }[f.verdict] || "plain";
+    const latest = (name) => { const r = f.table.rows.find((x) => x.metric === name); return r ? r.values[r.values.length - 1] : null; };
+    const kv = [["Sales growth", latest("Sales growth %"), "%"], ["Operating margin", latest("Operating margin %"), "%"], ["Return on equity", latest("Return on equity %"), "%"],
+      ["Debt to equity", latest("Debt to equity"), ""], ["P/E", f.valuation.pe, ""], ["Market value", f.valuation.market_cap_cr, " cr"]]
+      .filter((x) => x[1] != null)
+      .map(([k, v, u]) => `<div class="stat"><div class="k">${k}</div><div class="v">${u === " cr" ? inr(v, 0) + u : num(v, u === "%" ? 1 : 2) + u}</div></div>`).join("");
+    const top = (xs, empty) => xs.length ? `<ul class="plain">${xs.slice(0, 3).map((x) => `<li><b>${esc(x.title)}.</b> ${esc(x.detail)}</li>`).join("")}</ul>` : `<p class="muted">${empty}</p>`;
+    biz = `<div class="biz-head">${chip(kind, "Business read: " + f.verdict)}<span class="muted">${esc(f.table.periods[f.table.periods.length - 1] || "")} figures · ${esc(f.source)}</span></div>
+      <div class="kstats">${kv}</div>
+      <div class="two"><div><h4>Strengths</h4>${top(f.pros, "No strength met the thresholds.")}</div><div><h4>Weaknesses</h4>${top(f.cons, "No weakness was flagged by the checks that ran.")}</div></div>
+      <p class="muted">Latest quarter: ${quarterText(f.quarter)}${f.quarter.stale_note ? ` <span class="missing">${esc(f.quarter.stale_note)}</span>` : ""}</p>`;
+  }
+  el.innerHTML = `<div class="eyebrow">What the company does</div>
+    <p class="profile">${p.available ? esc(p.summary) : missing(p.missing_reason || "No company description from the source.")}</p>
+    ${facts.length ? `<p class="muted facts">${facts.join(" · ")}</p>` : ""}${biz}
+    <div class="src">The full business table, peers and valuation are in the dossier below.</div>`;
+  glossify(el);
+}
+
+/* The verdict with a navigator over the rule's checks. The first unmet check opens first; each shows what the numbers
+   say and, for an unmet check, the context behind it. Navigating never changes the label. */
+let checkAt = 0;
 function verdictCard(d) {
-  const v = d.verdict, met = v.checks.filter((c) => c.passed).length;
+  const v = d.verdict, cs = v.checks;
+  const firstFail = cs.findIndex((c) => !c.passed);
+  checkAt = firstFail >= 0 ? firstFail : 0;
   $("verdict").innerHTML = `<h3>${esc(d.style.name)} view · ${esc(d.style.holds)}</h3>
     <div class="badge ${badgeClass(v.label_key)}">${esc(v.label)}</div>
-    ${v.checks.length ? `<div class="meter">${v.checks.map((c) => `<i class="${c.passed ? "on" : ""}"></i>`).join("")}</div>` : ""}
     <p>${esc(v.summary)}</p>
-    ${v.checks.length ? `<p class="muted">${met} of ${v.checks.length} conditions met. Open “Why this label” in the dossier for each one.</p>` : ""}
+    ${cs.length ? `<div class="checknav"><div class="steps" role="tablist" aria-label="Rule checks">${cs.map((c, i) => `<button type="button" role="tab" data-check="${i}" class="${c.passed ? "ok" : "no"}" title="${esc(c.name)}" aria-label="Check ${i + 1}: ${esc(c.name)}, ${c.passed ? "met" : "not met"}">${i + 1}</button>`).join("")}</div>
+      <p class="muted">Yellow is met, red is not. Select a number to read that check.</p><div id="check-view"></div></div>` : ""}
     ${v.context && v.context.facts.length ? `<div class="note plain"><b>What else the numbers show</b><ul class="plain">${v.context.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul><span class="muted">${esc(v.context.note)}</span></div>` : ""}
-    <div class="note ${v.label_key === "excluded" ? "bad" : ""}"><b>Main risk</b>${esc(v.main_risk)}</div>
-    <div class="note plain"><b>The view is wrong if</b>${esc(v.invalidation.text)}</div>
+    <div class="two"><div class="note ${v.label_key === "excluded" ? "bad" : ""}"><b>Main risk</b>${esc(v.main_risk)}</div>
+      <div class="note plain"><b>The view is wrong if</b>${esc(v.invalidation.text)}</div></div>
     <div class="src">A fixed, published rule produces this label from the numbers on this page. It states which conditions hold. It is not a recommendation to buy, sell or hold.</div>`;
+  if (cs.length) showCheck(d);
   glossify($("verdict"));
 }
+
+function showCheck(d) {
+  const cs = d.verdict.checks, c = cs[checkAt];
+  document.querySelectorAll("#verdict .steps button").forEach((b, i) => { b.classList.toggle("on", i === checkAt); b.setAttribute("aria-selected", String(i === checkAt)); });
+  $("check-view").innerHTML = `<div class="check ${c.passed ? "ok" : "no"}">
+      <div class="check-head"><span class="muted">Check ${checkAt + 1} of ${cs.length}</span>${chip(c.passed ? "ok" : "no", c.passed ? "met" : "not met")}</div>
+      <h4>${esc(c.name)}</h4><p>${esc(c.detail)}</p>
+      ${c.context ? `<div class="ctx"><b>Context</b>${esc(c.context)}</div>` : ""}
+      <div class="check-nav"><button type="button" data-step="-1" ${checkAt === 0 ? "disabled" : ""}>← Previous</button><button type="button" data-step="1" ${checkAt === cs.length - 1 ? "disabled" : ""}>Next →</button></div></div>`;
+  glossify($("check-view"));
+}
+
+$("verdict").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-check], button[data-step]");
+  if (!b || !S.report) return;
+  const n = S.report.verdict.checks.length;
+  checkAt = b.dataset.check != null ? Number(b.dataset.check) : Math.min(n - 1, Math.max(0, checkAt + Number(b.dataset.step)));
+  showCheck(S.report);
+});
 
 function calc(d) {
   const s = d.sizing;
