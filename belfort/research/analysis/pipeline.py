@@ -16,6 +16,7 @@ from ...data.universe import LENDER_SECTORS, SECTOR_OF, peers_of
 from ...settings import (
     FUND_SOURCE,
     LEVEL_LOOKBACK_BARS,
+    MOMENTUM_CHART_BARS,
     PRICE_SOURCE,
     PROFILE_MAX_CHARS,
     STATS_FILE,
@@ -185,7 +186,21 @@ def chart_data(df: pd.DataFrame, st) -> dict:
     daily = _series_payload(df, st.fast, st.slow)
     daily["weekly"] = _series_payload(weekly_bars(df), WEEKLY_FAST, WEEKLY_SLOW)
     daily["years"] = round((df.index[-1] - df.index[0]).days / 365.25, 1) if len(df) else 0
+    daily["momentum"] = momentum_series(df)
     return daily
+
+
+def momentum_series(df: pd.DataFrame, bars: int = MOMENTUM_CHART_BARS) -> dict:
+    """RSI(14), MACD(12,26,9) with its signal line and histogram, and ATR(14) for the last `bars` sessions, so the page
+    can draw them as charts. Computed on the whole history first, so the early values are already settled."""
+    line, sig, hist = macd(df["close"])
+    series = {"rsi": rsi(df["close"]), "macd": line, "signal": sig, "hist": hist, "atr": atr_series(df)}
+    tail = df.index[-bars:]
+    ts = [d.strftime("%Y-%m-%d") for d in tail]
+    return {
+        k: [{"time": t, "value": round(float(x), 2)} for t, x in zip(ts, s.loc[tail], strict=False) if not math.isnan(x)]
+        for k, s in series.items()
+    }
 
 
 def company_profile(info: dict) -> dict:

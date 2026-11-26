@@ -360,8 +360,11 @@ function agreeCard(d) {
 
 function pane(d) {
   const el = $("pane");
+  levelCharts.forEach((c) => c.remove());
+  levelCharts = [];
   el.innerHTML = ({ overview, levels, business, risks, patterns: patternStats, sources })[S.tab](d);
   glossify(el);
+  if (S.tab === "levels") drawLevelCharts(d);
 }
 
 function overview(d) {
@@ -379,14 +382,16 @@ function overview(d) {
 function levels(d) {
   const t = d.technical;
   const lv = (rows, kind) => rows.length ? rows.map((l) => `<tr><td>${kind}</td><td class="num">${inr(l.price)}</td><td class="num">${l.distance_pct}%</td>
-      <td class="num">${l.touches}</td><td>${esc(l.dates.join(", "))}</td></tr>`).join("") : `<tr><td>${kind}</td><td colspan="4" class="missing">none found in the last year of swings</td></tr>`;
+      <td class="num">${l.touches}</td><td>${esc(l.dates.join(", "))}</td></tr>`).join("") : `<tr><td>${kind}</td><td colspan="4" class="missing">none found in ${d.style.key === "swing" ? "the last year" : "the last 2 years"} of swings</td></tr>`;
   const pats = t.patterns.length ? t.patterns.map((p) => `<tr><td><b>${esc(p.name)}</b><div class="src">${esc(p.note)}</div></td><td>${esc(p.direction)}</td>
       <td>${esc(p.status)}${p.confirm_date ? `<div class="src">${esc(p.confirm_date)}</div>` : ""}</td><td class="num">${p.score.toFixed(2)}</td>
       <td class="num">${p.target == null ? "n/a" : inr(p.target)}</td><td class="num">${p.invalidation == null ? "n/a" : inr(p.invalidation)}</td>
       <td class="no-gloss">${p.points.map((q) => `${esc(q.role)}: ${inr(q.price)} on ${esc(q.date)}`).join("<br>")}</td></tr>`).join("")
     : `<tr><td colspan="7" class="missing">No pattern detected on the current chart.</td></tr>`;
-  const fib = t.fib ? `<p>Retracement levels of the ${esc(t.fib.direction)} swing between ${inr(t.fib.low)} (${esc(t.fib.low_date)}) and ${inr(t.fib.high)} (${esc(t.fib.high_date)}):
-      ${t.fib.levels.map((l) => `${(l.ratio * 100).toFixed(1)}% = ${inr(l.price)}`).join(" · ")}</p>` : `<p>${missing("too little history for a swing")}</p>`;
+  const fib = t.fib ? `<p>${fibText(t.fib, t.trend.close)}</p><div class="mini-chart" id="fib-chart"></div>
+      <div class="fib-keys">${t.fib.levels.map((l) => `<span><b>${(l.ratio * 100).toFixed(1)}%</b> ${inr(l.price)}</span>`).join("")}</div>
+      <div class="src">Fibonacci levels are fixed fractions of the swing, drawn as lines. They are a common reference, not a forecast, and are not part of the rule.</div>`
+    : `<p>${missing("too little history for a swing")}</p>`;
   return `<h4>Support and resistance</h4>
     <div class="scroll"><table><thead><tr><th>Type</th><th class="num">Price</th><th class="num">Distance</th><th class="num">Touches</th><th>Swing dates used</th></tr></thead>
       <tbody>${lv(t.levels.resistances.slice().reverse(), "Resistance")}${lv(t.levels.supports, "Support")}</tbody></table></div>
@@ -395,9 +400,91 @@ function levels(d) {
       <tbody>${pats}</tbody></table></div>
     <div class="src">The fit score (0 to 1) says how closely the shape matches its definition. It is not a chance of profit. A measured target is a textbook projection, not a forecast.</div>
     <h4>Fibonacci retracements</h4>${fib}
-    <h4>Momentum and daily range</h4>
-    <p>RSI(14): ${t.momentum.rsi.toFixed(1)} · MACD(12,26,9): ${t.momentum.macd.toFixed(2)} against signal line ${t.momentum.macd_signal.toFixed(2)} · ATR(14): ${inr(t.atr)}</p>
+    <h4>Momentum and daily range</h4>${momentumHtml(d)}
     <div class="src">Source: ${esc(d.price.source)} · as of ${esc(d.as_of)}</div>`;
+}
+
+/* ---- Charts in the Levels section ---- */
+let levelCharts = [];
+const fmtDate = (s) => new Date(s + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+
+function fibText(f, close) {
+  const move = f.direction === "up"
+    ? `the rise from ${inr(f.low)} on ${fmtDate(f.low_date)} to ${inr(f.high)} on ${fmtDate(f.high_date)}`
+    : `the fall from ${inr(f.high)} on ${fmtDate(f.high_date)} to ${inr(f.low)} on ${fmtDate(f.low_date)}`;
+  const lv = f.levels.map((l) => ({ ...l, pct: (l.ratio * 100).toFixed(1) + "%" })).sort((a, b) => a.price - b.price);
+  const below = lv.filter((l) => l.price <= close).pop(), above = lv.find((l) => l.price > close);
+  const where = below && above ? `between the ${below.pct} (${inr(below.price)}) and ${above.pct} (${inr(above.price)}) levels`
+    : below ? `above every level; the nearest is ${below.pct} at ${inr(below.price)}` : `below every level; the nearest is ${above.pct} at ${inr(above.price)}`;
+  return `Levels for ${move}. Today's close of ${inr(close)} is ${where}.`;
+}
+
+function momentumHtml(d) {
+  const t = d.technical, m = t.momentum, r = m.rsi, close = t.trend.close;
+  const rsiRead = r >= 70 ? "above 70: over the last 14 sessions, gains have been much larger than losses"
+    : r <= 30 ? "below 30: over the last 14 sessions, losses have been much larger than gains" : "between 30 and 70: neither gains nor losses have dominated the last 14 sessions";
+  const macdRead = m.macd >= m.macd_signal ? "above its signal line: MACD has risen above its own 9-day average"
+    : "below its signal line: MACD has fallen below its own 9-day average";
+  return `<div class="mom"><div class="mom-head"><b>RSI(14)</b> ${num(r, 1)} · ${rsiRead}.</div><div class="mini-chart short" id="rsi-chart"></div></div>
+    <div class="mom"><div class="mom-head"><b>MACD(12,26,9)</b> ${num(m.macd, 2)}, signal ${num(m.macd_signal, 2)} · ${macdRead}.</div>
+      <div class="legend"><span><i style="background:#facc15"></i>MACD</span><span><i style="background:#f4f4f2"></i>signal</span><span><i style="background:#16c47f"></i>difference</span></div>
+      <div class="mini-chart short" id="macd-chart"></div></div>
+    <div class="mom"><div class="mom-head"><b>ATR(14)</b> ${inr(t.atr)} · a normal day's range is ${num((t.atr / close) * 100, 1)}% of the price. The rule's stop and stretch checks are measured in ATRs.</div>
+      <div class="mini-chart short" id="atr-chart"></div></div>
+    <div class="src">Last year of daily values. These describe what price has done; they are not part of the rule and do not predict a move.</div>`;
+}
+
+function miniChart(el, height) {
+  if (!el || !window.LightweightCharts) return null;
+  el.innerHTML = "";
+  const c = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
+    grid: { vertLines: { color: "rgba(255,255,255,.03)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" },
+    timeScale: { borderColor: "rgba(255,255,255,.08)" }, crosshair: { mode: LightweightCharts.CrosshairMode.Normal }, handleScroll: false, handleScale: false });
+  levelCharts.push(c);
+  return c;
+}
+
+function drawLevelCharts(d) {
+  const t = d.technical, m = d.chart.momentum, f = t.fib;
+  const plain = { priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false };
+  if (f) {
+    const c = miniChart($("fib-chart"));
+    if (c) {
+      const first = [f.low_date, f.high_date].sort()[0], i = Math.max(0, d.chart.candles.findIndex((x) => x.time >= first) - 15);
+      const bars = d.chart.candles.slice(i);
+      const s = c.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444", priceLineVisible: false });
+      s.setData(bars);
+      const line = (price, title, color, style) => s.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title });
+      line(f.high, "swing high", "rgba(244,244,242,.6)", 0);
+      line(f.low, "swing low", "rgba(244,244,242,.6)", 0);
+      f.levels.forEach((l) => line(l.price, (l.ratio * 100).toFixed(1) + "%", "#facc15", 2));
+      s.setMarkers([{ time: f.high_date, position: "aboveBar", color: "#f4f4f2", shape: "arrowDown", text: "high" },
+        { time: f.low_date, position: "belowBar", color: "#f4f4f2", shape: "arrowUp", text: "low" }].sort((a, b) => (a.time < b.time ? -1 : 1)));
+      c.timeScale().fitContent();
+    }
+  }
+  if (!m) return;
+  const rc = miniChart($("rsi-chart"));
+  if (rc) {
+    const s = rc.addLineSeries({ color: "#facc15", lineWidth: 2, ...plain });
+    s.setData(m.rsi);
+    [[70, "70"], [30, "30"]].forEach(([p, title]) => s.createPriceLine({ price: p, color: "rgba(244,244,242,.35)", lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title }));
+    s.applyOptions({ autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
+    rc.timeScale().fitContent();
+  }
+  const mc = miniChart($("macd-chart"));
+  if (mc) {
+    mc.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false })
+      .setData(m.hist.map((x) => ({ ...x, color: x.value >= 0 ? "rgba(22,196,127,.5)" : "rgba(239,68,68,.5)" })));
+    mc.addLineSeries({ color: "#facc15", lineWidth: 2, ...plain }).setData(m.macd);
+    mc.addLineSeries({ color: "#f4f4f2", lineWidth: 1, ...plain }).setData(m.signal);
+    mc.timeScale().fitContent();
+  }
+  const ac = miniChart($("atr-chart"));
+  if (ac) {
+    ac.addLineSeries({ color: "#8b8b90", lineWidth: 2, ...plain, priceFormat: { type: "price", precision: 2, minMove: 0.01 } }).setData(m.atr);
+    ac.timeScale().fitContent();
+  }
 }
 
 function quarterText(q) {

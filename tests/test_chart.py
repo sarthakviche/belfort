@@ -35,3 +35,15 @@ def test_chart_data_sends_the_whole_history_and_weekly_series():
     assert 235 <= len(w["candles"]) <= 245
     assert len(w["slow"]) == len(w["candles"]) - WEEKLY_SLOW + 1
     assert all(isinstance(v["value"], int) for v in w["volume"][:5])
+
+
+def test_momentum_series_match_the_reported_latest_values():
+    df = price_frame(n=400)
+    m = pipeline.chart_data(df, STYLES["swing"])["momentum"]
+    tech = pipeline.technical(df, STYLES["swing"])
+    assert set(m) == {"rsi", "macd", "signal", "hist", "atr"}
+    assert all(len(v) == 250 and v[-1]["time"] == df.index[-1].strftime("%Y-%m-%d") for v in m.values())
+    assert abs(m["rsi"][-1]["value"] - tech["momentum"]["rsi"]) < 0.01
+    assert abs(m["macd"][-1]["value"] - tech["momentum"]["macd"]) < 0.01
+    assert abs(m["atr"][-1]["value"] - tech["atr"]) < 0.01
+    assert all(0 <= x["value"] <= 100 for x in m["rsi"])

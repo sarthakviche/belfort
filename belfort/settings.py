@@ -71,6 +71,8 @@ TICK = 0.05
 # Weekly chart: averages in weeks (10 and 40 weeks are about the 50 and 200-day averages).
 WEEKLY_FAST = 10
 WEEKLY_SLOW = 40
+# Bars of RSI, MACD and ATR history sent for the momentum charts in the Levels section (about a year).
+MOMENTUM_CHART_BARS = 250
 RUN_LOOKBACK_BARS = 40
 RUN_MIN_PCT = 8.0
 BASE_MIN_BARS = 20

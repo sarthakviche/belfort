@@ -432,3 +432,14 @@ details.plan[open] summary { margin-bottom: 8px; }
 .kstats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px 20px; }
 .kstats .stat { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(0,0,0,.25); }
 .kstats .n { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* Fibonacci and momentum charts in the Levels section. */
+.mini-chart { height: 300px; width: 100%; margin: 8px 0; }
+.mini-chart.short { height: 150px; }
+.fib-keys { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 6px; }
+.fib-keys span { border: 1px solid var(--line); border-radius: 99px; padding: 3px 10px; font-size: 13px; color: var(--ink2); }
+.fib-keys b { color: var(--y); margin-right: 4px; }
+.mom { margin: 10px 0 4px; }
+.mom-head { color: var(--ink2); font-size: 14px; }
+.mom-head b { color: var(--ink); margin-right: 4px; }
+.mom .legend { margin-top: 4px; }

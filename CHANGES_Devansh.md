@@ -306,6 +306,30 @@ Rows the source does not have are left out. For example, banks have no operating
 - HDFC Bank's own reported figure is higher. The 2023 merger with HDFC Ltd roughly doubled its equity, and Yahoo's calculation may not match the bank's.
 - This is a source issue, not a calculation bug. It is another reason for the NSE filings idea in section 9, finding E.
 
+## 12. Fibonacci and momentum as charts ✅
+
+**Before:** the Levels section of the dossier printed one long line of numbers for Fibonacci levels and another for RSI, MACD and ATR.
+
+**Now:**
+- **Fibonacci chart**
+  - It shows price over the swing, with the swing high and low marked and each level (23.6% to 78.6%) drawn as a yellow line.
+  - The levels are also listed as small tags under the chart.
+  - It has one sentence in date order, for example: "Levels for the fall from ₹1,017.50 on 1 Dec 2025 to ₹669.20 on 28 Oct 2026. Today's close of ₹862.00 is between the 50.0% (₹843.35) and 61.8% (₹884.45) levels."
+  - The old text listed the later date first ("between ₹669.20 (2026-10-28) and ₹1,017.50 (2025-12-01)"), which was confusing.
+- **RSI(14) chart:** the last year, with lines at 70 and 30, and a factual reading, e.g. "above 70: over the last 14 sessions, gains have been much larger than losses".
+- **MACD(12,26,9) chart:** the MACD line, the signal line, and a green or red histogram, with whether MACD is above or below its signal line.
+- **ATR(14) chart:** the last year, plus "a normal day's range is 2.5% of the price", and a note that the rule's stop and stretch checks are measured in ATRs.
+- **Wording:** each chart says it describes what price has done, is not part of the rule, and does not predict a move.
+
+**Also:** the levels table said "none found in the last year of swings" for positional too. It now says "the last 2 years" for positional.
+
+**Code:**
+- `pipeline.momentum_series()`: sends 250 days of RSI, MACD, signal, histogram and ATR in `chart.momentum`. Setting: `MOMENTUM_CHART_BARS = 250`.
+- `app.js`: `fibText`, `momentumHtml`, `drawLevelCharts`.
+- Test: the series' last values match the numbers the report already showed.
+
+**Checked in the app** on HDFC Bank, swing and positional.
+
 ---
 
 ## Open items for you
