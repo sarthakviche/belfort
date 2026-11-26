@@ -258,6 +258,24 @@ I ran the rule on all 50 Nifty stocks in both styles with today's data (26 Nov 2
 1. **Lookback wording.** Texts said "in the last year of swings" for both styles, but positional looks back 2 years. They now say "the last 2 years" for positional. This uses `level_span()` in `settings.py`, in `explain.py` and `verdict.py`.
 2. **Forecast wording.** The failed "not stretched" check said "After a fast run like this, a pullback is common". That reads as a forecast. It now states a fact: "A stop under recent support sits far below the price, so the loss if it is hit is large."
 
+## 10. Browser showed the old page after updates ✅
+
+**What you saw:** "No files open. Search a company to start its dossier." That text was replaced in section 2, so your browser was still running an old copy of `app.js`.
+
+**Why:**
+- The server sent `Last-Modified` but no `Cache-Control` for the page files.
+- So the browser guessed how long its copy stayed fresh and reused it without asking the server.
+- Every user updating Belfort would hit the same problem.
+
+**Fix:**
+- Page files (`index.html`, `app.js`, `style.css` and the rest) are now sent with `Cache-Control: no-cache`.
+- The browser still keeps its copy, but it asks the server (by ETag) before each use, and gets the new file when it has changed.
+- This is the `AppFiles` class in `belfort/main.py`. Tests are in `tests/test_app.py`.
+
+**One-time step:** a copy already cached before this fix may last until you press **Ctrl+F5** once on http://localhost:8766.
+
+**Localhost stopping:** the preview servers I start are stopped by the desktop app when my turn ends. That stop is not a bug. Run the server from your own terminal to keep it up.
+
 ---
 
 ## Open items for you
