@@ -59,7 +59,7 @@ kbd { font: 500 11px var(--font); padding: 1px 7px; border-radius: 6px; backgrou
 .ix.on .no { color: var(--y); }
 .ix.on::after { content: ""; position: absolute; right: 6px; top: 50%; width: 7px; height: 7px; margin-top: -3px; border-radius: 50%; background: var(--y); box-shadow: 0 0 12px var(--y); }
 
-/* open files: a filing drawer of recently opened stocks */
+/* recent stocks: the stocks opened most recently */
 .drawer-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--dim); margin-bottom: -10px; padding: 0 6px; }
 .linkish { background: none; border: 0; padding: 0; color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; cursor: pointer; }
 .linkish:hover { color: var(--y); }

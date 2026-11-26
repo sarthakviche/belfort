@@ -25,6 +25,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Production engineering setup: Ruff lint and format, coverage threshold, pinned dependencies, dependency audit, Windows and Linux CI, commit and PR policy checks, pre-commit hooks, Dependabot, code owners, conventions guide.
 
 ### Changed
+- Sidebar: "Open files" is now "Recent stocks", the stocks you opened most recently.
 - README shortened to the essentials; project details moved to `docs/ABOUT.md`.
 - Practice: the portfolio opens much faster on repeat visits. Daily prices are kept until the next end-of-day release, and the paper account settles once per trading day instead of on every view.
 - Ask Belfort: errors now say what to do (wrong key, unknown model, rate limit, provider outage, slow answer, local model not running) and never show your key back to you.

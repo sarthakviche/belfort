@@ -18,7 +18,7 @@ const compact = (x) => (x == null ? "n/a" : x >= 1e7 ? (x / 1e7).toFixed(2) + " 
 const S = { report: null, symbol: null, style: localStorage.getItem("style") || "swing", tab: null, list: "large", screens: null,
   chat: [], cfg: null, view: "home", chatCtx: null };
 
-/* ---------- sidebar: index, open files, breadcrumb ---------- */
+/* ---------- sidebar: index, recent stocks, breadcrumb ---------- */
 const FILES_KEY = "belfortFiles";
 const readFiles = () => { try { return JSON.parse(localStorage.getItem(FILES_KEY)) || []; } catch (e) { return []; } };
 function rememberFile(d) {
@@ -33,7 +33,7 @@ function renderFiles() {
   box.innerHTML = f.length ? f.map((x) => `<button type="button" class="file ${x.symbol === S.symbol && !$("report").hidden ? "on" : ""}" data-sym="${esc(x.symbol)}">
       <div><b>${esc(x.symbol)}</b><span>${esc(x.name)}</span></div>
       <div class="px">${inr(x.close)}<i class="${x.chg >= 0 ? "up" : "down"}">${x.chg >= 0 ? "▲" : "▼"} ${Math.abs(x.chg)}%</i></div></button>`).join("")
-    : '<div class="files-empty">No files open. Search a company to start its dossier.</div>';
+    : '<div class="files-empty">No stocks yet. Search a company to see its report here.</div>';
 }
 /* ---------- views: research (home, report), learn, practice, news ---------- */
 const VIEWS = ["home", "report", "learn", "practice", "news"];
