@@ -90,6 +90,7 @@ TRAIL_ATR_RANGE = (
 )  # allowed trailing distance in ATR multiples  # about three months of sessions on the order ticket's mini chart
 # ---------------- Stock search (the picker) ----------------
 SEARCH_LIMIT = 8  # rows in the picker dropdown
+NIFTY_MIN_MEMBERS = 45  # an official Nifty 50 file with fewer symbols than this is treated as broken
 SEARCH_MIN_INITIALS = 2  # "hul" matches Hindustan Unilever from two letters up
 SEARCH_MIN_SUBSTRING = 3  # shorter queries only match prefixes, to keep the list relevant
 SEARCH_MIN_FUZZY = 4  # typo tolerance starts at four characters
