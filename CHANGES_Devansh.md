@@ -389,6 +389,23 @@ Wiping the whole cache on every start would also throw away 5 years of prices fo
 
 **Checked** on Power Grid at your screen width (about 1900px): the header is one compact block, 154px tall. Also checked at the narrow pane width and at phone width (375px); no sideways scrolling.
 
+## 16. Switching swing and positional jumped to the top ✅
+
+**What you saw:** when you changed Positional to Swing while looking at the chart, the page went back to the top.
+
+**Why:**
+- Switching style reloads the report, and `render()` always scrolled to the top.
+- Changing your capital, risk or stop in "Plan a trade" did the same.
+
+**Fix (`app.js`, `load()` and `render()`):**
+- When the report being re-drawn is the **same stock**, the page keeps its scroll position. That covers style, capital, risk and stop changes.
+- The position is restored instantly, so the page doesn't visibly slide (the site otherwise uses smooth scrolling).
+- Opening a **different stock** still starts at the top.
+
+**Checked in the app** on HDFC Bank, scrolled 1200px down:
+- Positional, then Swing, then a capital change: still at 1200px each time.
+- Opening TCS: back at the top.
+
 ---
 
 ## Open items for you

@@ -193,11 +193,13 @@ async function load(symbol) {
   try {
     const d = await api("/api/analyze?" + q);
     if (id !== reqId) return;
-    if (S.report && S.report.symbol !== d.symbol) S.tab = null;
+    // Same stock in the same view (a style, capital, risk or stop change): keep the reader where they were.
+    const sameStock = S.view === "report" && S.report && S.report.symbol === d.symbol;
+    if (!sameStock) S.tab = null;
     S.report = d; S.symbol = d.symbol; $("q").value = "";
     localStorage.setItem("capital", $("capital").value); localStorage.setItem("risk", $("risk").value); localStorage.setItem("style", S.style);
     S.view = "report"; VIEWS.forEach((v) => { $(v).hidden = v !== "report"; });
-    render(d); status(""); rememberFile(d); setCrumb(); $("side").classList.remove("open");
+    render(d, sameStock); status(""); rememberFile(d); setCrumb(); $("side").classList.remove("open");
   } catch (e) { if (id === reqId) status(e.message || "Something went wrong.", true); }
 }
 const reload = () => { if (S.symbol) load(S.symbol); };
@@ -237,10 +239,13 @@ $("folders").addEventListener("click", (e) => { const b = e.target.closest("butt
 $("tabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-tab]"); if (b) { S.tab = b.dataset.tab; dossier(S.report); } });
 $("dback").addEventListener("click", () => { S.tab = null; dossier(S.report); $("dossier").scrollIntoView({ behavior: "smooth", block: "start" }); });
 
-function render(d) {
+/* A new stock opens at the top. Re-rendering the same stock (switching swing and positional, or changing capital, risk
+   or stop) keeps the scroll position, so the reader stays at the chart or section they were looking at. */
+function render(d, keepScroll = false) {
+  const y = scrollY;
   document.querySelectorAll("#style-seg button").forEach((b) => b.classList.toggle("on", b.dataset.style === d.style.key));
   quote(d); companyCard(d); verdictCard(d); calc(d); agreeCard(d); dossier(d); drawChart(d);
-  scrollTo(0, 0);
+  scrollTo({ top: keepScroll ? y : 0, behavior: "instant" });
 }
 
 function quote(d) {

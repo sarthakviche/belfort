@@ -38,6 +38,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Renamed single-letter and uppercase local variables in the research engine to descriptive names; no behaviour change.
 
 ### Fixed
+- Research report: switching between Swing and Positional, or changing capital, risk or your own stop, no longer jumps the page back to the top. Opening a different stock still starts at the top.
 - Research header: with a long company name (for example Power Grid Corporation of India Limited) the day's figures were squeezed into a narrow column on the right, pushing the name and price far down the page. The figures now sit in their own row under the name and price.
 - After an update, the home lists and the tagged news feed are rebuilt instead of serving what the previous version produced. Results Belfort builds are cached under a fingerprint of its code; downloaded prices, company figures and exchange files stay cached as before.
 - Large caps could still show 48 companies and the old "built-in Nifty 50 list" text for up to six hours after updating, because the built lists are cached on disk under a fixed key. The key now carries a version that is raised whenever the lists change.
