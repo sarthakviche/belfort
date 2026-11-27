@@ -21,6 +21,7 @@ from .news.router import router as news_router
 from .practice.router import router as practice_router
 from .research.router import router as research_router
 from .settings import EDU_LAG_DAYS, PAPER_START_POINTS, PREDICTION_HORIZONS, STYLES, VERSION
+from .tipcheck.router import router as tipcheck_router
 
 
 def _codes() -> set[str]:
@@ -52,7 +53,7 @@ def config():
     }
 
 
-for r in (research_router, learn_router, practice_router, news_router, assistant_router):
+for r in (research_router, learn_router, practice_router, news_router, assistant_router, tipcheck_router):
     app.include_router(r, dependencies=[Depends(require_access)])
 
 

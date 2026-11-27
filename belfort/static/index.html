@@ -8,7 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=2026-11-26">
+<link rel="stylesheet" href="style.css?v=2026-11-28">
+<link rel="stylesheet" href="tipcheck.css?v=2026-11-28">
 <script src="vendor/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
@@ -34,6 +35,7 @@
       <button type="button" class="ix" id="nav-learn" data-view="learn"><span class="no">02</span><span class="tx">Learn</span></button>
       <button type="button" class="ix" id="nav-practice" data-view="practice"><span class="no">03</span><span class="tx">Practice</span></button>
       <button type="button" class="ix" id="nav-news" data-view="news"><span class="no">04</span><span class="tx">News</span></button>
+      <button type="button" class="ix" id="nav-tipcheck" data-view="tipcheck"><span class="no">05</span><span class="tx">Tip Check</span></button>
     </nav>
     <div class="tools">
       <button type="button" class="tool" id="dict-btn">Dictionary</button>
@@ -139,6 +141,7 @@
         <div id="practice-body"></div>
       </section>
 
+      <section id="tipcheck" hidden></section>
       <section id="news" hidden>
         <div class="intro">
           <h1>The market, <em>explained</em>.</h1>
@@ -188,8 +191,9 @@
   <p class="hint" id="about"></p>
 </div>
 <div id="tip" class="tip" hidden></div>
-<script src="app.js?v=2026-11-26"></script>
-<script src="stock-picker.js?v=2026-11-26"></script>
-<script src="verticals.js?v=2026-11-26"></script>
+<script src="app.js?v=2026-11-28"></script>
+<script src="stock-picker.js?v=2026-11-28"></script>
+<script src="verticals.js?v=2026-11-28"></script>
+<script src="tipcheck.js?v=2026-11-28"></script>
 </body>
 </html>
