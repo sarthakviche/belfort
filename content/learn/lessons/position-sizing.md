@@ -44,6 +44,9 @@ Belfort's research report has this calculator on every stock. Enter your capital
 [
   {"q": "Capital ₹1,00,000, risk 1%, entry ₹250, stop ₹240. How many shares?", "options": ["40", "100", "400"], "answer": 1, "why": "Risk money ₹1,000 ÷ ₹10 per share = 100 shares."},
   {"q": "What happens to the number of shares when the stop is placed further away, for the same risk?", "options": ["It goes up", "It goes down", "It stays the same"], "answer": 1, "why": "Shares = risk money ÷ stop distance, so a wider stop means fewer shares."},
-  {"q": "Why do many traders keep risk per trade at about 1%?", "options": ["SEBI requires it", "A normal losing streak then costs a recoverable amount", "It makes every trade profitable"], "answer": 1, "why": "Ten losses at 1% cost about 10%, which an account can recover from."}
+  {"q": "Why do many traders keep risk per trade at about 1%?", "options": ["SEBI requires it", "A normal losing streak then costs a recoverable amount", "It makes every trade profitable"], "answer": 1, "why": "Ten losses at 1% cost about 10%, which an account can recover from."},
+  {"type": "number", "q": "Capital ₹3,00,000, risk 1%, entry ₹400, stop ₹380. How many shares?", "answer": 150, "tolerance": 0, "unit": "shares", "why": "Risk money is ₹3,000 and the stop distance is ₹20, so 3,000 ÷ 20 = 150 shares."},
+  {"type": "number", "q": "Capital ₹2,50,000, risk 1%, entry ₹730, stop ₹700. How many shares, rounded down?", "answer": 83, "tolerance": 0, "unit": "shares", "why": "Risk money is ₹2,500 and the stop distance is ₹30. 2,500 ÷ 30 is about 83.3, rounded down to 83."},
+  {"type": "tf", "q": "The rupee amount you put into a trade is what sets how much you risk.", "answer": false, "why": "The stop sets the risk. In the lesson, ₹50,000 invested with a ₹20 stop risks only ₹2,000."}
 ]
 ```

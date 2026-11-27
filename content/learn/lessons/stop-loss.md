@@ -31,6 +31,9 @@ Practise it: in the replay trainer, set your stop below the nearest support befo
 [
   {"q": "Where does the stop belong on a trade bought near support?", "options": ["Exactly 5% below entry", "Just below the support zone, where the idea is proved wrong", "Above the entry"], "answer": 1, "why": "The stop goes where the trade's reason is invalidated."},
   {"q": "A stock's ATR is ₹12. Your stop is ₹4 below entry. What is the likely problem?", "options": ["The stop is too wide", "Ordinary daily noise will probably hit it", "Nothing"], "answer": 1, "why": "A stop much tighter than one ATR is usually hit by normal movement."},
-  {"q": "Price is falling toward your stop. What does the plan say?", "options": ["Move the stop lower to give it room", "Leave the stop; exit if it is hit", "Buy more to average down"], "answer": 1, "why": "Never move a stop down. Exiting at the planned stop keeps the loss small."}
+  {"q": "Price is falling toward your stop. What does the plan say?", "options": ["Move the stop lower to give it room", "Leave the stop; exit if it is hit", "Buy more to average down"], "answer": 1, "why": "Never move a stop down. Exiting at the planned stop keeps the loss small."},
+  {"type": "number", "q": "Belfort caps a swing stop at 8% below entry. For an entry at ₹750, what is the widest stop distance, in rupees?", "answer": 60, "tolerance": 0, "unit": "₹", "why": "8% of ₹750 is ₹60, so the stop can be no more than ₹60 below the entry."},
+  {"type": "tf", "q": "If you still believe in a trade, it is fine to move the stop lower as price approaches it.", "answer": false, "why": "Never move a stop down. Doing so accepts a bigger loss than planned on a trade that is going wrong. A stop only goes up."},
+  {"type": "tf", "q": "Being stopped out means the trading plan has failed.", "answer": false, "why": "A stop-out is the plan working. The failure is the unplanned large loss from removing the stop."}
 ]
 ```

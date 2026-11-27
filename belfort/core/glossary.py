@@ -548,6 +548,8 @@ G = [
         "Market",
         "Income tax return: the yearly form you file with the Income Tax Department. Which form you use (ITR-2, ITR-3) depends on your kinds of income.",
         ["itr-2", "itr-3", "itr"],
+    ),
+    (
         "Pump and dump",
         "Market",
         "A scheme where organisers buy a thinly traded share, push it through tips, then sell to the followers who bought. It is market manipulation, and SEBI acts against it.",

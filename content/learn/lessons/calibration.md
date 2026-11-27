@@ -44,6 +44,9 @@ Once some calls have played out, Belfort groups them by stated confidence (50–
 [
   {"q": "You make a call at 80% confidence and it comes true. What is its Brier score?", "options": ["0.04", "0.20", "0.64"], "answer": 0, "why": "(1 − 0.8)² = 0.2² = 0.04."},
   {"q": "Twenty calls made at about 70% confidence came true 12 times. What does that suggest?", "options": ["Well calibrated", "Overconfident at that level", "Underconfident at that level"], "answer": 1, "why": "12 of 20 is 60%, below the 70% stated, so the confidence was too high."},
-  {"q": "Why does a 50% call score 0 practice points whether right or wrong?", "options": ["It says you have no view either way", "It is a bug", "50% calls are not allowed"], "answer": 0, "why": "50% means no edge in either direction, so it neither earns nor loses points."}
+  {"q": "Why does a 50% call score 0 practice points whether right or wrong?", "options": ["It says you have no view either way", "It is a bug", "50% calls are not allowed"], "answer": 0, "why": "50% means no edge in either direction, so it neither earns nor loses points."},
+  {"type": "number", "q": "You make a call at 70% confidence and it comes true. Practice points are 100 × (1 − 4 × Brier). How many points?", "answer": 64, "tolerance": 0, "unit": "points", "why": "Brier is (1 − 0.7)² = 0.09, so 100 × (1 − 0.36) = 64."},
+  {"type": "number", "q": "A call made at 60% confidence comes true. What is its Brier score?", "answer": 0.16, "tolerance": 0.005, "why": "When right, Brier is (1 − confidence)², so (1 − 0.6)² = 0.16."},
+  {"type": "tf", "q": "Five well-scored calls are enough to earn the Well calibrated badge.", "answer": false, "why": "The badge needs an average Brier score under 0.20 over 20 or more calls."}
 ]
 ```
