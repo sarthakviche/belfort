@@ -64,7 +64,10 @@ belfort/
   news/                   feeds.py (RSS reader, categories, company tags, tip filter), router.py
   assistant/              chat.py (bring-your-own-key provider adapter), router.py
   static/                 index.html, app.js (shell + research), verticals.js (learn, practice, news, settings),
-                          stock-picker.js (reusable company picker), style.css
+                          stock-picker.js (reusable company picker), mobile.js and mobile.css (phone layout and
+                          the Android bridge), style.css
+android/                 Belfort for Android (T48): Java shell (MainActivity, Bridge, ShareProvider, ReminderReceiver),
+                          start screen and offline Tip Check in assets/, build_apk.py (no Gradle); see android/README.md
 content/
   learn/syllabus.json     tracks -> modules -> lessons
   learn/lessons/*.md      one lesson per file, with a quiz block
