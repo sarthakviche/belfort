@@ -61,6 +61,7 @@
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Blocked on T42 |
+| T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Ready (Sarthak, starts after T42) |
 
 ---
 
@@ -271,7 +272,7 @@ Shared contracts every Phase 6 task uses:
 
 ### T44 · Tip Check: is this stock tip a trap?
 - **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** research, assistant · The hackathon hook.
-- **What:** paste or screenshot a stock tip from WhatsApp, Telegram or Instagram. Belfort reads it and shows, in about ten seconds, the red flags it found: is the sender a SEBI-registered adviser or research analyst; does the tip promise returns or a target in days (SEBI forbids guaranteed returns); urgency and secrecy language; is the stock in NSE's ASM or GSM surveillance lists; does its recent price and volume look like a pump (volume many times its 50-day average, a sharp run-up, a small company); what happened to the stock the last time it looked like this. It ends with what to do (check the registration yourself on SEBI's site, report on SEBI SCORES) and links to the Safety lessons.
+- **What:** paste or screenshot a stock tip from WhatsApp, Telegram or Instagram, in English, Hindi or Hinglish (most tips arrive in Hinglish). Belfort reads it and shows, in about ten seconds, the red flags it found: is the sender a SEBI-registered adviser or research analyst; does the tip promise returns or a target in days (SEBI forbids guaranteed returns); urgency and secrecy language; is the stock in NSE's ASM or GSM surveillance lists; does its recent price and volume look like a pump (volume many times its 50-day average, a sharp run-up, a small company); what happened to the stock the last time it looked like this. It ends with what to do (check the registration yourself on SEBI's site, report on SEBI SCORES) and links to the Safety lessons.
 - **Compliance:** it never says a stock is good, safe, a buy or a sell. It reports red flags found and not found, and says Belfort cannot tell whether a trade will work.
 - **Done when:** text works offline with rules; a screenshot works with the user's own assistant key (vision); every check is a pure tested function with fixtures for the SEBI registers and the surveillance lists; it works in the running app.
 
@@ -292,6 +293,17 @@ Shared contracts every Phase 6 task uses:
 ### T48 · Belfort for Android
 - **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** mobile · Built on Devansh's machine (Android SDK).
 - **Do:** a native Android app named Belfort with every part of the desktop app in a mobile-first interface, the same mascot, loader and animations, the same account (T43). Coordinated in `conversations.md` on the `collab` branch.
+
+### T50 · Belfort in Indian languages
+- **Owner:** Sarthak · **P0 · L · Status:** Ready (starts after T42 merges, to avoid touching every screen twice) · **Area:** ui, learn, assistant
+- **Why:** Belfort is for India, and most Indians are more at home in a language other than English.
+- **Do:** English stays the default and the first choice. A language picker on the intro, in settings and on Android: English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી, ಕನ್ನಡ.
+  - Every interface string comes from a catalogue (`belfort/static/i18n/<lang>.json`, also used by Android), with English as the fallback for any missing key.
+  - Lessons can have translated files (`content/learn/lessons/<lang>/<id>.md`); the Beginner stage ships in Hindi first. Where a translation is missing, the English lesson shows with an "Explain in <language>" button.
+  - Ask Belfort, Tip Check and the dictionary answer in the chosen language.
+  - Numbers use Indian grouping (1,00,000) in every language.
+- **Compliance:** translated lessons and catalogues are machine-drafted and must be read by a fluent speaker before release; the banned-wording check must run on every language (add translated banned phrases to the content checker, T12).
+- **Done when:** switching language changes the whole interface without a reload, the choice syncs with the account (T43), Hindi Beginner lessons pass the content checker, and tests cover fallback and number formatting.
 
 ### T49 · New exercise types in every lesson
 - **Owner:** Sarthak · **P1 · M · Status:** Blocked on T42 · **Area:** learn
