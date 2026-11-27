@@ -256,7 +256,7 @@ Shared contracts every Phase 6 task uses:
 - **New UI** goes in its own file under `belfort/static/` (for example `learn-game.js`, `auth.js`, `tipcheck.js`), with only a script tag and a nav hook added to `index.html` and `app.js`, so parallel branches do not collide.
 
 ### T42 · Gamified Learn: stages, locks, XP, streaks, hearts
-- **P0 · L · Status:** In progress · **Area:** learn, ui · Supersedes T24.
+- **P0 · L · Owner:** Sarthak (agent) · **Status:** In progress · **Area:** learn, ui · Supersedes T24.
 - **Path:** a vertical map per stage: one node per lesson, a checkpoint node at the end of each module and a stage test at the end of the stage. Next node pulses; done nodes show a crown when the quiz was perfect.
 - **Locks:** a new user sees Beginner only. Intermediate and Advanced lessons show their title and a lock; their content and quiz are refused by the API (not only hidden in the page). A stage unlocks when its previous stage test is passed at 80% or more, or by passing the placement test (a 12-question mix from Beginner) on first open.
 - **Lesson flow:** the lesson is split into cards at each `## ` heading, one card per screen, with an exercise after the cards. Wrong answers cost a heart (5 per day); hearts refill each day or by finishing a Weak spots review (questions the user got wrong before).

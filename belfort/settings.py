@@ -101,3 +101,22 @@ AI_MAX_OUTPUT_TOKENS = 800
 AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
 
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}
+
+# Learn game (T42). XP, hearts and streaks are virtual: never redeemable, never bought.
+STAGES = ("beginner", "intermediate", "advanced")
+STAGE_PASS_RATIO = 0.8  # a stage test or the placement test unlocks the next stage at this score or more
+LESSON_PASS_RATIO = 0.6  # a lesson quiz at this score or more completes the lesson
+HEARTS_MAX = 5  # refilled every day, or by finishing a Weak spots review
+XP_LESSON = 10
+XP_LESSON_NO_MISTAKES = 5  # bonus
+XP_LESSON_REPEAT = 5  # replaying a lesson that is already done
+XP_TEST = 20  # first pass of a checkpoint or a stage test
+XP_WEAK_SPOTS = 5
+DAILY_GOALS = (10, 20, 50)
+DEFAULT_DAILY_GOAL = 20
+STREAK_FREEZE_EVERY = 7  # one freeze is earned each time the streak reaches a multiple of this
+STREAK_FREEZE_MAX = 2
+PLACEMENT_QUESTIONS = 12
+STAGE_TEST_QUESTIONS = 12
+CHECKPOINT_QUESTIONS = 8
+WEAK_SPOTS_QUESTIONS = 8

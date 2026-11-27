@@ -70,6 +70,35 @@ MIGRATIONS = [
         account_id INTEGER NOT NULL, day TEXT NOT NULL, equity REAL NOT NULL, PRIMARY KEY (account_id, day)
     );
     """,
+    # 7: the Learn game: profile (XP, hearts, streak), daily XP, lessons, tests, weak spots, test sessions (T42)
+    """
+    CREATE TABLE IF NOT EXISTS learn_profile (
+        user_id TEXT NOT NULL DEFAULT 'local' PRIMARY KEY, xp_total INTEGER NOT NULL DEFAULT 0,
+        goal INTEGER NOT NULL DEFAULT 20, hearts INTEGER NOT NULL DEFAULT 5, hearts_day TEXT,
+        streak INTEGER NOT NULL DEFAULT 0, last_goal_day TEXT, freezes INTEGER NOT NULL DEFAULT 0,
+        placement_seen INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS learn_xp_days (
+        user_id TEXT NOT NULL DEFAULT 'local', day TEXT NOT NULL, xp INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, day)
+    );
+    CREATE TABLE IF NOT EXISTS learn_lessons (
+        user_id TEXT NOT NULL DEFAULT 'local', lesson_id TEXT NOT NULL, completed_on TEXT NOT NULL,
+        best_score REAL NOT NULL, PRIMARY KEY (user_id, lesson_id)
+    );
+    CREATE TABLE IF NOT EXISTS learn_tests (
+        user_id TEXT NOT NULL DEFAULT 'local', kind TEXT NOT NULL, key TEXT NOT NULL, best_score REAL NOT NULL,
+        passed INTEGER NOT NULL, xp_awarded INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (user_id, kind, key)
+    );
+    CREATE TABLE IF NOT EXISTS learn_weak (
+        user_id TEXT NOT NULL DEFAULT 'local', lesson_id TEXT NOT NULL, q_index INTEGER NOT NULL,
+        wrong_count INTEGER NOT NULL DEFAULT 1, last_wrong TEXT NOT NULL, PRIMARY KEY (user_id, lesson_id, q_index)
+    );
+    CREATE TABLE IF NOT EXISTS learn_sessions (
+        id TEXT PRIMARY KEY, user_id TEXT NOT NULL DEFAULT 'local', kind TEXT NOT NULL, key TEXT NOT NULL,
+        refs TEXT NOT NULL, created TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    """,
 ]
 
 _lock = threading.Lock()
