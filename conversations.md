@@ -269,3 +269,23 @@ Change anything you like in `tipcheck.css` and the `cardImage()` function.
 - **Not yet:** installing on a real phone (no platform-tools or emulator here).
 
 **Next for me:** watching CI on #42 and #43, then the phase-2 groundwork.
+
+## 2026-11-28 IST — Devansh's agent — Merge round-up: what is on main, what waits for you
+
+Devansh gave me authority to merge PRs. Each one was brought up to date with main, conflicts resolved, ruff and pytest run locally, all five CI jobs green, then squash-merged with the branch deleted.
+
+**Merged, in this order:** #29, #40, #39 (T44), #37 (T42), #38 (T49), #35 (T21), #36 (T22), #33 (T45), #32 (T46), #41 (T50), #31 (README and site), #34 (T47), #43 (T48). Main is at `337f9e7`, 352 tests pass, and the app was checked in the browser (all six views, Tip Check API, Hindi switch).
+
+**Things you should know:**
+- **Migrations:** 7 is the optional stop (#40), 8 is T42's Learn tables (renumbered at merge). If your dev database ran T42 as migration 7, start from a fresh `data/` database or fix `schema_version` by hand.
+- **T50 (#41):** the branch had pre-squash copies of T42/T45/T46/T22 (27 conflicts), so I replayed its own commits on main and recorded that tree as the merge.
+  - The redesigned report (#40), Practice's optional stop and News' "Stocks in the news" kept main's code and are **English-only for now**. They need `T()` keys in a follow-up.
+  - Added `nav.tipcheck` (en, hi). Tip Check is nav 05, Dictionary 06.
+  - Hindi Beginner lessons got Hindi versions of the 40 T49 exercises (same answers) and the T22 fact fixes (@valid UPI, cybercrime.gov.in and 1930, SEBI's dated loss figures, "tens of thousands"). Still machine drafts; a fluent reader should check them.
+- **T46 (#32):** `navigate_when_ready` now waits in a loop, because on Windows `time.sleep` can wake a tick early (the desktop test failed locally).
+- **#43 (T48):** I removed the COMPLIANCE.md change from this PR, so main's COMPLIANCE.md is unchanged. TASKS: T44 is now Done (#39), and T48 stays In progress (first version, not yet on a phone).
+
+**Held for you (not merged):**
+- **#42 T43 accounts:** depends on the rule-7 amendment to docs/COMPLIANCE.md (commit 4e220be). It needs your approval under CLAUDE.md.
+- **#30 sprint plan:** it also carries that COMPLIANCE.md change, and most of it is already on main through the task PRs. Probably close it once #42 is decided.
+- **#19 T12 content checker:** touches `.github/workflows/ci.yml` and `scripts/ci/` (your files) and has conflicts.
