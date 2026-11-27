@@ -221,3 +221,120 @@ def test_sharp_recovery_is_read_as_a_new_uptrend_not_as_down():
     t = trend_state(df, find_pivots(df["high"].values, df["low"].values, 5), SWING)
     assert t["direction"] == "up" and t["phase"] == "early" and t["broke_above_last_high"]
     assert "turned up" in explain.trend_sentence(t)
+
+
+# ---------------- support and resistance zones ----------------
+
+
+def test_levels_do_not_creep_past_the_zone_width():
+    from belfort.research.analysis.pivots import Pivot
+    from belfort.research.analysis.structure import find_levels
+
+    # Four swing points 0.6 apart with ATR 1 (zone width 0.75). Comparing with a running average chained them all
+    # into one level spanning 1.8 ATR; each zone may now span at most 0.75 ATR.
+    piv = [Pivot(i, p, "H" if i % 2 else "L") for i, p in enumerate([100.0, 100.6, 101.2, 101.8])]
+    lv = find_levels(piv, close=110.0, atr=1.0, n_bars=10)
+    zones = sorted((z["low"], z["high"]) for z in lv["supports"])
+    assert zones == [(100.0, 100.6), (101.2, 101.8)]
+    assert all(z["high"] - z["low"] <= 0.75 for z in lv["supports"])
+
+
+def test_level_strength_follows_touch_count():
+    from belfort.research.analysis.pivots import Pivot
+    from belfort.research.analysis.structure import find_levels, level_strength
+
+    assert [level_strength(n) for n in (1, 2, 3, 5)] == ["single", "moderate", "strong", "strong"]
+    piv = [Pivot(1, 90.0, "L"), Pivot(3, 90.2, "L"), Pivot(5, 90.1, "L"), Pivot(7, 120.0, "H")]
+    lv = find_levels(piv, close=100.0, atr=1.0, n_bars=10)
+    assert lv["supports"][0]["strength"] == "strong" and lv["supports"][0]["touches"] == 3
+    assert lv["resistances"][0]["strength"] == "single"
+
+
+def test_levels_only_use_the_lookback_window():
+    from belfort.research.analysis.pivots import Pivot
+    from belfort.research.analysis.structure import find_levels
+
+    piv = [Pivot(5, 80.0, "L"), Pivot(400, 90.0, "L")]
+    assert [z["price"] for z in find_levels(piv, 100.0, 1.0, n_bars=500, lookback=260)["supports"]] == [90.0]
+    assert [z["price"] for z in find_levels(piv, 100.0, 1.0, n_bars=500, lookback=500)["supports"]] == [90.0, 80.0]
+
+
+def test_ratio_text_never_rounds_across_the_limit():
+    from belfort.research.analysis.verdict import ratio_text
+
+    assert ratio_text(1.48, 1.5) == "1.48"  # would read 1.5 and look like a pass
+    assert ratio_text(1.46, 1.5) == "1.46"
+    assert ratio_text(1.51, 1.5) == "1.5"
+    assert ratio_text(2.04, 1.5) == "2.0" and ratio_text(0.8, 1.5) == "0.8"
+
+
+def test_ratio_text_for_an_upper_limit():
+    from belfort.research.analysis.verdict import ratio_text
+
+    assert ratio_text(3.04, 3, over=True) == "3.04"  # fails the at-most-3 check, must not read as 3.0
+    assert ratio_text(2.97, 3, over=True) == "3.0"  # passes and 3.0 still passes
+    assert ratio_text(3.8, 3, over=True) == "3.8"
+
+
+# ---------------- latest quarter ----------------
+
+
+def _quarters(rows):
+    import pandas as pd
+
+    cols = [pd.Timestamp(d) for d, _, _ in rows]
+    return pd.DataFrame({c: {"Total Revenue": r, "Net Income": n} for c, (_, r, n) in zip(cols, rows, strict=True)})
+
+
+def test_quarter_compares_with_the_year_ago_quarter():
+    import pandas as pd
+
+    from belfort.research.analysis.fundamentals import quarter_trend
+
+    q = _quarters([("2025-09-30", 100.0, 10.0), ("2026-06-30", 105.0, 11.0), ("2026-09-30", 120.0, 13.0)])
+    out = quarter_trend(q, today=pd.Timestamp("2026-11-26"))
+    assert out["basis"] == "year" and out["compared_with"] == "Sep 2025"
+    assert out["sales_growth_pct"] == 20.0 and out["profit_growth_pct"] == 30.0 and not out["stale"]
+
+
+def test_quarter_falls_back_to_the_previous_quarter():
+    import pandas as pd
+
+    from belfort.research.analysis.fundamentals import quarter_trend
+
+    q = _quarters([("2026-06-30", 100.0, 10.0), ("2026-09-30", 110.0, 9.0)])
+    out = quarter_trend(q, today=pd.Timestamp("2026-11-26"))
+    assert out["available"] and out["basis"] == "quarter" and out["compared_with"] == "Jun 2026"
+    assert out["sales_growth_pct"] == 10.0 and out["profit_growth_pct"] == -10.0
+
+
+def test_quarter_says_when_the_source_is_stale():
+    import pandas as pd
+
+    from belfort.research.analysis.fundamentals import quarter_trend
+
+    # HDFC Bank on 2026-11-26: Yahoo's newest quarter was June 2025.
+    q = _quarters([("2025-03-31", 953.0, 153.9), ("2025-06-30", 853.5, 162.6)])
+    out = quarter_trend(q, today=pd.Timestamp("2026-11-26"))
+    assert out["stale"] and "Jun 2025" in out["stale_note"] and "NSE or BSE" in out["stale_note"]
+
+
+# ---------------- company profile ----------------
+
+
+def test_company_profile_cuts_at_whole_sentences():
+    from belfort.research.analysis.pipeline import company_profile
+    from belfort.settings import PROFILE_MAX_CHARS
+
+    text = "HDFC Bank Limited provides banking services in India. " + "It runs retail and wholesale banking. " * 30
+    p = company_profile({"longBusinessSummary": text, "industry": "Banks", "fullTimeEmployees": 210109})
+    assert p["available"] and p["summary"].startswith("HDFC Bank Limited provides banking services in India.")
+    assert len(p["summary"]) <= PROFILE_MAX_CHARS and p["summary"].endswith(".")
+    assert p["industry"] == "Banks" and p["employees"] == 210109
+
+
+def test_company_profile_without_a_description():
+    from belfort.research.analysis.pipeline import company_profile
+
+    p = company_profile({})
+    assert not p["available"] and p["summary"] is None and "no business description" in p["missing_reason"]
