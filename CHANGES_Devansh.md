@@ -374,6 +374,21 @@ Wiping the whole cache on every start would also throw away 5 years of prices fo
 
 **Note on a flaky test:** `test_search_is_fast_on_a_full_size_listing` sometimes fails during the full run with coverage on this PC (139 ms per search against a 100 ms limit). It passes every time on its own. Search code isn't touched by this change. It's a timing test that is sensitive to how busy the machine is.
 
+## 15. Header broke with long company names ✅
+
+**What you saw (Power Grid):**
+- Open, high, low and the other figures were stacked in a narrow column on the right.
+- The name and price sat far down the page, with a large empty space above them.
+
+**Why:**
+- The day's figures shared one row with the name and price and only got whatever width was left.
+- A long name in the large serif font left almost nothing.
+- So the figures shrank to one per line, and the whole row grew tall.
+
+**Fix (`style.css`, `.stats`):** the figures always get their own full-width row under the name and price, with a thin divider line above them.
+
+**Checked** on Power Grid at your screen width (about 1900px): the header is one compact block, 154px tall. Also checked at the narrow pane width and at phone width (375px); no sideways scrolling.
+
 ---
 
 ## Open items for you
