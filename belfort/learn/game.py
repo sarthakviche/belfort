@@ -141,11 +141,11 @@ def _unlocked(con: sqlite3.Connection, user: str) -> list[str]:
 
 
 def _lock_message(stage: str) -> str:
-    before = STAGES[STAGES.index(stage) - 1]
-    msg = f"The {stage.capitalize()} stage is locked. Pass the {before.capitalize()} stage test with {round(STAGE_PASS_RATIO * 100)}% or more"
-    if before == STAGES[0]:
-        msg += ", or test out of Beginner with the placement test,"
-    return msg + f" to open it. Finish the {before.capitalize()} stage first."
+    before = STAGES[STAGES.index(stage) - 1].capitalize()
+    msg = f"The {stage.capitalize()} stage is locked. Pass the {before} stage test with {round(STAGE_PASS_RATIO * 100)}% or more"
+    if STAGES.index(stage) == 1:
+        msg += ", or test out of Beginner with the placement test"
+    return msg + " to open it."
 
 
 # ---------------- the path ----------------
