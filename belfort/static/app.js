@@ -36,8 +36,8 @@ function renderFiles() {
     : '<div class="files-empty">No stocks yet. Search a company to see its report here.</div>';
 }
 /* ---------- views: research (home, report), learn, practice, news ---------- */
-const VIEWS = ["home", "report", "learn", "practice", "news", "tipcheck"];
-const VIEW_NAME = { home: "Research", report: "Research", learn: "Learn", practice: "Practice", news: "News", tipcheck: "Tip Check" };
+const VIEWS = ["home", "report", "learn", "practice", "news", "tipcheck", "dictionary"];
+const VIEW_NAME = { home: "Research", report: "Research", learn: "Learn", practice: "Practice", news: "News", tipcheck: "Tip Check", dictionary: "Dictionary" };
 const onView = {};   // verticals.js registers a loader per view
 function setCrumb(extra) {
   const v = S.view, tail = v === "report" && S.report ? S.report.name : extra;
@@ -689,7 +689,7 @@ $("chat-form").addEventListener("submit", async (e) => {
 });
 
 /* ---------- dictionary drawer ---------- */
-$("dict-btn").addEventListener("click", () => { $("dict").hidden = false; renderDict(""); $("dict-q").value = ""; $("dict-q").focus(); });
+$("dict-btn").addEventListener("click", () => { $("side").classList.remove("open"); go("dictionary"); });
 $("dict-x").addEventListener("click", () => { $("dict").hidden = true; });
 $("dict-q").addEventListener("input", () => renderDict($("dict-q").value));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("dict").hidden = true; hideTip(); } });
@@ -707,5 +707,5 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("dict"
   renderFiles(); setCrumb();
   loadScreens();
   const start = location.hash.slice(1);
-  if (["learn", "practice", "news", "tipcheck"].includes(start)) go(start);
+  if (["learn", "practice", "news", "tipcheck", "dictionary"].includes(start)) go(start);
 })();

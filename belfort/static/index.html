@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="style.css?v=2026-11-28">
 <link rel="stylesheet" href="tipcheck.css?v=2026-11-28">
 <link rel="stylesheet" href="learn-game.css?v=2026-11-28">
+<link rel="stylesheet" href="dictionary.css?v=2026-11-28">
 <script src="vendor/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
@@ -37,6 +38,7 @@
       <button type="button" class="ix" id="nav-practice" data-view="practice"><span class="no">03</span><span class="tx">Practice</span></button>
       <button type="button" class="ix" id="nav-news" data-view="news"><span class="no">04</span><span class="tx">News</span></button>
       <button type="button" class="ix" id="nav-tipcheck" data-view="tipcheck"><span class="no">05</span><span class="tx">Tip Check</span></button>
+      <button type="button" class="ix" id="nav-dictionary" data-view="dictionary"><span class="no">06</span><span class="tx">Dictionary</span></button>
     </nav>
     <div class="tools">
       <button type="button" class="tool" id="dict-btn">Dictionary</button>
@@ -152,6 +154,15 @@
         <div id="news-body"></div>
         <p class="src" id="news-src"></p>
       </section>
+      <section id="dictionary" hidden>
+        <div class="intro">
+          <h1>Every term, <em>in plain words</em>.</h1>
+          <p>Search by name or by the way you would say it. Press <kbd>/</kbd> to jump to the box. If a term is missing, you can ask Belfort or search the web.</p>
+        </div>
+        <div class="dx-search"><input id="dx-q" type="search" placeholder="Search the dictionary, for example stop-loss" autocomplete="off" maxlength="80" aria-label="Search the dictionary"></div>
+        <div id="dx-cats" class="seg dx-cats"></div>
+        <div id="dx-body" aria-live="polite"></div>
+      </section>
       <p class="disclaimer" id="disclaimer"></p>
     </main>
   </div>
@@ -197,5 +208,6 @@
 <script src="verticals.js?v=2026-11-28"></script>
 <script src="learn-game.js?v=2026-11-28"></script>
 <script src="tipcheck.js?v=2026-11-28"></script>
+<script src="dictionary.js?v=2026-11-28"></script>
 </body>
 </html>
