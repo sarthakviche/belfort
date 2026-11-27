@@ -71,3 +71,16 @@ Branch `feat/T46-startup-loader`.
 - `content/learn/syllabus.json`: every module has a `stage`.
 - `belfort/core/users.py`: `current_user_id()` stub that returns `"local"` until T43.
 - `belfort/static/img/mascot/`: the two mascot GIFs.
+
+## 2026-11-28 — T45 dictionary search
+
+### Decisions
+- **Own router and module.** `belfort/assistant/glossary_router.py` (`/api/glossary/search`, `/ask`, `/web-search`) and the pure ranking in `belfort/core/glossary_search.py`; `assistant/chat.py` and `core/glossary.py` are untouched. `ask()` is called in `general` mode, so the existing compliance filter applies.
+- **Web search from pywebview.** The desktop window does not open new browser windows, so inside it the page asks the backend (`POST /api/glossary/web-search`, loopback only) to call `webbrowser.open`; in a normal browser it uses `window.open`. The URL is `https://www.google.com/search?q=<term> stock market meaning`, URL-encoded.
+- **Ranking.** Exact term, exact phrase, prefix, word prefix, substring, difflib closeness (0.75 cutoff), then a whole word in the explanation. Empty query returns the full glossary for browsing by category.
+- **Old drawer.** The sidebar Dictionary button now opens the new page; the old drawer markup is left in place, unused.
+- **Privacy.** Nothing about a query leaves the computer except on the user's own click on Ask Belfort (their AI provider) or Search the web (their browser).
+
+### Changes
+- New: `belfort/static/dictionary.js`, `dictionary.css`, `tests/test_dictionary.py`.
+- Touched: `belfort/main.py` (router), `belfort/static/index.html` (nav item, section, links), `belfort/static/app.js` (view list, button, start hash), `CHANGELOG.md`, `docs/STATUS.md`, `docs/TASKS.md`.

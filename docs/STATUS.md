@@ -11,6 +11,8 @@
 
 ## Not verified yet
 
+- **Dictionary fallbacks in the Windows window.** "Ask Belfort" with a real key and "Search the web" from inside the pywebview window (it asks the backend to open the system browser) were exercised only with a faked provider and in a normal browser (T45).
+
 - **Ask Belfort with a real AI key.** Error paths were checked live on 22 November 2026 (wrong Gemini key, wrong OpenAI key, local Ollama not running) and now say what to do. A successful answer from a real provider for a report, a lesson and a news story is still untested (T02).
 - **Small windows and keyboard-only use** (T32).
 - **The Windows desktop launcher** (`run.bat`, `run_desktop.py`) was carried over from Belfort AI with renamed paths but not re-run. It is replaced by T36. T46 changed it to show a loader first (`belfort/static/splash.html`) and load the app when the server answers; that flow was exercised in the browser, not in the pywebview window.
