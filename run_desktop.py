@@ -112,7 +112,8 @@ def app_url(port: int) -> str:
 def navigate_when_ready(window, port: int, started: float, ready=wait_ready, min_seconds: float = SPLASH_MIN_SECONDS) -> bool:
     """Once the server answers and the loader has played, replace it with the app."""
     ok = ready(port)
-    time.sleep(max(0.0, min_seconds - (time.monotonic() - started)))
+    while (left := min_seconds - (time.monotonic() - started)) > 0:
+        time.sleep(left)  # loop: on Windows sleep can wake a tick before the clock agrees
     if ok:
         window.load_url(app_url(port))
     else:

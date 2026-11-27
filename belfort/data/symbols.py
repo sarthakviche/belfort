@@ -218,6 +218,12 @@ def remember_close(symbol: str, close: float, as_of: str) -> None:
             pass
 
 
+def known_close(symbol: str) -> dict:
+    """The last close Belfort remembered for a symbol ({last_close, as_of}), or {} if it has none."""
+    with _lock:
+        return dict(_load_closes().get(symbol, {}))
+
+
 def search(rows: list[tuple[str, str]], query: str, limit: int | None = None) -> list[dict]:
     """Ranked matches for a query, each with symbol, name, sector and, when known, last_close and as_of."""
     results = index_for(rows).search((query or "").strip(), limit or settings.SEARCH_LIMIT)

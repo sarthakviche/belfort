@@ -36,6 +36,9 @@ ATR has no direction. A high ATR means the stock moves a lot, up or down. It als
 [
   {"q": "Yesterday's close was ₹200. Today's high is ₹204 and low is ₹190. What is today's true range?", "options": ["₹4", "₹10", "₹14"], "answer": 2, "why": "High minus low is ₹14, which is larger than ₹4 (high minus close) and ₹10 (close minus low)."},
   {"q": "With no support nearby, where does Belfort suggest a swing stop if ATR is ₹12 and the close is ₹400?", "options": ["₹382", "₹388", "₹364"], "answer": 0, "why": "1.5 × ₹12 = ₹18 below the close: ₹400 − ₹18 = ₹382."},
-  {"q": "What does a rising ATR tell you?", "options": ["The price will rise", "The stock is moving more each day, in either direction", "The company is growing"], "answer": 1, "why": "ATR measures the size of daily moves, not their direction."}
+  {"q": "What does a rising ATR tell you?", "options": ["The price will rise", "The stock is moving more each day, in either direction", "The company is growing"], "answer": 1, "why": "ATR measures the size of daily moves, not their direction."},
+  {"type": "number", "q": "A stock closed yesterday at ₹500. Today it traded between ₹515 and ₹525. What is today's true range?", "answer": 25, "tolerance": 0, "unit": "₹", "why": "The gap counts: today's high minus yesterday's close is 525 − 500 = ₹25, larger than the day's own range of ₹10."},
+  {"type": "number", "q": "A swing stock closes at ₹400 with an ATR of ₹8 and no support nearby. Belfort puts the suggested stop 1.5 ATR below the close. At what price?", "answer": 388, "tolerance": 0, "unit": "₹", "why": "1.5 × ₹8 = ₹12 below ₹400 gives ₹388."},
+  {"type": "tf", "q": "A high ATR tells you the stock is more likely to rise.", "answer": false, "why": "ATR has no direction. A high ATR only means the stock moves a lot, up or down."}
 ]
 ```

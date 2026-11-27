@@ -43,6 +43,9 @@ The report uses yearly statements from Yahoo Finance and labels each figure with
 [
   {"q": "A company reports profit of ₹100 crore and cash from operations of ₹30 crore, a pattern it has shown for three years. How does Belfort read this?", "options": ["A strength: profit is high", "A concern: cash lags reported profit", "Nothing: cash does not matter"], "answer": 1, "why": "Cash from operations at 30% of profit, weak for years, is below the 50% level Belfort flags. Profit that does not turn into cash deserves a closer look."},
   {"q": "Total debt is ₹600 crore and shareholders' money is ₹300 crore. What is debt to equity?", "options": ["0.5", "2.0", "3.0"], "answer": 1, "why": "₹600 crore ÷ ₹300 crore = 2.0, above the 1.5 level Belfort treats as high."},
-  {"q": "Why does Belfort skip the debt check for a bank?", "options": ["Banks have no debt", "Borrowing is a bank's raw material, so the ratio means something different", "SEBI forbids it"], "answer": 1, "why": "Banks lend out deposits and borrowed money; high debt to equity is normal for them and is not the same warning sign."}
+  {"q": "Why does Belfort skip the debt check for a bank?", "options": ["Banks have no debt", "Borrowing is a bank's raw material, so the ratio means something different", "SEBI forbids it"], "answer": 1, "why": "Banks lend out deposits and borrowed money; high debt to equity is normal for them and is not the same warning sign."},
+  {"type": "number", "q": "A company has total debt of ₹300 crore and shareholders' money of ₹400 crore. What is its debt to equity?", "answer": 0.75, "tolerance": 0.005, "why": "Debt to equity is total debt ÷ shareholders' money: 300 ÷ 400 = 0.75."},
+  {"type": "number", "q": "A company has operating profit of ₹180 crore on sales of ₹1,200 crore. What is its operating margin?", "answer": 15, "tolerance": 0, "unit": "%", "why": "Operating margin is operating profit ÷ sales: 180 ÷ 1,200 = 15%."},
+  {"type": "tf", "q": "A high return on equity always means the company is a good business.", "answer": false, "why": "A high ROE with high debt can come from borrowing rather than a good business. Read the numbers together."}
 ]
 ```

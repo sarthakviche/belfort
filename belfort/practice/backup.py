@@ -65,7 +65,7 @@ TABLES = {
     "replays": ("id", "symbol", "start_date", "decision", "r_multiple", "outcome", "created"),
 }
 REQUIRED = {
-    "trades": ("symbol", "qty", "entry_type", "stop", "placed_on", "status"),
+    "trades": ("symbol", "qty", "entry_type", "placed_on", "status"),
     "predictions": ("symbol", "direction", "horizon_days", "confidence", "made_on", "ref_date", "ref_close", "status"),
     "replays": ("symbol", "start_date", "decision", "outcome"),
 }
@@ -132,7 +132,7 @@ def _check(backup: dict) -> None:
         raise BackupError("Every trade in the backup must belong to its practice account.")
     for i, t in enumerate(backup["trades"], start=1):
         try:
-            if int(t["qty"]) < 1 or float(t["stop"]) <= 0:
+            if int(t["qty"]) < 1 or (t.get("stop") is not None and float(t["stop"]) <= 0):
                 raise ValueError
             json.loads(t.get("stop_moves") or "[]")
             json.loads(t.get("mistakes") or "[]")
