@@ -456,8 +456,39 @@ The order form said "Decide the stop before you buy; it is required." It now rea
 
 ---
 
+## 18. Every open pull request merged, except three that wait for Sarthak ✅
+
+You gave me authority to merge pull requests. For each one I:
+1. brought it up to date with main and resolved the conflicts;
+2. ran ruff and the tests locally;
+3. waited for all five CI jobs to pass;
+4. squash-merged it and deleted its branch.
+
+**Merged:** #29, #40, #39 (Tip Check), #37 (Learn game), #38 (exercises), #35 and #36 (tax and safety lessons), #33 (dictionary), #32 (loader and intro), #41 (languages), #31 (README and site), #34 (landing page) and #43 (Android).
+
+**Main now:**
+- 352 tests pass.
+- Checked in the app: all six sections open, Tip Check answers, and switching to Hindi works.
+
+**Fixes made while merging:**
+- **Languages (#41).**
+  - The 16 Hindi Beginner lessons were missing the 40 new exercises. I added Hindi versions, with the same answers.
+  - I added the fact corrections from the safety lessons: @valid UPI handles, cybercrime.gov.in and helpline 1930, SEBI's dated loss figures.
+  - The redesigned report, the optional stop and "Stocks in the news" stay in English for now.
+- **Loader (#32).** On Windows the loader could end a few milliseconds early, which failed a test. It now waits until the minimum time has fully passed.
+- **Android (#43).** I took the docs/COMPLIANCE.md change out, because it needs Sarthak's approval. It is still proposed in #42.
+- **Task list.** Tip Check (T44) is now marked Done. Android (T48) stays In progress until it runs on a phone.
+
+**Not merged, waiting for Sarthak:**
+- **#42 accounts.** Needs his approval of the compliance rule-7 change.
+- **#30 sprint plan.** Carries the same compliance change.
+- **#19 content checker.** Changes his CI files and has conflicts.
+
+---
+
 ## Open items for you
-- **PR #29:** open, CI green, not merged. Merge it when you're happy with it.
-- **`feat/report-redesign-and-logic`:** contains PR #29's commits plus sections 4–9. I'll open a PR for it once you've read this file.
-- **Findings A, B and C:** choose an option for each. They change which stocks show "Conditions met", so they also change the published rule in `docs/`. If Sarthak owns the rule, he should agree too.
-- **Changelog:** `CHANGELOG.md` has a line for every user-visible change above.
+- **Sarthak:** approve or change the rule-7 amendment so #42 (accounts) can merge, and decide on #30 and #19.
+- **Hindi lessons:** machine drafts; someone fluent should read them before release.
+- **Translations:** the new report, Practice's optional stop and "Stocks in the news" need catalogue keys.
+- **Android:** install the APK on a phone or emulator (platform-tools are not on this machine).
+- **Folder:** the empty `D:elfort-wt` folder left from earlier worktrees can be deleted.
