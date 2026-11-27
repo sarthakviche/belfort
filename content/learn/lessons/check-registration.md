@@ -19,7 +19,7 @@ In India, giving investment advice for a fee needs registration with SEBI as an 
 
 Do not use a link or phone number sent to you by the person you are checking. Type the SEBI address yourself.
 
-SEBI also runs **SEBI Check**, a tool on its site and in its Saarthi app, to check whether a UPI handle or bank account belongs to a registered entity before you pay. Never send money to a personal account for "advice" or "membership".
+SEBI also runs **SEBI Check**, a tool on its site and in its Saarthi app, to check whether a UPI handle or bank account belongs to a registered entity before you pay. Registered brokers and advisers collect UPI payments through handles that contain **@valid** (for example `name.brk@validbank`); a payment to any other handle is a warning sign. Never send money to a personal account for "advice" or "membership".
 
 ## What registration does not mean
 
@@ -32,7 +32,7 @@ A registration tells you the person is allowed to do the work and is answerable 
 3. **If your broker is the problem, complain to the exchange.** NSE takes complaints against its trading members, forwards them to the broker, and can send them on to a grievance committee and then arbitration. Its investor pages list the current steps.
 4. SEBI also has an online dispute resolution platform (**SMART ODR**) for conciliation or arbitration when you are not satisfied with a firm's reply.
 
-For a scam by someone who is not registered at all, also report it to the police or the cyber-crime portal, and tell SEBI through SCORES.
+For a scam by someone who is not registered at all, also report it to the police, to the national cyber-crime portal (cybercrime.gov.in) or on the cyber-crime helpline **1930**, and tell SEBI through SCORES.
 
 Sources: SEBI's registered-intermediaries search and SEBI Check pages; SEBI's SCORES 2.0 pages and FAQs; NSE investor charter and complaint pages; SEBI's 22 October 2026 press release. The SEBI and NSE sites could not be opened when this lesson was written, so time limits and steps come from summaries; read the current guidance on those sites before you file.
 
