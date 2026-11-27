@@ -32,8 +32,8 @@
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) |
 | T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) |
-| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Ready |
-| T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | Ready |
+| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) |
+| T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | In progress (Sarthak) |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
 | T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Superseded by T42 |
 | T25 | Editable rule profiles | 3 Research and News | P1 | L | Blocked on D1 |
@@ -165,7 +165,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) · `open-risk`, `drawdown-rules`, `biases`, `rules`.
 
 ### T21 · Lessons: Taxes and records module
-- **P1 · M · Status:** Ready · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
+- **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
 
 ### T22 · Lessons: Safety module
 - **P1 · M · Status:** Ready · `tip-scams`, `check-registration` (how to verify a SEBI registration and file a complaint, with official links), `myths`.
@@ -264,37 +264,37 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** the engine (XP, streak, hearts, unlocks) is a pure tested module; the API refuses locked content; the path, lesson cards and all four exercise types work in the running app.
 
 ### T43 · Accounts and sync across devices
-- **P0 · L · Status:** In progress · **Area:** platform
+- **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** platform
 - **Decision:** Supabase Auth (email and password, and Google) with a Postgres table `user_state (user_id, kind, payload jsonb, updated_at)` protected by row-level security. Desktop and Android sign in to the same project. The paper account, journal, predictions, replays and Learn progress sync as whole JSON documents per kind (reusing the T10 backup format), last write wins by `updated_at`.
 - **Do:** a sign-in screen (email, password, Google, "continue without an account" keeps today's local mode), `current_user_id` returns the signed-in user, the local SQLite rows are scoped by `user_id`, sync on sign-in, on change (debounced) and on app close. Configuration from `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env`; with neither set the app runs local-only. Ship the SQL (table, RLS policies) in `supabase/migrations/`.
 - **Done when:** tests (with the Supabase HTTP calls faked) cover sign-in, token refresh, scoping and both sync directions; a user who signs in on a second machine sees the same paper account.
 
 ### T44 · Tip Check: is this stock tip a trap?
-- **P0 · L · Status:** In progress · **Area:** research, assistant · The hackathon hook.
+- **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** research, assistant · The hackathon hook.
 - **What:** paste or screenshot a stock tip from WhatsApp, Telegram or Instagram. Belfort reads it and shows, in about ten seconds, the red flags it found: is the sender a SEBI-registered adviser or research analyst; does the tip promise returns or a target in days (SEBI forbids guaranteed returns); urgency and secrecy language; is the stock in NSE's ASM or GSM surveillance lists; does its recent price and volume look like a pump (volume many times its 50-day average, a sharp run-up, a small company); what happened to the stock the last time it looked like this. It ends with what to do (check the registration yourself on SEBI's site, report on SEBI SCORES) and links to the Safety lessons.
 - **Compliance:** it never says a stock is good, safe, a buy or a sell. It reports red flags found and not found, and says Belfort cannot tell whether a trade will work.
 - **Done when:** text works offline with rules; a screenshot works with the user's own assistant key (vision); every check is a pure tested function with fixtures for the SEBI registers and the surveillance lists; it works in the running app.
 
 ### T45 · Dictionary search with an Ask and web fallback
-- **P1 · S · Status:** In progress · **Area:** ui, assistant
+- **Owner:** Sarthak · **P1 · S · Status:** In progress · **Area:** ui, assistant
 - **Do:** a search box over the glossary (fuzzy, by term and match phrases). When nothing matches, show the mascot shrugging and two choices: "Ask Belfort" (a short, plain explanation from the user's assistant key, labelled as AI and checked by the compliance filter) and "Search the web" (opens the default browser on a web search for the term plus "stock market").
 - **Done when:** tests cover matching and the fallback; it works in the running app with and without a key.
 
 ### T46 · Startup loader and intro with the mascot
-- **P0 · M · Status:** In progress · **Area:** ui, platform
+- **Owner:** Sarthak · **P0 · M · Status:** In progress · **Area:** ui, platform
 - **Do:** a loader that shows while the Windows app starts its server: black screen, a few candles draw in one by one, then the mascot settles in the centre and the Belfort wordmark fades in. Under 2.5 seconds, nothing else on screen. Then, on the first open only, a one-screen intro with the quote "Risk comes from not knowing what you're doing." (Warren Buffett) in a large serif, and a start button. The quote lives in one constant so it is easy to change. Respect `prefers-reduced-motion`.
 - **Done when:** the Windows app shows the loader from launch until the UI is ready and the intro on first open.
 
 ### T47 · Landing site rebuild
-- **P1 · M · Status:** In progress · **Area:** site
+- **Owner:** Sarthak · **P1 · M · Status:** In progress · **Area:** site
 - **Do:** rebuild `site/index.html` on top of the current landing page: a moving candlestick background (canvas, replaceable by a video file) under a black layer at about 60% opacity, the mascot, the quote, Tip Check as the lead feature, the gamified path, download and Android sections.
 
 ### T48 · Belfort for Android
-- **P0 · L · Status:** In progress (Devansh) · **Area:** mobile · Built on Devansh's machine (Android SDK).
+- **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** mobile · Built on Devansh's machine (Android SDK).
 - **Do:** a native Android app named Belfort with every part of the desktop app in a mobile-first interface, the same mascot, loader and animations, the same account (T43). Coordinated in `conversations.md` on the `collab` branch.
 
 ### T49 · New exercise types in every lesson
-- **P1 · M · Status:** Blocked on T42 · **Area:** learn
+- **Owner:** Sarthak · **P1 · M · Status:** Blocked on T42 · **Area:** learn
 - **Do:** add at least two exercises of the new types (tf, order, number) to every lesson, keeping the existing questions. Facts must match the lesson text.
 
 ## Decisions (maintainers, not code)
@@ -332,3 +332,4 @@ Shared contracts every Phase 6 task uses:
 - T18 Lessons: Journal module, trade journal, expectancy and calibration ([#25](https://github.com/sarthakviche/belfort/pull/25)).
 - T19 Lessons: Market context module, index trend and breadth, sectors, flows and events ([#26](https://github.com/sarthakviche/belfort/pull/26)).
 - T20 Lessons: Portfolio and Psychology modules, open risk, drawdown rules, biases and rules ([#27](https://github.com/sarthakviche/belfort/pull/27)).
+- T21 Lessons: Taxes and records module, capital gains on shares, records and filing ([#35](https://github.com/sarthakviche/belfort/pull/35)).

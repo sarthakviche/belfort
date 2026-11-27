@@ -531,6 +531,24 @@ G = [
         "Practising trades with virtual money on real price data, so mistakes cost nothing.",
         ["paper trading", "paper trade"],
     ),
+    (
+        "STCG",
+        "Market",
+        "Short-term capital gain: profit on listed shares held 12 months or less. Taxed at a flat rate (20% since 23 July 2024) rather than at your slab.",
+        ["stcg", "short-term capital gain", "short-term capital gains"],
+    ),
+    (
+        "LTCG",
+        "Market",
+        "Long-term capital gain: profit on listed shares held more than 12 months. The first ₹1.25 lakh a year is exempt; the rest is taxed at 12.5%.",
+        ["ltcg", "long-term capital gain", "long-term capital gains"],
+    ),
+    (
+        "ITR",
+        "Market",
+        "Income tax return: the yearly form you file with the Income Tax Department. Which form you use (ITR-2, ITR-3) depends on your kinds of income.",
+        ["itr-2", "itr-3", "itr"],
+    ),
 ]
 
 GLOSSARY = [{"term": t, "group": g, "meaning": m, "match": mt} for t, g, m, mt in G]

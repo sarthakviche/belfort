@@ -132,8 +132,8 @@
           "id": "taxes-records", "title": "Taxes and records for traders", "stage": "intermediate",
           "why": "Net profit is what matters, and the tax treatment of trading is different from investing.",
           "lessons": [
-            {"id": "capital-gains", "title": "Short and long-term capital gains on shares", "minutes": 7, "status": "planned"},
-            {"id": "records", "title": "Contract notes, P&L statements and filing", "minutes": 6, "status": "planned"}
+            {"id": "capital-gains", "title": "Short and long-term capital gains on shares", "minutes": 7},
+            {"id": "records", "title": "Contract notes, P&L statements and filing", "minutes": 6}
           ]
         },
         {
