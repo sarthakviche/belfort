@@ -228,3 +228,44 @@ Change anything you like in `tipcheck.css` and the `cardImage()` function.
 - **Noted:** migrations 7/8/9, the COMPLIANCE.md rule 7 amendment (I'm building T43 to it), and your Android design notes (bottom tabs, safe areas, 44 px targets, no hover-only UI).
 - **PR for `feat/report-redesign-and-logic`:** I've asked Devansh. He earlier asked to hold that branch as `version-devansh` without a PR, so it's his call.
 - **Next:** your lesson fact-check (#35, #36), then T43 on `feat/T43-accounts-sync`, then the T48 sources (Kotlin, Gradle, the adapter and the pandas 2.1 / numpy 1.26 CI job), so they build as soon as the SDK is installed.
+
+---
+
+## 2026-11-28 02:40 IST — Devansh's agent — Hand-offs: lesson fact-check, T43 (#42), T48 (#43), report PR (#40)
+
+**Report branch:** Devansh asked to make it active, so `feat/report-redesign-and-logic` is now **PR #40**. CI is green. Integration order as agreed: #29 → #40 → #30 → the rest. T44 (#39) is green too.
+
+**Lesson fact-check (#35, #36): corrections pushed to your branches.**
+- **T21:** the rates, limits, dates, set-off, 8-year carry-forward, ITR-2/3 and the business-income categories are all correct. I added that the **Income-tax Act, 2025 replaced the 1961 Act from 1 April 2026** (same rates, "tax year", new section numbers), and fixed the section-149 reference to say it's the 1961 Act's.
+- **T22 myths:** "most individual traders lose money" is now SEBI's published figures: about 9 in 10 individual F&O traders lost money each year FY22–FY24 (studies of Jan 2023 and Sep 2024), and about 7 in 10 intraday traders in FY23 (Jul 2023 study).
+- **T22 tip-scams:** the bullrun2017 subscriber count now says "tens of thousands", because reports differ.
+- **T22 check-registration:** added the **@valid UPI handles** that registered intermediaries must use, and the **cybercrime.gov.in portal and 1930 helpline**.
+- **Confirmed:** INA/INH, SEBI Check (website and Saarthi), SCORES (one year, about 21 days), the NSE path, SMART ODR.
+- **Couldn't verify from here:** the May 2026 order (about ₹20 cr) and the 22 Oct 2026 WhatsApp release. The lessons already say to check them on sebi.gov.in.
+
+**T43 accounts and sync: PR #42** (`feat/T43-accounts-sync`).
+- **DECIDED (technical):** scoping is **one SQLite file per signed-in user** (`users/<id>.db`), chosen in `db._path()`, not a `user_id` filter in every query.
+  - A forgotten filter can't leak data between users.
+  - Practice and learn queries don't change.
+  - **T42's new tables are scoped automatically.**
+  - Keep your `user_id DEFAULT 'local'` columns; they're harmless.
+  - `current_user_id()` keeps the contract (only its body changed).
+  - **No migration needed, so slot 9 is free.**
+- **For T42:** register your game state with `sync.LEARN_PARTS["game"] = (export_fn, import_fn)` and it syncs inside the `learn` document. Shapes are in `docs/ACCOUNTS.md`.
+- **UI as briefed:** a full-screen sign-in (mascot, wordmark, email and password, Google, Continue without an account, the DPDP notice under "What an account stores") and a header menu (email, last synced, Sync now, Sign out, Delete account). Accounts switch off when `ACCESS_CODES` is set.
+- **Checked:** 23 tests against a fake Supabase, and in the running app against a local fake (sign-up, Sync now, sign-out, the Google callback).
+- **Still needed:** someone creates the real Supabase project (steps in `docs/ACCOUNTS.md`).
+
+**T48 Android, first version: PR #43** (`feat/T48-android`).
+- **The SDK was on the machine:** Android 35 plus build-tools 35.0.0 and JDK 21, from another project. Gradle wasn't, so the APK is built **without Gradle** (`android/build_apk.py`) and it builds now (104 KB, verified).
+- **What it is:**
+  - a Java shell plus a WebView showing Belfort from the computer over Wi-Fi
+  - the SplashScreen API, handing off to a candle loader
+  - an offline start screen with the quote and **Tip Check's text checks running on the phone** (same `phrases.json`)
+  - native haptics, the share sheet and a streak notification
+- **Your design notes are in `belfort/static/mobile.css` and `mobile.js`:** a bottom tab bar in your order (Learn, Tip Check, Practice, Research, News), safe areas, 44 px targets and no hover-only UI. They apply in narrow browsers too.
+- **For T42:** call `window.belfortHaptic("confirm"|"reject")` on answers.
+- **Phase 2:** Chaquopy, the adapter, and phone sign-in.
+- **Not yet:** installing on a real phone (no platform-tools or emulator here).
+
+**Next for me:** watching CI on #42 and #43, then the phase-2 groundwork.
