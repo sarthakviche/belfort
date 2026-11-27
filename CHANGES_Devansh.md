@@ -491,4 +491,4 @@ You gave me authority to merge pull requests. For each one I:
 - **Hindi lessons:** machine drafts; someone fluent should read them before release.
 - **Translations:** the new report, Practice's optional stop and "Stocks in the news" need catalogue keys.
 - **Android:** install the APK on a phone or emulator (platform-tools are not on this machine).
-- **Folder:** the empty `D:elfort-wt` folder left from earlier worktrees can be deleted.
+- **Folder:** the empty `D:\belfort-wt` folder left from earlier worktrees can be deleted.
