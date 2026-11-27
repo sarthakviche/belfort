@@ -6,10 +6,13 @@
 
 - 191 automated tests pass offline, with 83% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
 - The contributor setup was followed on a clean clone on Windows 11 with Python 3.12.4 on 22 November 2026: setup, hooks, tests and the app all worked.
+- Eight languages (T50) were clicked through in the built-in browser on 28 November 2026: the intro chips, the sidebar, the Learn path, a Hindi lesson, the dictionary and Settings in Tamil and Hindi, at desktop width and at 360 px, with an automated scan for clipped text. All catalogues are machine drafts; no fluent speaker has reviewed them.
 - The gamified Learn path (T42) was clicked through in the built-in browser on 28 November 2026: the path, a lesson as cards with every exercise type, a wrong answer losing a heart, a locked lesson refused with 403, the placement test unlocking Intermediate, a checkpoint with its review screen, and the out-of-hearts screen. Reduced-motion behaviour was reviewed in code only; it was not tried with the system setting on.
 - Each section was clicked through in a browser against live data on 21 November 2026: a research report, a lesson with its example chart and quiz, a paper order, a chart replay, the news page with tip filtering.
 
 ## Not verified yet
+
+- **Language quality (T50).** The seven non-English catalogues and the 16 Hindi Beginner lessons are machine-drafted and unreviewed. Rendering of Telugu, Kannada, Gujarati and Bengali was checked by structure and the clip scan, not by a reader of those scripts. Text the Python engines write (verdicts, glossary meanings, news) is English in every language.
 
 - **Dictionary fallbacks in the Windows window.** "Ask Belfort" with a real key and "Search the web" from inside the pywebview window (it asks the backend to open the system browser) were exercised only with a faked provider and in a normal browser (T45).
 

@@ -9,6 +9,7 @@ import webbrowser
 from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
+from ..core import i18n
 from ..core.glossary_search import MAX_QUERY, search, web_search_url
 from . import chat
 
@@ -46,7 +47,11 @@ def api_ask(
         raise HTTPException(status_code=422, detail="Type a term first.")
     try:
         p = chat.Provider.resolve(x_ai_provider, x_ai_key, x_ai_model, x_ai_base)
-        answer = chat.ask(PROMPT.format(term=term.replace('"', "'")), None, CONTEXT, "general", p)
+        prompt = PROMPT.format(term=term.replace('"', "'"))
+        reply = i18n.reply_instruction(i18n.current())
+        answer = chat.ask(prompt + (" " + reply if reply else ""), None, CONTEXT, "general", p)
+        if i18n.find_banned(answer, i18n.current()):
+            answer = i18n.tr(i18n.current(), "chat.blocked")
     except chat.ChatError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     return {"term": term, "answer": answer, "label": AI_LABEL}

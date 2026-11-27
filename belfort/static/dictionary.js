@@ -9,7 +9,7 @@ function dxBrowse(list) {
   const cats = DX.cats.length ? DX.cats : [...new Set(list.map((g) => g.group))];
   DX.cats = cats;
   $("dx-cats").hidden = false;
-  $("dx-cats").innerHTML = ["All", ...cats].map((c) => `<button type="button" data-cat="${esc(c)}" class="${c === DX.cat ? "on" : ""}">${esc(c)}</button>`).join("");
+  $("dx-cats").innerHTML = ["All", ...cats].map((c) => `<button type="button" data-cat="${esc(c)}" class="${c === DX.cat ? "on" : ""}">${esc(c === "All" ? T("dx.all") : c)}</button>`).join("");
   const shown = DX.cat === "All" ? list : list.filter((g) => g.group === DX.cat);
   dxBody().innerHTML = `<div class="dx-list dx-fade">${shown.map(dxCard).join("")}</div>`;
 }
@@ -18,9 +18,9 @@ function dxNoMatch(term, webUrl) {
   const t = esc(term);
   dxBody().innerHTML = `<div class="dx-empty dx-fade">
     <img src="img/mascot/mascot-shrug.gif" alt="" width="140" height="140">
-    <h3>Belfort's dictionary doesn't have “${t}” yet.</h3>
-    <p>You can ask Belfort for a short explanation, or look it up on the web.</p>
-    <div class="dx-actions"><button type="button" class="btn" id="dx-ask">Ask Belfort</button><button type="button" class="btn ghost" id="dx-web">Search the web</button></div>
+    <h3>${T("dx.not_found", { term: t })}</h3>
+    <p>${T("dx.not_found_text")}</p>
+    <div class="dx-actions"><button type="button" class="btn" id="dx-ask">${T("dx.ask")}</button><button type="button" class="btn ghost" id="dx-web">${T("dx.web")}</button></div>
     <div id="dx-ai" class="dx-ai" aria-live="polite"></div></div>`;
   dxBody().dataset.term = term; dxBody().dataset.web = webUrl || "";
 }
@@ -33,22 +33,22 @@ async function dxSearch() {
     if (!q) return dxBrowse(d.results);
     $("dx-cats").hidden = true;
     if (!d.results.length) return dxNoMatch(q, d.web_url);
-    dxBody().innerHTML = `<div class="dx-count">${d.count} match${d.count === 1 ? "" : "es"}</div><div class="dx-list dx-fade">${d.results.map(dxCard).join("")}</div>`;
+    dxBody().innerHTML = `<div class="dx-count">${T("dx.matches", { n: d.count })}</div><div class="dx-list dx-fade">${d.results.map(dxCard).join("")}</div>`;
   } catch (e) { if (my === DX.seq) dxBody().innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
 }
 
 async function dxAsk() {
   const term = dxBody().dataset.term, box = $("dx-ai"), btn = $("dx-ask");
   if (!aiReady()) {
-    box.innerHTML = `<div class="dx-note">Ask Belfort needs your own AI key. Open <button type="button" class="linkish" id="dx-open-settings">Settings</button> (in the sidebar), choose a provider and paste a key; a Gemini key is free from Google AI Studio. Until then, you can search the web instead.</div>`;
+    box.innerHTML = `<div class="dx-note">${T("dx.need_key", { settings: `<button type="button" class="linkish" id="dx-open-settings">${T("tool.settings")}</button>` })}</div>`;
     return;
   }
-  btn.disabled = true; box.innerHTML = '<div class="dx-note">Asking…</div>';
+  btn.disabled = true; box.innerHTML = `<div class="dx-note">${T("dx.asking")}</div>`;
   try {
     const r = await api("/api/glossary/ask", { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, aiHeaders()), body: JSON.stringify({ term }) });
-    box.innerHTML = `<div class="dx-answer dx-fade"><span class="chip dx-chip">${esc(r.label)}</span><p>${esc(r.answer)}</p><div class="src">Written by the AI provider you chose in Settings. It explains words and gives no buy or sell advice. Check it against a trusted source.</div></div>`;
+    box.innerHTML = `<div class="dx-answer dx-fade"><span class="chip dx-chip">${esc(T("dx.ai_label"))}</span><p>${esc(r.answer)}</p><div class="src">${T("dx.ai_note")}</div></div>`;
   } catch (e) {
-    box.innerHTML = `<div class="dx-note err">${esc(e.message)} You can search the web instead.</div>`;
+    box.innerHTML = `<div class="dx-note err">${T("dx.web_instead", { why: esc(e.message) })}</div>`;
   } finally { btn.disabled = false; }
 }
 
@@ -74,4 +74,6 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault(); e.stopImmediatePropagation(); dxQ().focus(); dxQ().select();
   }
 }, true);
-onView.dictionary = () => { dxSearch(); dxQ().focus(); };
+onView.dictionary = (opts) => { dxSearch(); if (!(opts && opts.keepLesson)) dxQ().focus(); };
+/* app.js may already have opened #dictionary while this file was still loading: draw it now. */
+if (S.view === "dictionary") onView.dictionary({});

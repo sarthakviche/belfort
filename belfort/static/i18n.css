@@ -1,0 +1,45 @@
+/* Languages (T50): scripts, longer strings and the language pickers.
+   System fonts first (Nirmala UI ships with Windows and covers every script here), then Noto, then the old stack. */
+:root[data-lang="hi"], :root[data-lang="mr"] { --indic: "Noto Sans Devanagari", "Nirmala UI", "Mangal"; }
+:root[data-lang="bn"] { --indic: "Noto Sans Bengali", "Nirmala UI", "Vrinda"; }
+:root[data-lang="ta"] { --indic: "Noto Sans Tamil", "Nirmala UI", "Latha"; }
+:root[data-lang="te"] { --indic: "Noto Sans Telugu", "Nirmala UI", "Gautami"; }
+:root[data-lang="gu"] { --indic: "Noto Sans Gujarati", "Nirmala UI", "Shruti"; }
+:root[data-lang="kn"] { --indic: "Noto Sans Kannada", "Nirmala UI", "Tunga"; }
+:root:not([data-lang="en"]) { --serif: var(--indic), "Segoe UI", Inter, sans-serif; }
+:root:not([data-lang="en"]) body { font-family: var(--indic), Inter, "Segoe UI", system-ui, sans-serif; }
+/* Indic scripts have tall marks above and below the line: more line height, no italics, no tight tracking. */
+:root:not([data-lang="en"]) body { line-height: 1.7; }
+:root:not([data-lang="en"]) h1, :root:not([data-lang="en"]) h2, :root:not([data-lang="en"]) .wordmark { line-height: 1.3; letter-spacing: 0; }
+:root:not([data-lang="en"]) h1 { font-size: clamp(30px, 4.4vw, 46px); }
+:root:not([data-lang="en"]) h1 em, :root:not([data-lang="en"]) h2 em, :root:not([data-lang="en"]) .ix .no, :root:not([data-lang="en"]) .files-empty { font-style: normal; }
+:root:not([data-lang="en"]) .ix .tx { font-size: 19px; line-height: 1.35; }
+:root:not([data-lang="en"]) .intro-quote { line-height: 1.3; letter-spacing: 0; font-size: clamp(28px, 5.6vw, 72px); }
+
+/* Longer words must wrap, not clip: buttons and chips grow in height, the sidebar wraps. */
+.btn, .tool, .seg button, .linkish, .lg-opt, .lg-chip, .card-list, .folder h3, .folder p, .ix .tx, .lrow, .lg-label { overflow-wrap: anywhere; }
+.btn, .tool, .seg button { white-space: normal; height: auto; min-height: 34px; text-align: center; }
+.seg { flex-wrap: wrap; }
+.tool { text-align: left; }
+.side-foot, .drawer-label span { overflow-wrap: anywhere; }
+.pill { max-width: 100%; white-space: normal; }
+.top { flex-wrap: wrap; gap: 8px; }
+
+/* Language pickers: a select in the header, chips in Settings and on the intro. */
+.lang-select { background: var(--glass); color: var(--ink2); border: 1px solid var(--line); border-radius: 99px; padding: 5px 10px; font: inherit; font-size: 12.5px; max-width: 150px; }
+.lang-chips, .intro-langs { display: flex; flex-wrap: wrap; gap: 8px; }
+.lang-chip { border: 1px solid var(--line); background: var(--glass); color: var(--ink2); border-radius: 99px; padding: 7px 14px; font: inherit; font-size: 14px; line-height: 1.4; cursor: pointer; }
+.lang-chip:hover { border-color: #facc15; }
+.lang-chip.on { background: #facc15; color: #111; border-color: #facc15; font-weight: 600; }
+.lang-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.intro-langs { justify-content: center; max-width: 36em; margin: 22px auto 28px; padding: 0 16px; opacity: 0; animation: intro-rise .6s ease forwards; animation-delay: calc(var(--total, 0) * 70ms + 650ms); }
+.intro-langs .lang-chip { background: transparent; color: #d6d3d1; border-color: #44403c; }
+.intro-langs .lang-chip.on { background: #facc15; color: #111; border-color: #facc15; }
+@media (prefers-reduced-motion: reduce) { .intro-langs { animation: none; opacity: 1; } }
+.lg-xl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.lg-mt { margin-top: 14px; }
+@media (max-width: 420px) {
+  .lang-select { max-width: 110px; }
+  .intro-langs { gap: 6px; }
+  .lang-chip { padding: 6px 11px; font-size: 13px; }
+}

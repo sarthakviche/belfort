@@ -5,6 +5,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
+from ..core import i18n
 from ..core.users import current_user_id
 from ..data import market
 from ..data.providers import DataError, clean_symbol
@@ -29,12 +30,17 @@ class GoalIn(BaseModel):
 
 
 def _fail(e: LearnError) -> HTTPException:
-    """Locked or out of hearts: 403. Not ready yet: 409. Anything else about a missing thing: 404."""
+    """Locked or out of hearts: 403. Not ready yet: 409. Anything else about a missing thing: 404.
+
+    The message is said in the learner's language when the error has a catalogue key; X-Error-Key tells the page which."""
+    key = getattr(e, "key", None)
+    detail = i18n.tr(i18n.current(), key, **e.vars) if key else str(e)
+    headers = {"X-Error-Key": key} if key else None
     if isinstance(e, game.LockedError | game.NoHeartsError):
-        return HTTPException(status_code=403, detail=str(e))
+        return HTTPException(status_code=403, detail=detail, headers=headers)
     if isinstance(e, game.NotReadyError):
-        return HTTPException(status_code=409, detail=str(e))
-    return HTTPException(status_code=404, detail=str(e))
+        return HTTPException(status_code=409, detail=detail, headers=headers)
+    return HTTPException(status_code=404, detail=detail, headers=headers)
 
 
 @router.get("/syllabus")

@@ -104,6 +104,37 @@ The **assistant** serves all four: the page sends the context on screen (a repor
 | Quality | 81 unit and API tests; Ruff, coverage, audit and policy checks in GitHub Actions on Windows and Linux | Browser smoke tests (Playwright), accessibility checks, release checklist |
 | Hosting | None | A **static** docs and landing site only. A hosted Research service is deliberately not planned: per-stock labels served for money would fall under SEBI's research analyst rules. Hosting shared, non-personal content (lessons, news) is possible later. |
 
+## Languages
+
+Belfort speaks English (the default and the first choice), हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ (T50). The Android app reuses the same files.
+
+**Catalogues** are `belfort/static/i18n/<lang>.json`, one flat JSON object per language (`en`, `hi`, `mr`, `bn`, `ta`, `te`, `gu`, `kn`):
+
+```json
+{
+ "_meta": {"status": "machine-draft, needs review by a fluent speaker", "language": "hi", "name": "Hindi", "native": "हिन्दी"},
+ "learn.hearts.empty": "आपके दिल खत्म हो गए हैं",
+ "learn.min": "{n} मिनट"
+}
+```
+
+- Keys are dot-namespaced (`nav.learn`, `learn.hearts.empty`, `pr.col_stock`, `server.locked`). Values are plain text with `{name}` placeholders; a few values carry simple HTML (`<b>`, `<em>`, `<kbd>`) and are inserted as HTML, so catalogues are trusted files in the repo, never user input.
+- `en.json` is the source of truth. Other files may be partial: a missing key falls back to English, then to the key itself. Keys starting with `_` are metadata.
+- Plurals: when the call passes `n` equal to 1 and a `<key>_one` exists, that is used; otherwise the plain key.
+- A placeholder value that starts with `@` is itself a key (`stage="@stage.beginner"`), translated first.
+- Numbers use Indian grouping (1,00,000) and Latin digits in every language, through `Intl.NumberFormat("en-IN")` (`formatNumber`, `formatMoney`). Translators keep market terms such as stop-loss, SEBI, NSE and P/E in English.
+- `python -m belfort.core.i18n [lang]` reports unknown keys and changed placeholders or HTML tags; CI runs the same check in `tests/test_i18n.py`.
+
+**Web.** `static/i18n.js` loads first. `t(key, vars, fallback)` (alias `T`), `setLanguage(lang)` (re-renders without a reload and fires `belfort:language` on `document`; app views listen and redraw), `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria` and `data-i18n-title` for static markup, `lang` and `dir` on `<html>`. The choice is kept in `localStorage` (`belfort.lang`) and in SQLite through `GET/PUT /api/settings/language` (the `settings` table, with a `user_id` column; T43 syncs it as the non-secret key `language`). Pickers: language chips on the first-open intro and in Settings, and a select in the header. Every API call sends `X-Belfort-Lang`.
+
+**Server.** `belfort/core/i18n.py` reads the same catalogues for server messages (`tr(lang, key, **vars)`), sets the request language from `X-Belfort-Lang`, `?lang=` or `Accept-Language` (a small ASGI middleware), and builds the "Reply in <language>." sentence that Ask Belfort and the dictionary's Ask add to their question. Errors that carry a catalogue key (locked stage, out of hearts) are said in the learner's language and send the key in an `X-Error-Key` header so the page does not have to match words.
+
+**Lessons.** `content/learn/lessons/<lang>/<id>.md` has the same format and the same quiz structure and answers as the English file, with only the text translated and `translation: machine-draft` in the front matter. The API serves it when the request language matches and falls back to the English file otherwise (the response says `translated`); the page then offers "Explain in <language>", which asks the existing assistant to explain the current card, labelled as AI. Grading uses the same language as the text that was shown. Beginner lessons (16) ship in Hindi.
+
+**Compliance.** Banned promise-style phrases for a language are data in `content/compliance/banned.<lang>.json` (Hindi so far), loaded by `core/i18n.py`; `core/compliance.py` is unchanged. The lesson tests run that list on every translated lesson, and an AI answer containing one is replaced. Changes to compliance wording need Sarthak's review.
+
+**Not translated yet.** Text that the Python engines write (verdicts, rule explanations, chart reading, glossary meanings, news headlines, practice notes) is still English; labels, headings, tables, buttons and all messages around them are translated.
+
 ## Extension points for contributors
 
 - **A new lesson:** add `content/learn/lessons/<id>.md` and remove `"status": "planned"` for it in `syllabus.json`. The tests check the quiz, the wording and the format.

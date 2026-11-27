@@ -140,12 +140,14 @@ def _unlocked(con: sqlite3.Connection, user: str) -> list[str]:
     return engine.unlocked_stages(scores)
 
 
-def _lock_message(stage: str) -> str:
-    before = STAGES[STAGES.index(stage) - 1].capitalize()
-    msg = f"The {stage.capitalize()} stage is locked. Pass the {before} stage test with {round(STAGE_PASS_RATIO * 100)}% or more"
+def _locked(stage: str) -> "LockedError":
+    before = STAGES[STAGES.index(stage) - 1]
+    pct = round(STAGE_PASS_RATIO * 100)
+    msg = f"The {stage.capitalize()} stage is locked. Pass the {before.capitalize()} stage test with {pct}% or more"
     if STAGES.index(stage) == 1:
         msg += ", or test out of Beginner with the placement test"
-    return msg + " to open it."
+    key = "server.locked_testout" if STAGES.index(stage) == 1 else "server.locked"
+    return LockedError(msg + " to open it.", key, stage="@stage." + stage, before="@stage." + before, pct=pct)
 
 
 # ---------------- the path ----------------
@@ -192,7 +194,7 @@ def ensure_open(user: str, lesson_id: str):
     with db.connect() as con:
         _load(con, user, _today())
         if stage not in _unlocked(con, user):
-            raise LockedError(_lock_message(stage))
+            raise _locked(stage)
 
 
 def ensure_can_start(user: str, lesson_id: str):
@@ -201,7 +203,8 @@ def ensure_can_start(user: str, lesson_id: str):
         profile, _ = _load(con, user, _today())
         if profile.hearts == 0 and lesson_id not in _done_scores(con, user):
             raise NoHeartsError(
-                "You are out of hearts for today. Finish a Weak spots review to refill them, or come back tomorrow."
+                "You are out of hearts for today. Finish a Weak spots review to refill them, or come back tomorrow.",
+                "server.no_hearts_today",
             )
 
 
@@ -218,7 +221,9 @@ def check_question(user: str, lesson_id: str, index: int, answer) -> dict:
     with db.connect() as con:
         profile, _ = _load(con, user, today)
         if not engine.can_start_lesson(profile):
-            raise NoHeartsError("You are out of hearts for today. Finish a Weak spots review to refill them.")
+            raise NoHeartsError(
+                "You are out of hearts for today. Finish a Weak spots review to refill them.", "server.no_hearts_start"
+            )
         result = curriculum.check_answer(quiz[index], answer)
         if result["correct"]:
             con.execute("DELETE FROM learn_weak WHERE user_id=? AND lesson_id=? AND q_index=?", (user, lesson_id, index))
@@ -246,7 +251,9 @@ def complete_lesson(user: str, lesson_id: str, answers: list) -> dict:
     with db.connect() as con:
         profile, _ = _load(con, user, today)
         if profile.hearts == 0:
-            raise NoHeartsError("You ran out of hearts. Finish a Weak spots review to refill them and try again.")
+            raise NoHeartsError(
+                "You ran out of hearts. Finish a Weak spots review to refill them and try again.", "server.no_hearts"
+            )
         before = _summary(con, user, profile, today)
         if ok:
             first = lesson_id not in _done_scores(con, user)
@@ -315,28 +322,28 @@ def start_test(user: str, kind: str, key: str) -> dict:
             if not mod:
                 raise LearnError("No such module.")
             if mod["stage"] not in unlocked:
-                raise LockedError(_lock_message(mod["stage"]))
+                raise _locked(mod["stage"])
             lessons = [x["id"] for x in mod["lessons"] if x["written"]]
             title, count = f"Checkpoint: {mod['title']}", CHECKPOINT_QUESTIONS
         elif kind == "stage":
             if key not in STAGES:
                 raise LearnError("No such stage.")
             if key not in unlocked:
-                raise LockedError(_lock_message(key))
+                raise _locked(key)
             lessons = [x["id"] for m in modules if m["stage"] == key for x in m["lessons"] if x["written"]]
             title, count = f"{key.capitalize()} stage test", STAGE_TEST_QUESTIONS
         else:
             if key != STAGES[0]:
                 raise LearnError("The placement test is for the Beginner stage.")
             if STAGES[1] in unlocked:
-                raise NotReadyError("Intermediate is already unlocked.")
+                raise NotReadyError("Intermediate is already unlocked.", "server.already_unlocked")
             lessons = [x["id"] for m in modules if m["stage"] == key for x in m["lessons"] if x["written"]]
             title, count = "Test out of Beginner", PLACEMENT_QUESTIONS
         if kind != "placement" and not all(lid in done for lid in lessons):
-            raise NotReadyError("Finish all the lessons first, then take this test.")
+            raise NotReadyError("Finish all the lessons first, then take this test.", "server.finish_first")
         refs = engine.sample_refs(_pools(lessons), count, random.Random())
         if not refs:
-            raise LearnError("There are no questions for this test yet.")
+            raise LearnError("There are no questions for this test yet.", "server.no_questions")
         sid = _new_session(con, user, kind, key, refs)
         if kind == "placement":
             con.execute("UPDATE learn_profile SET placement_seen=1 WHERE user_id=?", (user,))
@@ -382,7 +389,7 @@ def grade_session(user: str, session_id: str, answers: list) -> dict:
     with db.connect() as con:
         row = con.execute("SELECT * FROM learn_sessions WHERE id=? AND user_id=?", (session_id, user)).fetchone()
         if row is None:
-            raise LearnError("This test has already been graded or has expired. Start it again.")
+            raise LearnError("This test has already been graded or has expired. Start it again.", "server.test_expired")
         con.execute("DELETE FROM learn_sessions WHERE id=?", (session_id,))
         refs, kind, key = json.loads(row["refs"]), row["kind"], row["key"]
         quiz = [curriculum.questions(lid)[i] for lid, i in map(engine.parse_ref, refs)]

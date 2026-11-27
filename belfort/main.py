@@ -14,8 +14,11 @@ from fastapi.staticfiles import StaticFiles
 from .assistant import chat
 from .assistant.glossary_router import router as glossary_router
 from .assistant.router import router as assistant_router
+from .core import i18n
 from .core.compliance import AI_NOTICE, DISCLAIMER
 from .core.glossary import GLOSSARY
+from .core.i18n import LANGUAGES, LanguageMiddleware
+from .core.prefs import router as prefs_router
 from .data.universe import UNIVERSE
 from .learn.router import router as learn_router
 from .news.router import router as news_router
@@ -31,10 +34,11 @@ def _codes() -> set[str]:
 def require_access(x_access_code: str | None = Header(default=None)):
     codes = _codes()
     if codes and x_access_code not in codes:
-        raise HTTPException(status_code=401, detail="A valid access code is required.")
+        raise HTTPException(status_code=401, detail=i18n.tr(i18n.current(), "server.access_code"))
 
 
 app = FastAPI(title="Belfort", version=VERSION, docs_url="/api/docs", redoc_url=None)
+app.add_middleware(LanguageMiddleware)
 
 
 @app.get("/api/config")
@@ -50,10 +54,11 @@ def config():
         "chat_env_ready": chat.configured(),
         "practice": {"start_points": PAPER_START_POINTS, "horizons": list(PREDICTION_HORIZONS)},
         "edu_lag_days": EDU_LAG_DAYS,
+        "languages": [{"code": c, "name": n[0], "native": n[1]} for c, n in LANGUAGES.items()],
     }
 
 
-for r in (research_router, learn_router, practice_router, news_router, assistant_router, glossary_router):
+for r in (research_router, learn_router, practice_router, news_router, assistant_router, glossary_router, prefs_router):
     app.include_router(r, dependencies=[Depends(require_access)])
 
 app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")

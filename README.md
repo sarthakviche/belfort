@@ -18,6 +18,7 @@
 
 |  |  |
 |---|---|
+| **Languages** | The whole app in English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ, switchable without a reload; Beginner lessons in Hindi; Ask Belfort answers in your language. Translations are machine drafts for now. |
 | **Learn** | A short, practical course for swing and positional trading, as a path of three stages with exercises, XP, a daily streak and hearts. |
 | **Practice** | Paper trading with virtual points, a prediction journal, and a chart-replay trainer. |
 | **Research** | One clear report per NSE stock: the rule's checklist, the risk, and a position size. |

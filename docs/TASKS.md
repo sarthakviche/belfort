@@ -61,6 +61,7 @@
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Blocked on T42 |
+| T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Done ([#PR](https://github.com/sarthakviche/belfort/pull/PR)) |
 
 ---
 
@@ -296,6 +297,10 @@ Shared contracts every Phase 6 task uses:
 ### T49 · New exercise types in every lesson
 - **Owner:** Sarthak · **P1 · M · Status:** Blocked on T42 · **Area:** learn
 - **Do:** add at least two exercises of the new types (tf, order, number) to every lesson, keeping the existing questions. Facts must match the lesson text.
+
+### T50 · Belfort in Indian languages
+- **P0 · L · Owner:** Sarthak (agent) · **Status:** Done ([#PR](https://github.com/sarthakviche/belfort/pull/PR)) · **Area:** ui, learn, assistant
+- English stays the default. Language picker on the intro, in Settings and in the header: English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી, ಕನ್ನಡ. Catalogues in `belfort/static/i18n/<lang>.json` (shared with Android), English as the fallback; Beginner lessons in Hindi; Ask Belfort and the dictionary answer in the chosen language; Indian number grouping everywhere. Machine drafts: a fluent speaker must read them before release. See `docs/ARCHITECTURE.md` ("Languages").
 
 ## Decisions (maintainers, not code)
 

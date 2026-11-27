@@ -11,20 +11,32 @@
   function done(action) { document.dispatchEvent(new CustomEvent("belfort:intro-done", { detail: { action } })); }
 
   function show() {
-    const words = INTRO_QUOTE.text.split(/\s+/);
     const root = document.createElement("div");
     root.className = "intro-screen";
     root.setAttribute("role", "dialog");
     root.setAttribute("aria-modal", "true");
-    root.setAttribute("aria-label", "Welcome to Belfort");
-    root.style.setProperty("--total", words.length);
     const q = document.createElement("blockquote");
     q.className = "intro-quote";
-    words.forEach((w, i) => { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--n", i); s.textContent = w; q.appendChild(s); });
-    const by = document.createElement("div"); by.className = "intro-by"; by.textContent = "— " + INTRO_QUOTE.by;
-    const go = document.createElement("button"); go.type = "button"; go.className = "intro-go"; go.textContent = "Start learning";
-    const skip = document.createElement("button"); skip.type = "button"; skip.className = "intro-skip"; skip.textContent = "Skip";
-    root.append(skip, q, by, go);
+    const by = document.createElement("div"); by.className = "intro-by";
+    const langs = document.createElement("div"); langs.className = "intro-langs"; langs.setAttribute("role", "group");
+    const go = document.createElement("button"); go.type = "button"; go.className = "intro-go";
+    const skip = document.createElement("button"); skip.type = "button"; skip.className = "intro-skip";
+    // Words, labels and the quote are drawn from the catalogue, so choosing a language below redraws them at once.
+    function paint(animate) {
+      const words = T("intro.quote", null, INTRO_QUOTE.text).split(/\s+/);
+      root.setAttribute("aria-label", T("intro.aria", null, "Welcome to Belfort"));
+      root.style.setProperty("--total", animate ? words.length : 0);
+      q.textContent = "";
+      words.forEach((w, i) => { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--n", animate ? i : 0); s.textContent = w; q.appendChild(s); });
+      by.textContent = "— " + T("intro.by", null, INTRO_QUOTE.by);
+      langs.setAttribute("aria-label", T("intro.langs", null, "Choose your language"));
+      go.textContent = T("intro.start", null, "Start learning");
+      skip.textContent = T("intro.skip", null, "Skip");
+    }
+    paint(true);
+    I18N.chips(langs);
+    document.addEventListener("belfort:language", () => paint(false));
+    root.append(skip, q, by, langs, go);
     document.body.appendChild(root);
     requestAnimationFrame(() => root.classList.add("in"));
     go.focus({ preventScroll: true });
@@ -46,5 +58,5 @@
     skip.addEventListener("click", () => close("skip"));
   }
 
-  document.addEventListener("belfort:splash-done", () => { if (seen()) done("seen"); else show(); }, { once: true });
+  document.addEventListener("belfort:splash-done", () => { I18N.ready.then(() => { if (seen()) done("seen"); else show(); }); }, { once: true });
 })();
