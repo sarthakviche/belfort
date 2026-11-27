@@ -58,7 +58,7 @@
 | T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | Done ([#33](https://github.com/sarthakviche/belfort/pull/33)) |
 | T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | Done ([#32](https://github.com/sarthakviche/belfort/pull/32)) |
-| T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
+| T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | Done ([#34](https://github.com/sarthakviche/belfort/pull/34)) |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
 | T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Done ([#41](https://github.com/sarthakviche/belfort/pull/41)) |
@@ -287,7 +287,7 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** the Windows app shows the loader from launch until the UI is ready and the intro on first open.
 
 ### T47 · Landing site rebuild
-- **Owner:** Sarthak · **P1 · M · Status:** In progress · **Area:** site
+- **Owner:** Sarthak · **P1 · M · Status:** Done ([#34](https://github.com/sarthakviche/belfort/pull/34)) · **Area:** site
 - **Do:** rebuild `site/index.html` on top of the current landing page: a moving candlestick background (canvas, replaceable by a video file) under a black layer at about 60% opacity, the mascot, the quote, Tip Check as the lead feature, the gamified path, download and Android sections.
 
 ### T48 · Belfort for Android

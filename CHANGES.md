@@ -2,6 +2,13 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T47 landing site
+
+### Changes
+- `site/index.html` rebuilt (PR #34, stacked on the README PR #31): canvas candlestick hero under a 60% black layer and vignette, mascot, Buffett quote, Tip Check, Learn path, Practice/Research/News cards, accounts, open source, compliance footer. `site/img/` holds the mascot GIFs and two screenshots.
+- To use a video hero, add `site/img/hero-bg.mp4` (or `.webm`); it replaces the canvas. Reduced motion shows a static frame.
+- Tip Check, streak and XP on the page are illustrations; those features ship with T44 and T42.
+
 ## 2026-11-28 — T50 languages
 
 Branch `feat/T50-languages`, built on `feat/T42-gamified-learn` with T22 (safety lessons), T46 (loader and intro) and T45 (dictionary search) merged in.
@@ -163,6 +170,7 @@ Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
 - **Look:** neon green and red candles drawing on black (from the intro inspiration), large editorial serif type for the quote, Belfort yellow (#facc15) for the accent.
 - **Inspiration videos and images** in `design assets/intro animation inspos/` stay out of git: they are third-party downloads, for reference only.
 - **Work split (equal):** Devansh's side takes T48 Android, T43 accounts and sync, T44 Tip Check (technical architecture and market-domain data). Sarthak's side takes T42 gamified Learn, T45 dictionary, T46 loader, T47 landing site, T21 and T22 lessons, T49 exercises (design, UI and content).
+
 - **Multi-language (T50):** English first, with Hindi, Marathi, Bengali, Tamil, Telugu, Gujarati and Kannada. Interface strings in shared catalogues for desktop and Android; Beginner lessons in Hindi first; Ask Belfort, Tip Check and the dictionary answer in the chosen language. Tip Check reads Hinglish tips. Owned by Sarthak's side, starting after T42 to avoid editing every screen twice.
 - **Agent coordination** happens in `conversations.md` on the `collab` branch. The Android app (T48) is built on Devansh's machine.
 
