@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Learn: the Scams, tips and your rights module. How tip groups and pump-and-dump schemes work, with SEBI actions described factually and a list of red flags; how to check a SEBI registration and complain (SCORES and the exchange); and the common trading myths, each tied to the lesson that tests it. Glossary adds Pump and dump, Investment adviser, Research analyst and SCORES. Thirty-six of 38 lessons are now written.
 - Windows app: `scripts\build_windows.ps1` builds a single `Belfort.exe` (no Python needed). It keeps user data in `%LOCALAPPDATA%\Belfort`, uses port 8766 (or a free port if that is taken) so it can run next to the older Belfort AI, and bundles the chart library so charts work offline.
 - Learn: the Running several trades and Psychology modules. Total open risk and correlation (matching the Practice Open risk card and its 2% and 6% warnings), Drawdown rules: when to stop trading (with the equity curve), FOMO, revenge trading and overconfidence (each bias linked to a journal mistake tag), and Writing your own trading rules. Thirty-three of 38 lessons are now written.
 - Learn: the Market context module. Index trend and market breadth, Sector strength and rotation, and FII and DII flows, RBI policy and the event calendar. Glossary adds Market breadth. Twenty-nine of 38 lessons are now written.
