@@ -101,3 +101,16 @@ AI_MAX_OUTPUT_TOKENS = 800
 AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
 
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}
+
+# ---------------- Tip Check (T44) ----------------
+TIP_MAX_CHARS = 5000  # longest tip text read
+TIP_TIME_BUDGET_SECONDS = 8.0  # data checks still running after this are reported as "could not check"
+TIP_VOLUME_SPIKE = 5.0  # a session's volume at least this many times its 50-session average
+TIP_VOLUME_RECENT_BARS = 5  # the spike must be in this many most recent sessions
+TIP_VOLUME_BASE_BARS = 50  # average volume is taken over this many sessions before the recent ones
+TIP_RUNUP_SHORT = (20, 0.30)  # a rise of at least 30% in 20 sessions...
+TIP_RUNUP_LONG = (60, 0.60)  # ...or at least 60% in 60 sessions counts as a sharp run-up
+TIP_SMALL_CAP_CRORE = 5000  # market value below this (in crore rupees) counts as a small company
+TIP_HISTORY_GAP_BARS = 60  # sessions after a past pump signature that Tip Check reports on
+TIP_SURVEILLANCE_LOOKBACK_DAYS = 7  # how many weekdays back to look for NSE's latest surveillance file
+TIP_IMAGE_MAX_BYTES = 5_000_000  # largest screenshot accepted

@@ -31,8 +31,8 @@ function renderFiles() {
     : '<div class="files-empty">No files open. Search a company to start its dossier.</div>';
 }
 /* ---------- views: research (home, report), learn, practice, news ---------- */
-const VIEWS = ["home", "report", "learn", "practice", "news"];
-const VIEW_NAME = { home: "Research", report: "Research", learn: "Learn", practice: "Practice", news: "News" };
+const VIEWS = ["home", "report", "learn", "practice", "news", "tipcheck"];
+const VIEW_NAME = { home: "Research", report: "Research", learn: "Learn", practice: "Practice", news: "News", tipcheck: "Tip Check" };
 const onView = {};   // verticals.js registers a loader per view
 function setCrumb(extra) {
   const v = S.view, tail = v === "report" && S.report ? S.report.name : extra;
@@ -489,5 +489,5 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("dict"
   renderFiles(); setCrumb();
   loadScreens();
   const start = location.hash.slice(1);
-  if (["learn", "practice", "news"].includes(start)) go(start);
+  if (["learn", "practice", "news", "tipcheck"].includes(start)) go(start);
 })();
