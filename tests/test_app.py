@@ -202,3 +202,11 @@ def test_dictionary_covers_terms_and_is_plain():
         assert must in terms
     for g in GLOSSARY:
         assert g["meaning"] and g["match"] and not explain.find_banned(g["meaning"])
+
+
+@pytest.mark.parametrize("path", ["/", "/app.js", "/style.css"])
+def test_page_files_are_revalidated_so_updates_show(path):
+    r = TestClient(app).get(path)
+    assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
+    again = TestClient(app).get(path, headers={"If-None-Match": r.headers["etag"]})
+    assert again.status_code == 304

@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
 
+from ..core import i18n
 from . import chat
 
 router = APIRouter(prefix="/api", tags=["assistant"])
@@ -25,6 +26,13 @@ def api_chat(
 ):
     try:
         p = chat.Provider.resolve(x_ai_provider, x_ai_key, x_ai_model, x_ai_base)
-        return {"answer": chat.ask(body.question, body.history, body.context, body.mode, p)}
+        question = body.question
+        reply = i18n.reply_instruction(i18n.current())  # answers come in the language chosen in the app
+        if reply:
+            question = question[:1900] + "\n\n" + reply
+        answer = chat.ask(question, body.history, body.context, body.mode, p)
+        if i18n.find_banned(answer, i18n.current()):  # banned promise-style wording in the chosen language
+            answer = i18n.tr(i18n.current(), "chat.blocked")
+        return {"answer": answer}
     except chat.ChatError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e

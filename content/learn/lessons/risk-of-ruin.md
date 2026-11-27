@@ -44,6 +44,8 @@ The last column is the trap. Losses and recoveries are not symmetric: the deeper
 [
   {"q": "A plan wins half of its trades. Over 100 trades, how unusual is a run of five losses in a row?", "options": ["Very rare, under 5%", "Common, about 80%", "Impossible if the plan is good"], "answer": 1, "why": "With a 50% win rate, at least one five-loss streak shows up in about 81% of 100-trade runs."},
   {"q": "Ten losses in a row at 2% risk each leave about how much of the account?", "options": ["About 80%", "About 98%", "About 50%"], "answer": 0, "why": "Each loss takes 2% of what is left: 0.98 to the power 10 is about 0.82, so roughly 18% is lost."},
-  {"q": "An account falls 40%. What gain does it need to get back to where it started?", "options": ["40%", "About 67%", "100%"], "answer": 1, "why": "60 must grow to 100, which is a gain of 40 ÷ 60, about 67%."}
+  {"q": "An account falls 40%. What gain does it need to get back to where it started?", "options": ["40%", "About 67%", "100%"], "answer": 1, "why": "60 must grow to 100, which is a gain of 40 ÷ 60, about 67%."},
+  {"type": "number", "q": "A ₹1,00,000 account takes ten losses in a row at 5% risk each. Using the lesson's table (40.1% lost), about how much is left?", "answer": 59900, "tolerance": 100, "unit": "₹", "why": "Losing 40.1% of ₹1,00,000 leaves about ₹59,900. The gain needed to get back is 67%."},
+  {"type": "tf", "q": "With a 40% win rate, a run of five losses in a row somewhere in 100 trades is unusual.", "answer": false, "why": "The table gives about 98% for five in a row at a 40% win rate, so a streak is close to expected."}
 ]
 ```

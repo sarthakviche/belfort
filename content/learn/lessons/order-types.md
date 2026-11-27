@@ -42,6 +42,8 @@ Belfort uses **end-of-day** prices, so practice orders behave like orders placed
 [
   {"q": "You want to buy only if the price comes down to ₹1,240. Which order fits?", "options": ["Market order", "Limit order at ₹1,240", "Stop-loss order at ₹1,240"], "answer": 1, "why": "A limit buy fills at your price or lower, and only if the market gets there."},
   {"q": "Your stop is at ₹480. The stock closes at ₹500 and opens at ₹460 the next day. Roughly where does the stop fill?", "options": ["₹480 exactly", "Near ₹460", "It does not fill"], "answer": 1, "why": "A gap jumps past the stop, so it fills at the first available price, near ₹460."},
-  {"q": "In Belfort's practice account, when does a market order placed today fill?", "options": ["Instantly at today's close", "At the next session's open", "At the end of the week"], "answer": 1, "why": "Practice uses end-of-day data, so orders fill at the next session's open."}
+  {"q": "In Belfort's practice account, when does a market order placed today fill?", "options": ["Instantly at today's close", "At the next session's open", "At the end of the week"], "answer": 1, "why": "Practice uses end-of-day data, so orders fill at the next session's open."},
+  {"type": "number", "q": "You hold 100 shares bought at ₹500 with a stop at ₹480. Bad news makes the stock open at ₹460 and the stop exits at the open. What is the loss in rupees?", "answer": 4000, "tolerance": 0, "unit": "₹", "why": "A stop does not promise your price. The exit is at the open of ₹460, so the loss is (500 − 460) × 100 = ₹4,000, not ₹2,000."},
+  {"type": "tf", "q": "A stop-loss order always exits you at exactly your stop price.", "answer": false, "why": "If a stock gaps past the stop, the order fills near the new price, not at the stop."}
 ]
 ```

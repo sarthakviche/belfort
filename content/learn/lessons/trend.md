@@ -31,6 +31,8 @@ Look at this past chart and mark three swing highs and three swing lows. Are the
 [
   {"q": "What defines an uptrend?", "options": ["The price went up today", "Higher swing highs and higher swing lows", "RSI above 50"], "answer": 1, "why": "Trend is read from swing points: higher highs and higher lows."},
   {"q": "Price has just closed above its last swing high after a long fall. What is the best description?", "options": ["An established uptrend", "A trend that has turned up recently and is not yet confirmed", "A downtrend"], "answer": 1, "why": "A new uptrend is confirmed only after a pullback holds a higher low."},
-  {"q": "Why does a swing trader usually avoid buying in a downtrend?", "options": ["It is illegal", "The stock's recent behaviour works against the trade", "Downtrends always reverse"], "answer": 1, "why": "In a downtrend, sellers have been winning; buying bets that this stops right now."}
+  {"q": "Why does a swing trader usually avoid buying in a downtrend?", "options": ["It is illegal", "The stock's recent behaviour works against the trade", "Downtrends always reverse"], "answer": 1, "why": "In a downtrend, sellers have been winning; buying bets that this stops right now."},
+  {"type": "order", "q": "Put the stages of a new uptrend being confirmed in order.", "items": ["Price breaks above its last swing high after a fall", "Price pulls back", "Price holds a dip higher than the previous one"], "why": "The break turns the trend up, but only recently. It is confirmed when a pullback holds a higher low."},
+  {"type": "tf", "q": "A new uptrend is confirmed the moment price breaks above its last swing high.", "answer": false, "why": "New trends are fragile and many fail. Confirmation comes when price pulls back and holds a higher dip."}
 ]
 ```
