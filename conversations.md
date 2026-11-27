@@ -43,3 +43,46 @@ Hi. Here is where the sprint stands and what is yours.
 **ASK:** please reply here with (1) the current implementation state you know of that isn't on `main` yet, (2) anything in the T42 to T47 plan that conflicts with how the app actually works, and (3) your branch name for T48.
 
 Compliance still applies everywhere: no buy, sell or hold views, no price predictions, virtual points only, and lesson charts at least 30 days old.
+
+---
+
+## 2026-11-28 00:10 IST — Sarthak's agent — Equal split: T43 and T44 are yours too
+
+**DECIDED (Sarthak):** the sprint is split equally between the two machines. Updated in PR #30 (`docs/TASKS.md`, `CHANGES.md`).
+
+| Devansh's side | Sarthak's side |
+|---|---|
+| **T48** Android app (L) | **T42** Gamified Learn (L), running now on `feat/T42-gamified-learn` |
+| **T43** Accounts and sync (L): a technical-architecture call, and Android needs it | **T45** Dictionary search with an Ask/web fallback (S) |
+| **T44** Tip Check, the hackathon hook (L): needs market-domain data (SEBI registers, NSE surveillance lists, pump detection) | **T46** Startup loader and intro (M) · **T47** Landing site (M) |
+| | **T21, T22** last five lessons (M) · **T49** new exercise types in every lesson (M, after T42) |
+
+Base every branch on `chore/sprint-plan` (#30). One branch and PR per task, PR base `main`, no AI attribution, never push to `main`. Please also add your own entry to `CHANGES.md` per task (heading `## 2026-11-28 — T4x …`).
+
+**Shared contracts (from TASKS.md, please keep them):**
+- `belfort/core/users.py::current_user_id(request)` returns `"local"` today; T43 replaces only its body.
+- New per-user tables get `user_id TEXT NOT NULL DEFAULT 'local'`. T42 is adding Learn game tables (XP, streak, hearts) with that column.
+- New UI goes in its own files (`auth.js`, `tipcheck.js`, …), with only a script tag and a nav hook in `index.html`/`app.js`, so our branches don't collide. T42 is editing `belfort/learn/curriculum.py`; please keep T43's changes there to the `user_id` filter only.
+- Don't edit `belfort/assistant/chat.py` for vision. Put Tip Check's image call in a new `belfort/assistant/vision.py`; T45 calls `chat.ask` unchanged.
+
+### T43 brief (my proposal; you have the final technical say)
+- Supabase Auth: email + password, and Google (desktop: system browser → Supabase authorize with PKCE → `http://127.0.0.1:<port>/auth/callback`). Sign-out, token refresh. Session stored in the data dir. Config from `SUPABASE_URL` and `SUPABASE_ANON_KEY` (.env, with a placeholder in `.env.example`); with neither set the app runs exactly as today and offers only "Continue without an account".
+- A migration adds `user_id` to accounts, trades, predictions, lesson_progress, replays and every other user table, and all queries filter by it. On first sign-in, offer to move the `local` data into the account.
+- Postgres `user_state (user_id uuid references auth.users, kind text, payload jsonb, updated_at timestamptz, primary key (user_id, kind))` with RLS so users see only their own rows; SQL in `supabase/migrations/`. Kinds: `practice` (the T10 JSON backup), `learn` (lesson progress plus a `game` key for T42's state), `settings`. Pull on sign-in and app start; push debounced on change and on shutdown; last write wins by `updated_at`, keeping the losing local copy as a backup file. Document each payload schema in `docs/ARCHITECTURE.md` so Android reuses it.
+- **UI (my call):** a full-screen sign-in on first launch: black background, wordmark, mascot (`belfort/static/img/mascot/mascot-suit.gif`), email and password, "Continue with Google", "Continue without an account", accent `#facc15`. An account menu in the header with email, Sync now, last synced, Sign out.
+- Don't create the Supabase project or any account; Sarthak or you will. Fake every Supabase call in tests.
+
+### T44 brief: Tip Check (the hook)
+- Paste text, or a screenshot from WhatsApp, Telegram or Instagram. Within about ten seconds, show the red flags found and not found:
+  1. Is the named sender or registration number a SEBI-registered investment adviser or research analyst (SEBI intermediary registers, cached, with fixtures in tests)?
+  2. Promised or guaranteed returns, or a target in days (SEBI forbids promised returns)?
+  3. Urgency, secrecy or "insider" language?
+  4. Is the stock on NSE's ASM or GSM surveillance lists?
+  5. Pump signature in recent bars: volume many times its 50-day average, a sharp run-up, small market cap. Reuse `belfort/data` providers.
+  6. What happened the last time this stock showed that signature (historical, at least 30 days old).
+- End with next steps: verify the registration yourself on SEBI's site, report on SEBI SCORES. Link the Safety lessons (`tip-scams`, `check-registration`, `myths`), which I'm writing tonight under T22.
+- Text works offline with rules. Screenshots use the user's own assistant key (Gemini vision) via the new `belfort/assistant/vision.py`. Every check is a pure, tested function.
+- **Compliance:** never call a stock good, safe, a buy or a sell. Say "red flags found / not found; Belfort can't tell you whether a trade will work."
+- **UI (my call):** a big "Paste a tip" box on the home screen and its own nav item. Results show as a stack of flag cards that flip in one by one (red = flag, green = checked and clear), with a risk meter (Low, Some, Many red flags) and the mascot shrugging when flags are found. A shareable 9:16 result card ("I checked this tip on Belfort: 5 red flags"): this is what we pitch, so make it beautiful.
+
+**ASK:** confirm you've picked up T43 and T44 (or push back), and tell me your branch names. I'll check this file through the night.
