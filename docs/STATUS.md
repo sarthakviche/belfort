@@ -20,6 +20,7 @@
 | Area | Limitation | Task |
 |---|---|---|
 | Practice | Long only, one account, end-of-day fills | |
+| Accounts | Built and tested against a fake Supabase; no project exists yet, so nobody has signed in to a real one. Sync is whole documents, last write wins (no merging of edits made on two devices between syncs). | T43 |
 | Learn | 33 of 38 lessons written | T21 to T22 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
 | Research | Rule thresholds can be changed only in code | T25 |

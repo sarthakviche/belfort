@@ -1,0 +1,35 @@
+/* Accounts (T43): full-screen sign-in on first launch, and the account menu in the header. */
+.auth-gate { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 24px; overflow-y: auto;
+  background: radial-gradient(60% 50% at 50% 30%, rgba(250,204,21,.10), transparent 70%), #000; }
+.auth-card { width: min(400px, 100%); display: flex; flex-direction: column; align-items: stretch; gap: 12px; text-align: center; }
+.auth-mascot { width: 120px; height: 120px; object-fit: contain; margin: 0 auto -6px; }
+.auth-word { font-family: var(--serif); font-size: 56px; line-height: 1; color: var(--ink); }
+.auth-sub { color: var(--ink2); margin: 0 0 6px; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.auth-form label { display: flex; flex-direction: column; gap: 5px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.auth-form input { background: rgba(255,255,255,.05); border: 1px solid var(--line2); border-radius: 12px; padding: 12px 14px; color: var(--ink);
+  font: 15px var(--font); text-transform: none; letter-spacing: 0; outline: none; min-height: 44px; }
+.auth-form input:focus { border-color: var(--y); }
+.auth-main, .auth-google { min-height: 46px; font-size: 15px; }
+.auth-google { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.auth-google .g { width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #1a1a1a; font-weight: 700; display: grid; place-items: center; font-size: 13px; }
+.auth-switch { color: var(--y); font-size: 13px; margin-top: 2px; }
+.auth-local { background: none; border: 0; color: var(--muted); font: 14px var(--font); padding: 10px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
+.auth-local:hover { color: var(--ink); }
+.auth-msg { min-height: 1.2em; margin: 0; color: var(--ink2); font-size: 13px; }
+.auth-msg.err { color: #ef4444; }
+.auth-privacy { text-align: left; color: var(--muted); font-size: 12.5px; }
+.auth-privacy summary { cursor: pointer; text-align: center; }
+.auth-privacy p { margin: 8px 0 0; line-height: 1.5; }
+
+.acct { position: relative; margin-right: 10px; }
+.acct-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--y-a30); background: var(--y-a14); color: var(--y); font-weight: 700; cursor: pointer; }
+.acct-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 80; min-width: 240px; padding: 8px; border-radius: 14px;
+  background: rgba(20,20,22,.97); border: 1px solid var(--line2); box-shadow: 0 18px 40px rgba(0,0,0,.6); display: flex; flex-direction: column; }
+.acct-email { padding: 8px 10px 2px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.acct-sync { padding: 0 10px 8px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.acct-menu button { background: none; border: 0; text-align: left; color: var(--ink); padding: 9px 10px; border-radius: 9px; font: 14px var(--font); cursor: pointer; }
+.acct-menu button:hover { background: var(--glass-hi); }
+.acct-menu .danger { color: #ef4444; }
+@media (prefers-reduced-motion: no-preference) { .auth-card { animation: auth-in .45s ease-out both; } }
+@keyframes auth-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }

@@ -51,7 +51,11 @@ belfort/
   core/
     compliance.py         banned wording, disclaimer, AI notice
     glossary.py           the dictionary behind every hover explanation
-    db.py                 SQLite connection and numbered migrations
+    db.py                 SQLite connection and numbered migrations; one database file per signed-in user
+    users.py              current_user_id(): the signed-in user, or "local"
+    auth.py               accounts (Supabase Auth): sign-in, Google with PKCE, refresh, sign-out, delete
+    sync.py               practice, learn and settings documents to and from Supabase, last write wins
+    accounts_router.py    /api/auth/*, /api/sync, /auth/callback
   data/
     providers.py          Yahoo and NSE archive providers (swap in a licensed feed here)
     market.py             daily bars for any vertical; lagged() for learning content
@@ -81,6 +85,8 @@ tests/                    offline tests; no network, every source replaced by sy
 | **Learn** | A screened syllabus in three tracks, short lessons, quizzes graded on the server, streaks, lessons that jump into Practice. | Charts in lessons only use prices at least 30 days old (`market.lagged`), following SEBI's 2026 education norms. |
 | **Practice** | Paper account (long only, end-of-day fills, costs), prediction journal scored with the Brier score, chart-replay trainer on hidden historical charts. | Pure settlement engine with no I/O, so every fill rule is unit-tested. Points can never be redeemed. |
 | **News** | Public RSS feeds merged, de-duplicated, categorised, tagged with companies, explained on demand. | Shows only what the feed provides and links out. Headlines that relay buy/sell calls or targets are hidden by default. |
+
+**Accounts** (T43, optional) are described in [ACCOUNTS.md](ACCOUNTS.md), including the JSON document shapes the Android app reuses.
 
 The **assistant** serves all four: the page sends the context on screen (a report, a lesson, or a news headline and description) and the mode, plus the user's own provider and key in `X-AI-*` headers.
 
