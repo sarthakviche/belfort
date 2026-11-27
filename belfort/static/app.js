@@ -708,4 +708,5 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("dict"
   loadScreens();
   const start = location.hash.slice(1);
   if (["learn", "practice", "news", "tipcheck", "dictionary"].includes(start)) go(start);
+  document.dispatchEvent(new CustomEvent("belfort:app-ready")); // lets the startup loader fade (splash.js)
 })();
