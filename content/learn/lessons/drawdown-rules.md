@@ -34,6 +34,9 @@ The Practice page draws an **equity curve**: the account's value at the end of e
 [
   {"q": "An account peaked at ₹5,00,000 and is now ₹4,25,000. What is the drawdown?", "options": ["7.5%", "15%", "17.6%"], "answer": 1, "why": "The fall is ₹75,000 from a ₹5,00,000 peak: 75,000 ÷ 5,00,000 = 15%."},
   {"q": "Why write drawdown rules before a losing run starts?", "options": ["Judgement is worst in the middle of a losing run", "Rules make losses impossible", "SEBI requires them"], "answer": 0, "why": "During a drawdown the urges to quit or to trade bigger are strongest. A rule written while calm decides instead."},
-  {"q": "What does halving risk per trade in a drawdown do?", "options": ["Speeds up recovery", "Protects what is left while you check the plan", "Doubles the win rate"], "answer": 1, "why": "Smaller trades limit further damage while you find out what is going wrong."}
+  {"q": "What does halving risk per trade in a drawdown do?", "options": ["Speeds up recovery", "Protects what is left while you check the plan", "Doubles the win rate"], "answer": 1, "why": "Smaller trades limit further damage while you find out what is going wrong."},
+  {"type": "number", "q": "An account peaked at ₹3,00,000 and is now ₹2,55,000. What is the drawdown?", "answer": 15, "tolerance": 0, "unit": "%", "why": "The fall is ₹45,000, and 45,000 ÷ 3,00,000 = 15% of the peak."},
+  {"type": "order", "q": "Put the example drawdown rules in order, from the smallest drawdown to the largest.", "items": ["Review the last ten trades in the journal", "Halve the risk per trade", "Stop opening new trades for a week", "Stop live trading and go back to paper trading"], "why": "The example table triggers these at 5%, 10%, 15% and 20% drawdown."},
+  {"type": "tf", "q": "Cutting risk during a drawdown is meant to speed up the recovery.", "answer": false, "why": "It slows the recovery, and that is the point: smaller trades protect what is left while you find the cause."}
 ]
 ```

@@ -32,10 +32,10 @@
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) |
 | T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) |
-| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | In progress (Sarthak) |
+| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) |
 | T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | Done ([#36](https://github.com/sarthakviche/belfort/pull/36)) |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
-| T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Ready |
+| T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Superseded by T42 |
 | T25 | Editable rule profiles | 3 Research and News | P1 | L | Blocked on D1 |
 | T26 | Watchlists and in-app alerts | 3 Research and News | P1 | M | Ready |
 | T27 | Market context panel | 3 Research and News | P2 | M | Ready |
@@ -53,14 +53,15 @@
 | T39 | Release workflow | 5 Ship | P0 | M | Blocked on T38 |
 | T40 | Ship Belfort 1.0 for Windows | 5 Ship | P0 | L | Blocked on all P0 and P1 tasks |
 | T41 | Apply the brand decision | 5 Ship | P1 | S | Blocked on D2 |
-| T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | In progress |
+| T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | Done ([#37](https://github.com/sarthakviche/belfort/pull/37)) |
 | T43 | Accounts and sync across devices | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | In progress |
 | T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | In progress |
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
-| T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Blocked on T42 |
+| T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
+| T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Ready (Sarthak, starts after T42) |
 
 ---
 
@@ -165,7 +166,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) · `open-risk`, `drawdown-rules`, `biases`, `rules`.
 
 ### T21 · Lessons: Taxes and records module
-- **P1 · M · Status:** Ready · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
+- **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
 
 ### T22 · Lessons: Safety module
 - **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#36](https://github.com/sarthakviche/belfort/pull/36)) · `tip-scams`, `check-registration` (how to verify a SEBI registration and file a complaint, with official links), `myths`.
@@ -175,7 +176,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Do:** A `::drill KIND` directive (for example `support`, `stop`, `trend`) that opens a replay chart inside the lesson with a specific question ("Where would the stop go?") and checks the answer against the engine's levels. Lagged data only.
 
 ### T24 · Module checkpoints and progress summary
-- **P2 · S · Status:** Ready · A short mixed quiz at the end of each module; a progress page per track.
+- **P2 · S · Status:** Superseded by [T42](#t42--gamified-learn-stages-locks-xp-streaks-hearts) · A short mixed quiz at the end of each module; a progress page per track. T42 adds a checkpoint node to every module and a stage test, and the path shows progress.
 
 ## Phase 3: Research and News
 
@@ -256,7 +257,7 @@ Shared contracts every Phase 6 task uses:
 - **New UI** goes in its own file under `belfort/static/` (for example `learn-game.js`, `auth.js`, `tipcheck.js`), with only a script tag and a nav hook added to `index.html` and `app.js`, so parallel branches do not collide.
 
 ### T42 · Gamified Learn: stages, locks, XP, streaks, hearts
-- **Owner:** Sarthak · **P0 · L · Status:** In progress · **Area:** learn, ui · Supersedes T24.
+- **Owner:** Sarthak · **P0 · L · Status:** Done ([#37](https://github.com/sarthakviche/belfort/pull/37)) · **Area:** learn, ui · Supersedes T24.
 - **Path:** a vertical map per stage: one node per lesson, a checkpoint node at the end of each module and a stage test at the end of the stage. Next node pulses; done nodes show a crown when the quiz was perfect.
 - **Locks:** a new user sees Beginner only. Intermediate and Advanced lessons show their title and a lock; their content and quiz are refused by the API (not only hidden in the page). A stage unlocks when its previous stage test is passed at 80% or more, or by passing the placement test (a 12-question mix from Beginner) on first open.
 - **Lesson flow:** the lesson is split into cards at each `## ` heading, one card per screen, with an exercise after the cards. Wrong answers cost a heart (5 per day); hearts refill each day or by finishing a Weak spots review (questions the user got wrong before).
@@ -271,7 +272,7 @@ Shared contracts every Phase 6 task uses:
 
 ### T44 · Tip Check: is this stock tip a trap?
 - **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** research, assistant · The hackathon hook.
-- **What:** paste or screenshot a stock tip from WhatsApp, Telegram or Instagram. Belfort reads it and shows, in about ten seconds, the red flags it found: is the sender a SEBI-registered adviser or research analyst; does the tip promise returns or a target in days (SEBI forbids guaranteed returns); urgency and secrecy language; is the stock in NSE's ASM or GSM surveillance lists; does its recent price and volume look like a pump (volume many times its 50-day average, a sharp run-up, a small company); what happened to the stock the last time it looked like this. It ends with what to do (check the registration yourself on SEBI's site, report on SEBI SCORES) and links to the Safety lessons.
+- **What:** paste or screenshot a stock tip from WhatsApp, Telegram or Instagram, in English, Hindi or Hinglish (most tips arrive in Hinglish). Belfort reads it and shows, in about ten seconds, the red flags it found: is the sender a SEBI-registered adviser or research analyst; does the tip promise returns or a target in days (SEBI forbids guaranteed returns); urgency and secrecy language; is the stock in NSE's ASM or GSM surveillance lists; does its recent price and volume look like a pump (volume many times its 50-day average, a sharp run-up, a small company); what happened to the stock the last time it looked like this. It ends with what to do (check the registration yourself on SEBI's site, report on SEBI SCORES) and links to the Safety lessons.
 - **Compliance:** it never says a stock is good, safe, a buy or a sell. It reports red flags found and not found, and says Belfort cannot tell whether a trade will work.
 - **Done when:** text works offline with rules; a screenshot works with the user's own assistant key (vision); every check is a pure tested function with fixtures for the SEBI registers and the surveillance lists; it works in the running app.
 
@@ -293,9 +294,21 @@ Shared contracts every Phase 6 task uses:
 - **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** mobile · Built on Devansh's machine (Android SDK).
 - **Do:** a native Android app named Belfort with every part of the desktop app in a mobile-first interface, the same mascot, loader and animations, the same account (T43). Coordinated in `conversations.md` on the `collab` branch.
 
+### T50 · Belfort in Indian languages
+- **Owner:** Sarthak · **P0 · L · Status:** Ready (starts after T42 merges, to avoid touching every screen twice) · **Area:** ui, learn, assistant
+- **Why:** Belfort is for India, and most Indians are more at home in a language other than English.
+- **Do:** English stays the default and the first choice. A language picker on the intro, in settings and on Android: English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી, ಕನ್ನಡ.
+  - Every interface string comes from a catalogue (`belfort/static/i18n/<lang>.json`, also used by Android), with English as the fallback for any missing key.
+  - Lessons can have translated files (`content/learn/lessons/<lang>/<id>.md`); the Beginner stage ships in Hindi first. Where a translation is missing, the English lesson shows with an "Explain in <language>" button.
+  - Ask Belfort, Tip Check and the dictionary answer in the chosen language.
+  - Numbers use Indian grouping (1,00,000) in every language.
+- **Compliance:** translated lessons and catalogues are machine-drafted and must be read by a fluent speaker before release; the banned-wording check must run on every language (add translated banned phrases to the content checker, T12).
+- **Done when:** switching language changes the whole interface without a reload, the choice syncs with the account (T43), Hindi Beginner lessons pass the content checker, and tests cover fallback and number formatting.
+
 ### T49 · New exercise types in every lesson
-- **Owner:** Sarthak · **P1 · M · Status:** Blocked on T42 · **Area:** learn
+- **P1 · M · Owner:** Sarthak (agent) · **Status:** Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) · **Area:** learn
 - **Do:** add at least two exercises of the new types (tf, order, number) to every lesson, keeping the existing questions. Facts must match the lesson text.
+- **Result:** 97 new items across all 38 lessons: 45 number, 41 true/false, 11 order. Every lesson has at least two items of at least two types. `tests/test_learn_exercises.py` keeps it that way.
 
 ## Decisions (maintainers, not code)
 
@@ -311,6 +324,7 @@ Shared contracts every Phase 6 task uses:
 
 ## Done
 
+- T42 Gamified Learn: stage path, locks, cards, four exercise types, XP, streaks, hearts ([#37](https://github.com/sarthakviche/belfort/pull/37)).
 - v0.1 foundation (see README "What is built").
 - Production engineering setup: lint, format, coverage, pinned dependencies, CI on Windows and Linux, commit policy, conventions (PR #1).
 - T01 Onboarding steps checked on a clean clone and fixed ([#7](https://github.com/sarthakviche/belfort/pull/7)).
@@ -331,4 +345,5 @@ Shared contracts every Phase 6 task uses:
 - T18 Lessons: Journal module, trade journal, expectancy and calibration ([#25](https://github.com/sarthakviche/belfort/pull/25)).
 - T19 Lessons: Market context module, index trend and breadth, sectors, flows and events ([#26](https://github.com/sarthakviche/belfort/pull/26)).
 - T20 Lessons: Portfolio and Psychology modules, open risk, drawdown rules, biases and rules ([#27](https://github.com/sarthakviche/belfort/pull/27)).
+- T21 Lessons: Taxes and records module, capital gains on shares, records and filing ([#35](https://github.com/sarthakviche/belfort/pull/35)).
 - T22 Lessons: Safety module, tip scams, checking registration, myths ([#36](https://github.com/sarthakviche/belfort/pull/36)).

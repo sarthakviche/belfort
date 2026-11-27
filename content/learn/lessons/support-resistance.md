@@ -40,6 +40,8 @@ In this past chart, find the price that was tested most often from above. Where 
 [
   {"q": "What makes a support level more meaningful?", "options": ["A round number", "Several past swing lows near the same price", "A news headline"], "answer": 1, "why": "Repeated touches show buyers acted at that price more than once."},
   {"q": "Entry ₹100, stop ₹95, next resistance ₹110. What is the reward to risk?", "options": ["1", "2", "0.5"], "answer": 1, "why": "Reward is ₹10, risk is ₹5, so reward to risk is 2."},
-  {"q": "Support at ₹500 breaks decisively. What often happens to ₹500 afterwards?", "options": ["It becomes resistance", "It disappears from the chart", "It becomes stronger support"], "answer": 0, "why": "Broken support often acts as resistance when price returns to it."}
+  {"q": "Support at ₹500 breaks decisively. What often happens to ₹500 afterwards?", "options": ["It becomes resistance", "It disappears from the chart", "It becomes stronger support"], "answer": 0, "why": "Broken support often acts as resistance when price returns to it."},
+  {"type": "number", "q": "A plan has an entry at ₹400, a stop at ₹390 and a target at the next resistance, ₹430. What is the reward to risk?", "answer": 3, "tolerance": 0, "unit": "to 1", "why": "Distance to the target is ₹30 and distance to the stop is ₹10, so 30 ÷ 10 = 3. Belfort's rule wants at least 1.5."},
+  {"type": "tf", "q": "A support level is an exact rupee price where price will turn again.", "answer": false, "why": "Treat a level as a zone of about one daily range (ATR). Price rarely turns at the same paisa twice, and levels are not promises."}
 ]
 ```

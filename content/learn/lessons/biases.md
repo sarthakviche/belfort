@@ -41,6 +41,8 @@ Tag mistakes honestly in the Practice journal. Once a tag has at least 3 trades,
 [
   {"q": "After a large loss you place a bigger, unplanned trade to recover it the same day. What is this called?", "options": ["Revenge trading", "Position sizing", "Calibration"], "answer": 0, "why": "Trying to win back a loss quickly with bigger or unplanned trades is revenge trading."},
   {"q": "Which journal tag usually goes with loss aversion?", "options": ["Moved the stop", "Exited early", "Chased the entry"], "answer": 0, "why": "Loss aversion makes people move the stop lower to avoid taking a loss."},
-  {"q": "What is a simple test for a revenge or overconfident trade?", "options": ["Would I take it if my last trade had gone the other way?", "Did the stock rise today?", "Is someone online recommending it?"], "answer": 0, "why": "If the answer depends on the last result, emotion is driving the decision rather than the plan."}
+  {"q": "What is a simple test for a revenge or overconfident trade?", "options": ["Would I take it if my last trade had gone the other way?", "Did the stock rise today?", "Is someone online recommending it?"], "answer": 0, "why": "If the answer depends on the last result, emotion is driving the decision rather than the plan."},
+  {"type": "tf", "q": "If you skip a setup because one of your pre-order checks fails, the setup is usually gone for good tomorrow.", "answer": false, "why": "A good setup is usually still there tomorrow, while a bad decision cannot be undone."},
+  {"type": "order", "q": "Put the four pre-order check questions in the order the lesson asks them.", "items": ["Is this trade in my written plan, with a stop and a reason?", "Is the size the one the formula gives?", "Am I entering near the planned level, not chasing?", "Would I take this trade if my last trade had gone the other way?"], "why": "Plan first, then size, then entry level, and last the honest test about your previous trade."}
 ]
 ```

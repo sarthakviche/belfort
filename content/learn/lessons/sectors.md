@@ -41,6 +41,8 @@ A strong sector can turn quickly, and a weak one can stay weak far longer than e
 [
   {"q": "Over three months a sector rose 10% while the Nifty 50 rose 4%. How would you describe it?", "options": ["Weaker than the market", "Stronger than the market", "Certain to keep rising"], "answer": 1, "why": "It outperformed the index over that period. That describes the past three months, not the future."},
   {"q": "Why can three open trades in the same sector be riskier than they look?", "options": ["They tend to fall together when the sector turns", "Sectors have no effect on stocks", "Exchanges limit trades per sector"], "answer": 0, "why": "Stocks with shared drivers move together, so the trades behave more like one larger position."},
-  {"q": "What is relative strength?", "options": ["A company's profit growth", "How a stock or sector moved compared with the market", "The RSI indicator"], "answer": 1, "why": "Relative strength compares a stock's or sector's move with the index over the same period."}
+  {"q": "What is relative strength?", "options": ["A company's profit growth", "How a stock or sector moved compared with the market", "The RSI indicator"], "answer": 1, "why": "Relative strength compares a stock's or sector's move with the index over the same period."},
+  {"type": "number", "q": "Over 3 months a sector is +9% and the Nifty 50 is +3%. By how many percentage points is the sector ahead of the market?", "answer": 6, "tolerance": 0, "unit": "points", "why": "9 − 3 = 6 points ahead, which the lesson reads as stronger than the market."},
+  {"type": "tf", "q": "A sector that is strong against the market today will stay strong for the next few months.", "answer": false, "why": "Relative strength describes recent months only. A strong sector can turn quickly."}
 ]
 ```
