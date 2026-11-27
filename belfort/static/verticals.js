@@ -154,7 +154,7 @@ function renderPaper() {
       ${stat("Available points", num(d.available, 0), d.reserved ? `${num(d.reserved, 0)} held for pending orders` : "ready to use")}
       ${stat("Win rate", st.win_rate == null ? "n/a" : pctTxt(st.win_rate), `${st.closed} closed trades`)}
       ${stat("Average R", st.avg_r == null ? "n/a" : (st.avg_r >= 0 ? "+" : "") + st.avg_r, "result per trade, in units of risk")}
-      ${stat("Open risk", d.risk.total_pct == null ? "n/a" : `<span class="${d.risk.over_limit ? "down" : ""}">${d.risk.total_pct}%</span>`, `${num(d.risk.total_points, 0)} points if every stop is hit · limit ${d.risk.limit_pct}%`)}</div>
+      ${stat("Open risk", d.risk.total_pct == null ? "n/a" : `<span class="${d.risk.over_limit ? "down" : ""}">${d.risk.total_pct}%</span>`, `${num(d.risk.total_points, 0)} points if every stop is hit · limit ${d.risk.limit_pct}%${d.risk.unprotected ? ` · ${d.risk.unprotected} with no stop, counted in full` : ""}`)}</div>
     <div class="layout practice-layout">
       <div class="col-main">
         <div class="panel glass"><h3>Open positions</h3>${d.open.length ? `<div class="scroll"><table><thead><tr><th>Stock</th><th class="num">Qty</th><th class="num">Entry</th><th class="num">Last close</th><th class="num">Stop</th><th class="num">Target</th><th class="num">P&amp;L</th><th class="num">Now</th><th></th></tr></thead><tbody>
@@ -164,7 +164,7 @@ function renderPaper() {
             + (t.close_requested_on ? "" : manageRow(t))).join("")}</tbody></table></div>`
           : '<p class="missing">No open positions.</p>'}</div>
         ${d.pending.length ? `<div class="panel glass"><h3>Waiting to fill</h3><div class="scroll"><table><thead><tr><th>Stock</th><th>Order</th><th class="num">Qty</th><th class="num">Stop</th><th>Placed</th><th></th></tr></thead><tbody>
-          ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? "limit " + inr(t.limit_price) : "market, next open", num(t.qty, 0), inr(t.stop), esc(t.placed_on),
+          ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? "limit " + inr(t.limit_price) : "market, next open", num(t.qty, 0), t.stop == null ? '<span class="down">none</span>' : inr(t.stop), esc(t.placed_on),
             `<button type="button" class="btn ghost sm" data-close="${t.id}">Cancel</button>`])).join("")}</tbody></table></div></div>` : ""}
         ${equityPanel()}
         ${journalPanel()}
@@ -178,7 +178,7 @@ function renderPaper() {
       </div>
       <aside class="col-side">
         <form class="panel glass glow" id="order-form"><h3>New practice trade</h3>
-          <p class="hint">Long only, end-of-day fills. Decide the stop before you buy; it is required.</p>
+          <p class="hint">Long only, end-of-day fills. A stop-loss is optional but recommended: without one, the whole position is at risk and the trade has no R.</p>
           <div class="fields">
             <label class="wide">Stock<input name="symbol" required maxlength="80" placeholder="Type a company, e.g. HDFC Bank" data-stock-picker></label>
             <div class="wide ticket" id="ticket" hidden></div>
@@ -186,7 +186,7 @@ function renderPaper() {
             <label>Setup<select name="setup"><option value="">Not tagged</option>${Object.entries(P.an ? P.an.setups : {}).map(([k, v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join("")}</select></label>
             <label>Order<select name="entry_type"><option value="market">Market, next open</option><option value="limit">Limit</option></select></label>
             <label class="wide limit-only" hidden>Limit price (₹)<input name="limit_price" type="number" min="0" step="0.05"></label>
-            <label>Stop-loss (₹)<input name="stop" type="number" min="0" step="0.05" required></label>
+            <label>Stop-loss (₹, optional)<input name="stop" type="number" min="0" step="0.05" placeholder="recommended"></label>
             <label>Target (₹, optional)<input name="target" type="number" min="0" step="0.05"></label>
             <label>Risk per trade (%)<input id="risk-pct" type="number" min="0.1" max="10" step="0.1" value="1"></label>
             <div class="size-row"><button type="button" class="btn ghost sm" id="size-it">Size it</button></div>
@@ -228,12 +228,13 @@ function ticketEntry() {
 function updateRisk() {
   const f = $("order-form"), out = $("order-risk"); if (!f || !out) return;
   const entry = ticketEntry(), qty = +f.qty.value, stop = +f.stop.value;
-  if (!entry || !qty || !stop) { out.textContent = ""; return; }
-  if (stop >= entry) { out.innerHTML = `<span class="down">The stop must be below the entry (about ${inr(entry)}).</span>`; return; }
-  const risk = qty * (entry - stop), equity = P.pf ? P.pf.equity : 0, share = equity > 0 ? (risk / equity) * 100 : null;
+  if (!entry || !qty) { out.textContent = ""; return; }
+  if (stop && stop >= entry) { out.innerHTML = `<span class="down">The stop must be below the entry (about ${inr(entry)}).</span>`; return; }
+  const risk = stop ? qty * (entry - stop) : qty * entry, equity = P.pf ? P.pf.equity : 0, share = equity > 0 ? (risk / equity) * 100 : null;
   const max = P.pf ? P.pf.risk.trade_limit_pct : 2, limit = P.pf ? P.pf.risk.limit_pct : 6;
   const after = equity > 0 && P.pf ? ((P.pf.risk.total_points + risk) / equity) * 100 : null;
-  out.innerHTML = `This order risks <b>${num(risk, 0)} points</b>${share == null ? "" : `, <b class="${share > max ? "down" : ""}">${share.toFixed(2)}%</b> of the account`}, and uses ${num(qty * entry, 0)} points.`
+  out.innerHTML = (stop ? "" : `<span class="down">No stop-loss: the whole ${num(risk, 0)} points are at risk, and the trade will have no R.</span> `)
+    + `This order risks <b>${num(risk, 0)} points</b>${share == null ? "" : `, <b class="${share > max ? "down" : ""}">${share.toFixed(2)}%</b> of the account`}, and uses ${num(qty * entry, 0)} points.`
     + (after == null ? "" : ` Open risk after it: <b class="${after > limit ? "down" : ""}">${after.toFixed(2)}%</b> (limit ${limit}%).`)
     + (share != null && share > max ? ` <span class="down">That is more than ${max}% on one trade.</span>` : "")
     + (after != null && after > limit ? ` <span class="down">Together your open trades would risk more than ${limit}% of the account.</span>` : "");
@@ -300,18 +301,20 @@ function journalPanel() {
 
 /* ---- managing an open position: raise the stop, trail it, sell part ---- */
 function stopCell(t) {
+  if (t.current_stop == null) return '<span class="down">none</span><div class="src">whole position at risk</div>';
+  if (t.stop == null) return `${inr(t.current_stop)}<div class="src">added after entry</div>`;
   const raised = t.current_stop > t.stop;
   const trail = t.trail_kind ? `<div class="src">trailing ${t.trail_kind === "pct" ? t.trail_value + "%" : t.trail_value + " x ATR"}</div>` : "";
   return `${inr(t.current_stop)}${raised ? `<div class="src">raised from ${inr(t.stop)}</div>` : ""}${trail}`;
 }
 function manageRow(t) {
   return `<tr class="manage-row" id="manage-${t.id}" hidden><td colspan="9"><div class="manage">
-    <label>Raise stop to (₹)<span class="inline"><input type="number" step="0.05" min="${t.current_stop}" data-raise-input="${t.id}" placeholder="above ${num(t.current_stop)}"><button type="button" class="btn ghost sm" data-raise="${t.id}">Raise</button></span></label>
+    <label>${t.current_stop == null ? "Set a stop at (₹)" : "Raise stop to (₹)"}<span class="inline"><input type="number" step="0.05" min="${t.current_stop || 0}" data-raise-input="${t.id}" placeholder="${t.current_stop == null ? "below the last close" : "above " + num(t.current_stop)}"><button type="button" class="btn ghost sm" data-raise="${t.id}">${t.current_stop == null ? "Set" : "Raise"}</button></span></label>
     <label>Trailing stop<span class="inline"><select data-trail-kind="${t.id}"><option value="pct" ${t.trail_kind === "pct" ? "selected" : ""}>% below close</option><option value="atr" ${t.trail_kind === "atr" ? "selected" : ""}>x ATR below close</option></select>
       <input type="number" step="0.1" min="0.5" data-trail-value="${t.id}" value="${t.trail_value || ""}" placeholder="e.g. 8 or 2"><button type="button" class="btn ghost sm" data-trail="${t.id}">Set</button>
       ${t.trail_kind ? `<button type="button" class="btn ghost sm" data-trail-off="${t.id}">Off</button>` : ""}</span></label>
     <label>Sell part (shares)<span class="inline"><input type="number" step="1" min="1" max="${t.qty - 1}" data-sell-input="${t.id}" placeholder="1 to ${t.qty - 1}"><button type="button" class="btn ghost sm" data-sell="${t.id}">Sell at next open</button></span></label>
-    <p class="hint">Changes apply from the next session. A stop only moves up; R is still measured against the original stop of ${inr(t.stop)}.</p>
+    <p class="hint">Changes apply from the next session. A stop only moves up; ${t.stop == null ? "this trade was placed without a stop, so it has no R." : `R is still measured against the original stop of ${inr(t.stop)}.`}</p>
   </div></td></tr>`;
 }
 async function manage(path, body) {
@@ -360,7 +363,7 @@ $("practice-body").addEventListener("submit", async (e) => {
   const f = new FormData(e.target), val = (k) => (f.get(k) === "" || f.get(k) == null ? null : f.get(k));
   try {
     if (e.target.id === "order-form") {
-      const r = await post("/api/practice/trades", { symbol: val("symbol"), qty: +val("qty"), stop: +val("stop"), target: val("target") ? +val("target") : null,
+      const r = await post("/api/practice/trades", { symbol: val("symbol"), qty: +val("qty"), stop: val("stop") ? +val("stop") : null, target: val("target") ? +val("target") : null,
         setup: val("setup"), entry_type: val("entry_type"), limit_price: val("limit_price") ? +val("limit_price") : null, confidence: +val("confidence") / 100, thesis: val("thesis") || "" });
       status(r.message); loadPractice();
     } else if (e.target.id === "predict-form") {

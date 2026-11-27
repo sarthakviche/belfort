@@ -394,7 +394,6 @@ function levels(d) {
       <td class="no-gloss">${p.points.map((q) => `${esc(q.role)}: ${inr(q.price)} on ${esc(q.date)}`).join("<br>")}</td></tr>`).join("")
     : `<tr><td colspan="7" class="missing">No pattern detected on the current chart.</td></tr>`;
   const fib = t.fib ? `<p>${fibText(t.fib, t.trend.close)}</p><div class="mini-chart" id="fib-chart"></div>
-      <div class="fib-keys">${t.fib.levels.map((l) => `<span><b>${(l.ratio * 100).toFixed(1)}%</b> ${inr(l.price)}</span>`).join("")}</div>
       <div class="src">Fibonacci levels are fixed fractions of the swing, drawn as lines. They are a common reference, not a forecast, and are not part of the rule.</div>`
     : `<p>${missing("too little history for a swing")}</p>`;
   return `<h4>Support and resistance</h4>
@@ -459,12 +458,33 @@ function drawLevelCharts(d) {
       const bars = d.chart.candles.slice(i);
       const s = c.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444", priceLineVisible: false });
       s.setData(bars);
-      const line = (price, title, color, style) => s.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title });
-      line(f.high, "swing high", "rgba(244,244,242,.6)", 0);
-      line(f.low, "swing low", "rgba(244,244,242,.6)", 0);
-      f.levels.forEach((l) => line(l.price, (l.ratio * 100).toFixed(1) + "%", "#facc15", 2));
-      s.setMarkers([{ time: f.high_date, position: "aboveBar", color: "#f4f4f2", shape: "arrowDown", text: "high" },
-        { time: f.low_date, position: "belowBar", color: "#f4f4f2", shape: "arrowUp", text: "low" }].sort((a, b) => (a.time < b.time ? -1 : 1)));
+      /* One label per line, on the line itself (ratio and price), so the right axis keeps only the price scale and
+         today's close. Swing high and low are solid; the retracement levels dashed, from light to strong yellow. */
+      const line = (price, title, color, style, width = 1) =>
+        s.createPriceLine({ price, color, lineWidth: width, lineStyle: style, axisLabelVisible: false, title, lineVisible: true });
+      line(f.high, `swing high ${num(f.high, 2)}`, "rgba(244,244,242,.55)", 0);
+      line(f.low, `swing low ${num(f.low, 2)}`, "rgba(244,244,242,.55)", 0);
+      const shade = { 0.236: ".45", 0.382: ".6", 0.5: ".75", 0.618: ".9", 0.786: ".6" };
+      f.levels.forEach((l) => line(l.price, `${(l.ratio * 100).toFixed(1)}%  ${num(l.price, 2)}`, `rgba(250,204,21,${shade[l.ratio] || ".7"})`, 2));
+      s.priceScale().applyOptions({ scaleMargins: { top: 0.06, bottom: 0.06 } });
+      s.setMarkers([{ time: f.high_date, position: "aboveBar", color: "#f4f4f2", shape: "circle", size: 0.6 },
+        { time: f.low_date, position: "belowBar", color: "#f4f4f2", shape: "circle", size: 0.6 }].sort((a, b) => (a.time < b.time ? -1 : 1)));
+      // Labels at the left end of each line, placed from the chart's own price scale and kept in place on resize.
+      const el = $("fib-chart"), marks = [
+        { price: f.high, text: `swing high ${inr(f.high)}`, cls: "edge" }, { price: f.low, text: `swing low ${inr(f.low)}`, cls: "edge" },
+        ...f.levels.map((l) => ({ price: l.price, text: `${(l.ratio * 100).toFixed(1)}%  ${inr(l.price)}`, cls: "" }))];
+      const place = () => {
+        el.querySelectorAll(".fib-label").forEach((n) => n.remove());
+        marks.forEach((m) => {
+          const y = s.priceToCoordinate(m.price);
+          if (y == null) return;
+          const n = document.createElement("span");
+          n.className = `fib-label ${m.cls}`; n.textContent = m.text; n.style.top = `${y}px`;
+          el.appendChild(n);
+        });
+      };
+      requestAnimationFrame(place);
+      new ResizeObserver(() => requestAnimationFrame(place)).observe(el);
       c.timeScale().fitContent();
     }
   }

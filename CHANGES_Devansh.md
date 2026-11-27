@@ -406,6 +406,54 @@ Wiping the whole cache on every start would also throw away 5 years of prices fo
 - Positional, then Swing, then a capital change: still at 1200px each time.
 - Opening TCS: back at the top.
 
+## 17. Stop-loss optional in Practice, and a cleaner Fibonacci chart ✅
+
+### Stop-loss is now optional
+
+The order form said "Decide the stop before you buy; it is required." It now reads "Stop-loss (₹, optional)", with a hint that a stop is recommended.
+
+**How a trade without a stop is handled:**
+- **Open risk.** The whole position value counts as risk, because nothing limits the loss. The 2% per-trade and 6% total warnings still work. The Open risk card says how many positions have no stop.
+- **Placing the order.** It is accepted with a first warning: "No stop-loss: nothing limits the loss on this trade, so its whole value counts as risk, and it has no R in your journal. You can add a stop once it is open." The live preview on the form says the same before you place it.
+- **Settlement.** Nothing closes the trade on a fall. Target, "Exit", and a stop or trailing stop added later all still work.
+- **R and the journal.** The trade has no R. Win rate and average R leave it out, the same way they already left out trades without R.
+- **Manage.** "Raise stop" becomes "Set a stop" for these trades. The stop column shows "none – whole position at risk", or "added after entry" once you set one.
+- **Unchanged:** "Size it" still needs a stop, because it sizes by the distance to the stop. Chart replay still asks for a stop, because it is scored in R.
+- **Database.** Migration 7 rebuilds the trades table so the stop can be empty. Every existing trade, with all its fields, is copied across.
+- **Backups.** Backups without a stop are accepted.
+
+**Code:**
+- `core/db.py`: migration 7.
+- `practice/engine.py`: settlement and `r_multiple`.
+- `practice/service.py`: `current_stop`, `raise_stop`, open risk, `place_trade`.
+- `practice/router.py`, `practice/backup.py`.
+- `static/verticals.js`.
+- `docs/ABOUT.md`.
+- **Tests:** `tests/test_optional_stop.py`, 8 tests:
+  - no stop means no exit on a fall;
+  - a stop added later applies from the next session;
+  - a trailing stop works with no initial stop;
+  - no stop means no R;
+  - the API accepts an order with a warning;
+  - open risk counts the whole value;
+  - a stop can be set later;
+  - the migration keeps old trades.
+
+**Worth deciding:** the Learn lessons teach "decide the stop before you buy". The app still recommends a stop, but it no longer enforces one.
+
+### Fibonacci chart
+
+**Before:** each level had two boxes on the right axis (ratio and price). Big "high" and "low" arrows stretched the price scale, so the candles were squashed.
+
+**Now:**
+- **Labels.** Each line has one small label at its left end, e.g. "38.2% ₹794.28" and "swing high ₹871.60". The right axis shows only the price scale and today's close.
+- **Swing points.** The swing high and low are small dots.
+- **Lines.** The levels are dashed yellow lines, stronger toward 61.8%.
+- **Size.** The candles use the full chart height, and the chart is taller.
+- **Tags.** The row of level tags under the chart was removed, since the lines are now labelled.
+
+**Checked in the app** on HDFC Bank.
+
 ---
 
 ## Open items for you
