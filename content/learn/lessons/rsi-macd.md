@@ -42,6 +42,8 @@ The report's momentum line reads like this: "RSI(14) is 64 (in the middle of its
 [
   {"q": "RSI(14) has been above 70 for three weeks while the stock makes higher highs. What does that tell you?", "options": ["A fall must start now", "Gains have been much larger than losses recently", "The company's profits rose"], "answer": 1, "why": "RSI only compares recent up and down moves. In strong uptrends it can stay above 70 for a long time."},
   {"q": "What is MACD built from?", "options": ["Volume and delivery", "The difference between a 12-day and a 26-day average of price", "Quarterly profits"], "answer": 1, "why": "MACD is the fast exponential average minus the slow one; its 9-day average is the signal line."},
-  {"q": "Does RSI or MACD change Belfort's label?", "options": ["Yes, RSI above 70 excludes the trade", "No, they are shown as context only", "Only MACD does"], "answer": 1, "why": "The label comes from checks that connect to a stop and a size. Momentum is shown for context."}
+  {"q": "Does RSI or MACD change Belfort's label?", "options": ["Yes, RSI above 70 excludes the trade", "No, they are shown as context only", "Only MACD does"], "answer": 1, "why": "The label comes from checks that connect to a stop and a size. Momentum is shown for context."},
+  {"type": "number", "q": "A stock's 12-day exponential average is ₹505 and its 26-day exponential average is ₹498. What is its MACD?", "answer": 7, "tolerance": 0, "unit": "₹", "why": "MACD is the 12-day average minus the 26-day one: 505 − 498 = 7."},
+  {"type": "tf", "q": "An RSI reading above 70 means the rise is over and a fall is coming.", "answer": false, "why": "In a strong uptrend RSI can stay above 70 for weeks. A high reading describes a fast rise; it does not say the rise is over."}
 ]
 ```

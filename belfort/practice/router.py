@@ -23,7 +23,7 @@ def _guard(fn, *a, **k):
 class TradeIn(BaseModel):
     symbol: str = Field(min_length=1, max_length=30)
     qty: int = Field(gt=0, le=10_000_000)
-    stop: float = Field(gt=0)
+    stop: float | None = Field(default=None, gt=0)  # optional: no stop means the whole position is at risk
     target: float | None = Field(default=None, gt=0)
     thesis: str = Field(default="", max_length=2000)
     confidence: float | None = Field(default=None, ge=0.5, le=0.99)

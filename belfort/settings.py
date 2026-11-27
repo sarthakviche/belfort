@@ -50,8 +50,36 @@ STYLES = {
 }
 
 MIN_REWARD_TO_RISK = 1.5
+# Support and resistance: swing points within this many ATRs of a zone's lowest point form one level; levels come from
+# this many recent daily bars (about one year for swing, two for positional); 3 or more swing points make a strong level.
+LEVEL_ZONE_ATR = 0.75
+LEVEL_LOOKBACK_BARS = {"swing": 260, "positional": 500}
+
+
+def level_span(style_key: str) -> str:
+    """The level lookback in words, for sentences such as "in the last year of swings"."""
+    years = round(LEVEL_LOOKBACK_BARS[style_key] / 250)
+    return "the last year" if years <= 1 else f"the last {years} years"
+
+
+LEVEL_STRONG_TOUCHES = 3
 BREAKOUT_VOLUME = 1.5  # times the 20-day average
 TICK = 0.05
+# Context for the checks (research/analysis/context.py). A run is a rise of at least RUN_MIN_PCT from the lowest low of
+# the last RUN_LOOKBACK_BARS sessions; a sideways range (base) is at least BASE_MIN_BARS sessions whose high-to-low
+# range stays within BASE_MAX_RANGE_PCT, searched back up to BASE_MAX_BARS sessions.
+# Weekly chart: averages in weeks (10 and 40 weeks are about the 50 and 200-day averages).
+WEEKLY_FAST = 10
+WEEKLY_SLOW = 40
+# Bars of RSI, MACD and ATR history sent for the momentum charts in the Levels section (about a year).
+MOMENTUM_CHART_BARS = 250
+RUN_LOOKBACK_BARS = 40
+RUN_MIN_PCT = 8.0
+BASE_MIN_BARS = 20
+BASE_MAX_BARS = 400
+BASE_MAX_RANGE_PCT = 15.0
+PROFILE_MAX_CHARS = 420  # the company description at the top of a report, cut at a sentence
+QUARTER_STALE_DAYS = 200  # a newest quarter older than this means the fundamentals source is behind
 
 # Labels describe whether a fixed rule's conditions hold. They are not buy or sell words.
 LABEL_VALID = "Conditions met"
@@ -90,6 +118,7 @@ TRAIL_ATR_RANGE = (
 )  # allowed trailing distance in ATR multiples  # about three months of sessions on the order ticket's mini chart
 # ---------------- Stock search (the picker) ----------------
 SEARCH_LIMIT = 8  # rows in the picker dropdown
+NIFTY_MIN_MEMBERS = 45  # an official Nifty 50 file with fewer symbols than this is treated as broken
 SEARCH_MIN_INITIALS = 2  # "hul" matches Hindustan Unilever from two letters up
 SEARCH_MIN_SUBSTRING = 3  # shorter queries only match prefixes, to keep the list relevant
 SEARCH_MIN_FUZZY = 4  # typo tolerance starts at four characters
@@ -101,3 +130,34 @@ AI_MAX_OUTPUT_TOKENS = 800
 AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
 
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}
+
+# Learn game (T42). XP, hearts and streaks are virtual: never redeemable, never bought.
+STAGES = ("beginner", "intermediate", "advanced")
+STAGE_PASS_RATIO = 0.8  # a stage test or the placement test unlocks the next stage at this score or more
+LESSON_PASS_RATIO = 0.6  # a lesson quiz at this score or more completes the lesson
+HEARTS_MAX = 5  # refilled every day, or by finishing a Weak spots review
+XP_LESSON = 10
+XP_LESSON_NO_MISTAKES = 5  # bonus
+XP_LESSON_REPEAT = 5  # replaying a lesson that is already done
+XP_TEST = 20  # first pass of a checkpoint or a stage test
+XP_WEAK_SPOTS = 5
+DAILY_GOALS = (10, 20, 50)
+DEFAULT_DAILY_GOAL = 20
+STREAK_FREEZE_EVERY = 7  # one freeze is earned each time the streak reaches a multiple of this
+STREAK_FREEZE_MAX = 2
+PLACEMENT_QUESTIONS = 12
+STAGE_TEST_QUESTIONS = 12
+CHECKPOINT_QUESTIONS = 8
+WEAK_SPOTS_QUESTIONS = 8
+# ---------------- Tip Check (T44) ----------------
+TIP_MAX_CHARS = 5000  # longest tip text read
+TIP_TIME_BUDGET_SECONDS = 8.0  # data checks still running after this are reported as "could not check"
+TIP_VOLUME_SPIKE = 5.0  # a session's volume at least this many times its 50-session average
+TIP_VOLUME_RECENT_BARS = 5  # the spike must be in this many most recent sessions
+TIP_VOLUME_BASE_BARS = 50  # average volume is taken over this many sessions before the recent ones
+TIP_RUNUP_SHORT = (20, 0.30)  # a rise of at least 30% in 20 sessions...
+TIP_RUNUP_LONG = (60, 0.60)  # ...or at least 60% in 60 sessions counts as a sharp run-up
+TIP_SMALL_CAP_CRORE = 5000  # market value below this (in crore rupees) counts as a small company
+TIP_HISTORY_GAP_BARS = 60  # sessions after a past pump signature that Tip Check reports on
+TIP_SURVEILLANCE_LOOKBACK_DAYS = 7  # how many weekdays back to look for NSE's latest surveillance file
+TIP_IMAGE_MAX_BYTES = 5_000_000  # largest screenshot accepted

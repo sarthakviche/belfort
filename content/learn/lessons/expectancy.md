@@ -43,6 +43,9 @@ Practice charges about 0.05% each way to stand in for brokerage and taxes. Small
 [
   {"q": "Win rate 40%, average win +2R, average loss −1R. What is the expectancy?", "options": ["+0.2R", "+0.8R", "−0.2R"], "answer": 0, "why": "0.40 × 2 − 0.60 × 1 = 0.8 − 0.6 = +0.2R per trade."},
   {"q": "A plan wins 80% of trades but averages +0.3R on wins and −1.5R on losses. Over time it…", "options": ["Makes money because it wins often", "Loses a little per trade on average", "Breaks even exactly"], "answer": 1, "why": "0.8 × 0.3 − 0.2 × 1.5 = 0.24 − 0.30 = −0.06R per trade."},
-  {"q": "After 6 trades your Average R is +1.1. What should you conclude?", "options": ["The plan is proven", "It is too few trades to say much", "Double the risk per trade"], "answer": 1, "why": "Six trades can be lucky or unlucky. Expectancy needs many trades before it is reliable."}
+  {"q": "After 6 trades your Average R is +1.1. What should you conclude?", "options": ["The plan is proven", "It is too few trades to say much", "Double the risk per trade"], "answer": 1, "why": "Six trades can be lucky or unlucky. Expectancy needs many trades before it is reliable."},
+  {"type": "number", "q": "A plan wins 40% of the time with an average win of +2R and an average loss of −1R. What is its expectancy in R?", "answer": 0.2, "tolerance": 0.005, "unit": "R", "why": "0.40 × 2 − 0.60 × 1 = 0.8 − 0.6 = +0.2R."},
+  {"type": "number", "q": "A plan wins 60% of the time with an average win of +0.5R and an average loss of −1.5R. What is its expectancy in R?", "answer": -0.3, "tolerance": 0.005, "unit": "R", "why": "0.60 × 0.5 − 0.40 × 1.5 = 0.3 − 0.6 = −0.3R. A high win rate does not make a plan work."},
+  {"type": "tf", "q": "A plan that wins 80% of its trades is bound to make money over time.", "answer": false, "why": "Plan B in the lesson wins four trades in five and still loses, because each loss wipes out five wins."}
 ]
 ```

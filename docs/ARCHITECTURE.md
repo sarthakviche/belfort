@@ -59,12 +59,17 @@ belfort/
     universe.py           built-in large caps with sectors
     symbols.py            company search index: names, initials, aliases, typos; last close per symbol
   research/               the stock report (from Belfort AI): analysis/, backtest/, screens.py, router.py
-  learn/                  curriculum.py (syllabus, Markdown renderer, quizzes, streaks), router.py
+  learn/                  curriculum.py (syllabus, Markdown renderer, cards, four exercise types, grading), engine.py (pure game rules:
+                          XP, streak and freezes, hearts, stage unlocks, the path), game.py (SQLite layer, locks, tests, weak spots), router.py
   practice/               engine.py (pure settlement and scoring), service.py (accounts, journal, replay), router.py
   news/                   feeds.py (RSS reader, categories, company tags, tip filter), router.py
-  assistant/              chat.py (bring-your-own-key provider adapter), router.py
-  static/                 index.html, app.js (shell + research), verticals.js (learn, practice, news, settings),
-                          stock-picker.js (reusable company picker), style.css
+  assistant/              chat.py (bring-your-own-key provider adapter), vision.py (screenshot to text, same keys), router.py
+  tipcheck/               rules.py (pure red-flag checks), phrases.json (tip wording by language), strings.py (every
+                          sentence it shows), sources.py (NSE surveillance file, SEBI register copy), register.py
+                          (import SEBI's lists), service.py, router.py
+  static/                 index.html, app.js (shell + research), verticals.js (practice, news, settings),
+                          learn-game.js and learn-game.css (the Learn path, lesson player and rewards),
+                          stock-picker.js (reusable company picker), tipcheck.js and tipcheck.css (Tip Check), style.css
 content/
   learn/syllabus.json     tracks -> modules -> lessons
   learn/lessons/*.md      one lesson per file, with a quiz block
@@ -78,9 +83,11 @@ tests/                    offline tests; no network, every source replaced by sy
 | Vertical | What it does | Key design decision |
 |---|---|---|
 | **Research** | Per-stock report: rule checklist, levels, patterns with measured reliability, business check, position size. Screens built from published criteria. | Labels are descriptive ("Conditions met", "Partly met", "Rule excludes"), never buy or sell words. |
-| **Learn** | A screened syllabus in three tracks, short lessons, quizzes graded on the server, streaks, lessons that jump into Practice. | Charts in lessons only use prices at least 30 days old (`market.lagged`), following SEBI's 2026 education norms. |
+| **Learn** | A screened syllabus shown as a path in three stages (Beginner, Intermediate, Advanced), short lessons split into cards, exercises (multiple choice, true or false, order, number) graded on the server, XP, a daily goal, a streak with freezes, hearts and a Weak spots review, lessons that jump into Practice. Later stages are locked by the API until a stage test or the placement test is passed at 80%. | Charts in lessons only use prices at least 30 days old (`market.lagged`), following SEBI's 2026 education norms. |
 | **Practice** | Paper account (long only, end-of-day fills, costs), prediction journal scored with the Brier score, chart-replay trainer on hidden historical charts. | Pure settlement engine with no I/O, so every fill rule is unit-tested. Points can never be redeemed. |
 | **News** | Public RSS feeds merged, de-duplicated, categorised, tagged with companies, explained on demand. | Shows only what the feed provides and links out. Headlines that relay buy/sell calls or targets are hidden by default. |
+
+**Tip Check** (T44) reads a forwarded stock tip and reports red flags found and not found. The text checks are pure functions over `tipcheck/phrases.json`, so they work offline and new languages are data, not code. The stock checks read NSE's daily regulatory-indicator file (`REG1_IND<ddmmyy>.csv` on nsearchives, one column per surveillance measure, 100 meaning not under it), daily bars and market value, in parallel with an eight-second budget; anything slower is shown as not checked. SEBI has no download for its adviser and analyst registers, so Belfort compares numbers with a local copy the user imports (`python -m belfort.tipcheck.register`), stored in the data folder. A screenshot is turned into text by `assistant/vision.py` with the user's own key, and the user sees that text before the rules run. The tip's own words are shown only as quoted evidence (`data-quoted-tip`); Belfort's wording lives in `tipcheck/strings.py` and is tested for banned phrases.
 
 The **assistant** serves all four: the page sends the context on screen (a report, a lesson, or a news headline and description) and the mode, plus the user's own provider and key in `X-AI-*` headers.
 
@@ -101,6 +108,37 @@ The **assistant** serves all four: the page sends the context on screen (a repor
 | Content | Markdown files in the repo | Same, plus a content linter in CI (quiz shape, banned wording, lagged charts) and translations (Hindi first) |
 | Quality | 81 unit and API tests; Ruff, coverage, audit and policy checks in GitHub Actions on Windows and Linux | Browser smoke tests (Playwright), accessibility checks, release checklist |
 | Hosting | None | A **static** docs and landing site only. A hosted Research service is deliberately not planned: per-stock labels served for money would fall under SEBI's research analyst rules. Hosting shared, non-personal content (lessons, news) is possible later. |
+
+## Languages
+
+Belfort speaks English (the default and the first choice), हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ (T50). The Android app reuses the same files.
+
+**Catalogues** are `belfort/static/i18n/<lang>.json`, one flat JSON object per language (`en`, `hi`, `mr`, `bn`, `ta`, `te`, `gu`, `kn`):
+
+```json
+{
+ "_meta": {"status": "machine-draft, needs review by a fluent speaker", "language": "hi", "name": "Hindi", "native": "हिन्दी"},
+ "learn.hearts.empty": "आपके दिल खत्म हो गए हैं",
+ "learn.min": "{n} मिनट"
+}
+```
+
+- Keys are dot-namespaced (`nav.learn`, `learn.hearts.empty`, `pr.col_stock`, `server.locked`). Values are plain text with `{name}` placeholders; a few values carry simple HTML (`<b>`, `<em>`, `<kbd>`) and are inserted as HTML, so catalogues are trusted files in the repo, never user input.
+- `en.json` is the source of truth. Other files may be partial: a missing key falls back to English, then to the key itself. Keys starting with `_` are metadata.
+- Plurals: when the call passes `n` equal to 1 and a `<key>_one` exists, that is used; otherwise the plain key.
+- A placeholder value that starts with `@` is itself a key (`stage="@stage.beginner"`), translated first.
+- Numbers use Indian grouping (1,00,000) and Latin digits in every language, through `Intl.NumberFormat("en-IN")` (`formatNumber`, `formatMoney`). Translators keep market terms such as stop-loss, SEBI, NSE and P/E in English.
+- `python -m belfort.core.i18n [lang]` reports unknown keys and changed placeholders or HTML tags; CI runs the same check in `tests/test_i18n.py`.
+
+**Web.** `static/i18n.js` loads first. `t(key, vars, fallback)` (alias `T`), `setLanguage(lang)` (re-renders without a reload and fires `belfort:language` on `document`; app views listen and redraw), `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria` and `data-i18n-title` for static markup, `lang` and `dir` on `<html>`. The choice is kept in `localStorage` (`belfort.lang`) and in SQLite through `GET/PUT /api/settings/language` (the `settings` table, with a `user_id` column; T43 syncs it as the non-secret key `language`). Pickers: language chips on the first-open intro and in Settings, and a select in the header. Every API call sends `X-Belfort-Lang`.
+
+**Server.** `belfort/core/i18n.py` reads the same catalogues for server messages (`tr(lang, key, **vars)`), sets the request language from `X-Belfort-Lang`, `?lang=` or `Accept-Language` (a small ASGI middleware), and builds the "Reply in <language>." sentence that Ask Belfort and the dictionary's Ask add to their question. Errors that carry a catalogue key (locked stage, out of hearts) are said in the learner's language and send the key in an `X-Error-Key` header so the page does not have to match words.
+
+**Lessons.** `content/learn/lessons/<lang>/<id>.md` has the same format and the same quiz structure and answers as the English file, with only the text translated and `translation: machine-draft` in the front matter. The API serves it when the request language matches and falls back to the English file otherwise (the response says `translated`); the page then offers "Explain in <language>", which asks the existing assistant to explain the current card, labelled as AI. Grading uses the same language as the text that was shown. Beginner lessons (16) ship in Hindi.
+
+**Compliance.** Banned promise-style phrases for a language are data in `content/compliance/banned.<lang>.json` (Hindi so far), loaded by `core/i18n.py`; `core/compliance.py` is unchanged. The lesson tests run that list on every translated lesson, and an AI answer containing one is replaced. Changes to compliance wording need Sarthak's review.
+
+**Not translated yet.** Text that the Python engines write (verdicts, rule explanations, chart reading, glossary meanings, news headlines, practice notes) is still English; labels, headings, tables, buttons and all messages around them are translated.
 
 ## Extension points for contributors
 

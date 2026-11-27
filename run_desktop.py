@@ -26,6 +26,7 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 PREFERRED_PORT = int(os.environ.get("BELFORT_PORT", "8766"))  # 8765 is the older Belfort AI
 WINDOW_TITLE = "Belfort"
+SPLASH_MIN_SECONDS = 2.3  # the loader animation (belfort/static/splash.css) takes about this long
 LR_LOADFROMFILE, IMAGE_ICON, WM_SETICON = 0x10, 1, 0x80  # Win32 constants for the window icon
 
 # A windowed app has no console, so stdout/stderr are None and logging would crash the server.
@@ -98,21 +99,44 @@ def set_icon():
         pass
 
 
+def splash_url() -> str | None:
+    """The loader page, loaded from disk so the window is never blank while the server starts."""
+    page = ROOT / "belfort" / "static" / "splash.html"
+    return page.as_uri() if page.is_file() else None
+
+
+def app_url(port: int) -> str:
+    return f"http://127.0.0.1:{port}/?splash=0"  # splash=0: the loader already played in this window
+
+
+def navigate_when_ready(window, port: int, started: float, ready=wait_ready, min_seconds: float = SPLASH_MIN_SECONDS) -> bool:
+    """Once the server answers and the loader has played, replace it with the app."""
+    ok = ready(port)
+    while (left := min_seconds - (time.monotonic() - started)) > 0:
+        time.sleep(left)  # loop: on Windows sleep can wake a tick before the clock agrees
+    if ok:
+        window.load_url(app_url(port))
+    else:
+        window.load_html(
+            "<body style='background:#000;color:#f5f5f4;font:16px sans-serif;padding:40px'>Belfort could not start its server. Close this window and try again.</body>"
+        )
+    return ok
+
+
 def main():
     server = None
     port = PREFERRED_PORT
     if port_in_use(port) and not is_belfort(port):
         port = free_port()  # something else (for example the older Belfort AI) holds the port
     if not port_in_use(port):  # already running? just open a window on it
-        server = start_server(port)
-        if not wait_ready(port):
-            sys.exit("Belfort: the server did not start.")
-    url = f"http://127.0.0.1:{port}"
+        server = start_server(port)  # keeps starting while the loader plays
 
     try:
         import webview
     except ImportError:  # no pywebview: fall back to an Edge app window
-        subprocess.Popen(["msedge", f"--app={url}"])
+        if not wait_ready(port):
+            sys.exit("Belfort: the server did not start.")
+        subprocess.Popen(["msedge", f"--app=http://127.0.0.1:{port}"])
         if server:
             while True:
                 time.sleep(3600)
@@ -126,8 +150,20 @@ def main():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Belfort.App")
     except Exception:
         pass
-    webview.create_window(WINDOW_TITLE, url, width=1500, height=950, min_size=(1000, 650), background_color="#08080a")
-    webview.start(set_icon, private_mode=False, storage_path=str(store))
+    started = time.monotonic()
+    first = splash_url()
+    if not first and not wait_ready(port):  # no loader page: wait so the window is not blank
+        sys.exit("Belfort: the server did not start.")
+    window = webview.create_window(
+        WINDOW_TITLE, first or app_url(port), width=1500, height=950, min_size=(1000, 650), background_color="#000000"
+    )
+
+    def on_start():
+        threading.Thread(target=set_icon, daemon=True).start()
+        if first:
+            navigate_when_ready(window, port, started)
+
+    webview.start(on_start, private_mode=False, storage_path=str(store))
     if server:
         server.should_exit = True
 

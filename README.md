@@ -34,13 +34,13 @@ Most people meet the market through tip groups and paid "signals". Belfort works
 <td width="33%" valign="top">
 
 ### Learn
-3 tracks, 12 modules, 38 lessons planned (33 written). Five-to-eight-minute lessons with a graded quiz, streaks, and charts that only use prices at least 30 days old.
+38 lessons on a path of three stages (Beginner, Intermediate, Advanced), with multiple-choice, true or false, put-in-order and number exercises, XP, a daily streak and hearts. Charts only use prices at least 30 days old.
 
 </td>
 <td width="33%" valign="top">
 
 ### Practice
-Paper trading with virtual points (a stop is required), a prediction journal scored with a Brier score, and a chart-replay trainer that hides the company and the future.
+Paper trading with virtual points (a stop-loss is optional but recommended), a prediction journal scored with a Brier score, and a chart-replay trainer that hides the company and the future.
 
 </td>
 <td width="33%" valign="top">
@@ -56,6 +56,8 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 - **Patterns shown, not scored.** A five-year backtest on 47 large NSE stocks found a weak, mixed edge, so patterns appear with that evidence but stay out of the label.
 - **Position size rounds down.** A stopped-out loss never exceeds your stated risk.
 - **Explains, never advises.** No buy, sell or hold words, no price predictions, and the app never places orders. Practice points are never redeemable.
+- **Tip Check and a dictionary.** Paste a stock tip and see its red flags (registration, promised returns, surveillance lists); search any market term.
+- **Eight languages.** English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ, switchable without a reload. Translations are machine drafts for now.
 - **Bring your own AI key.** Optional explainer chat with Gemini, any OpenAI-compatible service, or a local Ollama model. Replies pass the same wording filter.
 - **Source and date on every figure.** Prices are end-of-day. Missing data is shown as missing.
 

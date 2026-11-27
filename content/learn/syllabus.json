@@ -24,7 +24,7 @@
       "summary": "How the market works for you, how to read a chart, and why risk comes before everything else.",
       "modules": [
         {
-          "id": "market-basics", "title": "How the market works for you",
+          "id": "market-basics", "title": "How the market works for you", "stage": "beginner",
           "why": "You cannot plan a trade without knowing how orders fill, when money settles and what each trade costs.",
           "lessons": [
             {"id": "what-is-a-share", "title": "What you own when you buy a share", "minutes": 5},
@@ -34,7 +34,7 @@
           ]
         },
         {
-          "id": "reading-charts", "title": "Reading a price chart",
+          "id": "reading-charts", "title": "Reading a price chart", "stage": "beginner",
           "why": "The chart is where entries, stops and exits are planned.",
           "lessons": [
             {"id": "candles", "title": "Candles: one session in one shape", "minutes": 6},
@@ -45,7 +45,7 @@
           ]
         },
         {
-          "id": "risk-first", "title": "Risk comes first",
+          "id": "risk-first", "title": "Risk comes first", "stage": "beginner",
           "why": "Most beginner accounts are lost to position size, not to bad stock picks.",
           "lessons": [
             {"id": "position-sizing", "title": "Position sizing: the 1% rule", "minutes": 8},
@@ -61,7 +61,7 @@
       "summary": "Swing and positional setups, a business sanity check, the indicators worth knowing, and the journal that makes you better.",
       "modules": [
         {
-          "id": "setups", "title": "Setups for swing and positional trades",
+          "id": "setups", "title": "Setups for swing and positional trades", "stage": "intermediate",
           "why": "A setup is a repeatable reason to enter with a defined stop. Without one, every trade is a guess.",
           "lessons": [
             {"id": "pullback-setup", "title": "The pullback in an uptrend", "minutes": 8},
@@ -71,7 +71,7 @@
           ]
         },
         {
-          "id": "business-check", "title": "A business sanity check in ten minutes",
+          "id": "business-check", "title": "A business sanity check in ten minutes", "stage": "intermediate",
           "why": "A good chart on a weak business is a trap more often than a chance.",
           "lessons": [
             {"id": "five-numbers", "title": "The five numbers that matter", "minutes": 8},
@@ -80,7 +80,7 @@
           ]
         },
         {
-          "id": "indicators", "title": "Indicators and patterns, honestly",
+          "id": "indicators", "title": "Indicators and patterns, honestly", "stage": "intermediate",
           "why": "Learn what RSI, MACD, ATR and chart patterns measure, and what the evidence says they do not.",
           "lessons": [
             {"id": "atr", "title": "ATR: how far a stock normally moves", "minutes": 5},
@@ -89,7 +89,7 @@
           ]
         },
         {
-          "id": "journal", "title": "The journal and the review",
+          "id": "journal", "title": "The journal and the review", "stage": "intermediate",
           "why": "Improvement comes from reviewing decisions, not from more trades.",
           "lessons": [
             {"id": "trade-journal", "title": "What to write before and after every trade", "minutes": 6},
@@ -104,7 +104,7 @@
       "summary": "Market context, running several trades at once, the psychology that breaks plans, taxes and records, and staying safe.",
       "modules": [
         {
-          "id": "context", "title": "Market context",
+          "id": "context", "title": "Market context", "stage": "advanced",
           "why": "Most stocks move with the index and their sector. Context decides how many setups to take.",
           "lessons": [
             {"id": "index-trend", "title": "Index trend and market breadth", "minutes": 7},
@@ -113,7 +113,7 @@
           ]
         },
         {
-          "id": "portfolio", "title": "Running several trades",
+          "id": "portfolio", "title": "Running several trades", "stage": "advanced",
           "why": "Five correlated trades are one big trade.",
           "lessons": [
             {"id": "open-risk", "title": "Total open risk and correlation", "minutes": 7},
@@ -121,7 +121,7 @@
           ]
         },
         {
-          "id": "psychology", "title": "Psychology and discipline",
+          "id": "psychology", "title": "Psychology and discipline", "stage": "advanced",
           "why": "Plans fail at the moment of fear or greed. Name the traps before they arrive.",
           "lessons": [
             {"id": "biases", "title": "FOMO, revenge trading and overconfidence", "minutes": 7},
@@ -129,20 +129,20 @@
           ]
         },
         {
-          "id": "taxes-records", "title": "Taxes and records for traders",
+          "id": "taxes-records", "title": "Taxes and records for traders", "stage": "intermediate",
           "why": "Net profit is what matters, and the tax treatment of trading is different from investing.",
           "lessons": [
-            {"id": "capital-gains", "title": "Short and long-term capital gains on shares", "minutes": 7, "status": "planned"},
-            {"id": "records", "title": "Contract notes, P&L statements and filing", "minutes": 6, "status": "planned"}
+            {"id": "capital-gains", "title": "Short and long-term capital gains on shares", "minutes": 7},
+            {"id": "records", "title": "Contract notes, P&L statements and filing", "minutes": 6}
           ]
         },
         {
-          "id": "safety", "title": "Scams, tips and your rights",
+          "id": "safety", "title": "Scams, tips and your rights", "stage": "beginner",
           "why": "The fastest way to lose money is to follow someone else's 'sure shot'.",
           "lessons": [
-            {"id": "tip-scams", "title": "Tip groups, fake apps and guaranteed returns", "minutes": 6, "status": "planned"},
-            {"id": "check-registration", "title": "Checking SEBI registration and filing a complaint", "minutes": 5, "status": "planned"},
-            {"id": "myths", "title": "Myths: secret indicators and 'operator' stocks", "minutes": 5, "status": "planned"}
+            {"id": "tip-scams", "title": "Tip groups, fake apps and guaranteed returns", "minutes": 6},
+            {"id": "check-registration", "title": "Checking SEBI registration and filing a complaint", "minutes": 5},
+            {"id": "myths", "title": "Myths: secret indicators and 'operator' stocks", "minutes": 5}
           ]
         }
       ]
