@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="dictionary.css">
 <script src="vendor/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
@@ -34,6 +35,7 @@
       <button type="button" class="ix" id="nav-learn" data-view="learn"><span class="no">02</span><span class="tx">Learn</span></button>
       <button type="button" class="ix" id="nav-practice" data-view="practice"><span class="no">03</span><span class="tx">Practice</span></button>
       <button type="button" class="ix" id="nav-news" data-view="news"><span class="no">04</span><span class="tx">News</span></button>
+      <button type="button" class="ix" id="nav-dictionary" data-view="dictionary"><span class="no">05</span><span class="tx">Dictionary</span></button>
     </nav>
     <div class="tools">
       <button type="button" class="tool" id="dict-btn">Dictionary</button>
@@ -143,6 +145,15 @@
         <div id="news-body"></div>
         <p class="src" id="news-src"></p>
       </section>
+      <section id="dictionary" hidden>
+        <div class="intro">
+          <h1>Every term, <em>in plain words</em>.</h1>
+          <p>Search by name or by the way you would say it. Press <kbd>/</kbd> to jump to the box. If a term is missing, you can ask Belfort or search the web.</p>
+        </div>
+        <div class="dx-search"><input id="dx-q" type="search" placeholder="Search the dictionary, for example stop-loss" autocomplete="off" maxlength="80" aria-label="Search the dictionary"></div>
+        <div id="dx-cats" class="seg dx-cats"></div>
+        <div id="dx-body" aria-live="polite"></div>
+      </section>
       <p class="disclaimer" id="disclaimer"></p>
     </main>
   </div>
@@ -186,5 +197,6 @@
 <script src="app.js"></script>
 <script src="stock-picker.js"></script>
 <script src="verticals.js"></script>
+<script src="dictionary.js"></script>
 </body>
 </html>

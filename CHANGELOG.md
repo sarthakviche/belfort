@@ -5,6 +5,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 ## [Unreleased]
 
 ### Added
+- Dictionary: a Dictionary page (sidebar, and `/` jumps to its search box) with ranked, typo-tolerant search over every term and browsing by category. When a term is missing, the mascot shrugs and offers "Ask Belfort" (a short plain explanation from your own AI key, labelled as AI and checked by the compliance filter) or "Search the web" (opens your default browser).
 - Windows app: `scripts\build_windows.ps1` builds a single `Belfort.exe` (no Python needed). It keeps user data in `%LOCALAPPDATA%\Belfort`, uses port 8766 (or a free port if that is taken) so it can run next to the older Belfort AI, and bundles the chart library so charts work offline.
 - Learn: the Running several trades and Psychology modules. Total open risk and correlation (matching the Practice Open risk card and its 2% and 6% warnings), Drawdown rules: when to stop trading (with the equity curve), FOMO, revenge trading and overconfidence (each bias linked to a journal mistake tag), and Writing your own trading rules. Thirty-three of 38 lessons are now written.
 - Learn: the Market context module. Index trend and market breadth, Sector strength and rotation, and FII and DII flows, RBI policy and the event calendar. Glossary adds Market breadth. Twenty-nine of 38 lessons are now written.

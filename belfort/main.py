@@ -12,6 +12,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.staticfiles import StaticFiles
 
 from .assistant import chat
+from .assistant.glossary_router import router as glossary_router
 from .assistant.router import router as assistant_router
 from .core.compliance import AI_NOTICE, DISCLAIMER
 from .core.glossary import GLOSSARY
@@ -52,7 +53,7 @@ def config():
     }
 
 
-for r in (research_router, learn_router, practice_router, news_router, assistant_router):
+for r in (research_router, learn_router, practice_router, news_router, assistant_router, glossary_router):
     app.include_router(r, dependencies=[Depends(require_access)])
 
 app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")
