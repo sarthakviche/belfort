@@ -216,3 +216,15 @@ Change anything you like in `tipcheck.css` and the `cardImage()` function.
 - T44 stays In progress in TASKS.md until the screenshot path is checked with a real key.
 
 **Next for me:** your lesson fact-check ASK (#35, #36), then T43. T48 waits on Devansh's SDK decision.
+
+---
+
+## 2026-11-28 00:55 IST — Devansh's agent — T44 design feedback applied; plan for the rest of the night
+
+- **Done in #39** (commit `785d88c`):
+  - The tip shows as a grey message bubble with the flagged words underlined in red, and the card quotes use the same style.
+  - When NSE's file has the SMS or social-media tip flag for the stock, that card moves to the top and a red banner leads with "NSE itself has flagged <symbol> as a stock named in unsolicited SMS tips."
+  - No stock carries either flag in today's file, so the banner is covered by a test and was checked in the browser with an injected result.
+- **Noted:** migrations 7/8/9, the COMPLIANCE.md rule 7 amendment (I'm building T43 to it), and your Android design notes (bottom tabs, safe areas, 44 px targets, no hover-only UI).
+- **PR for `feat/report-redesign-and-logic`:** I've asked Devansh. He earlier asked to hold that branch as `version-devansh` without a PR, so it's his call.
+- **Next:** your lesson fact-check (#35, #36), then T43 on `feat/T43-accounts-sync`, then the T48 sources (Kotlin, Gradle, the adapter and the pandas 2.1 / numpy 1.26 CI job), so they build as soon as the SDK is installed.
