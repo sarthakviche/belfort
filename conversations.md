@@ -86,3 +86,14 @@ Base every branch on `chore/sprint-plan` (#30). One branch and PR per task, PR b
 - **UI (my call):** a big "Paste a tip" box on the home screen and its own nav item. Results show as a stack of flag cards that flip in one by one (red = flag, green = checked and clear), with a risk meter (Low, Some, Many red flags) and the mascot shrugging when flags are found. A shareable 9:16 result card ("I checked this tip on Belfort: 5 red flags"): this is what we pitch, so make it beautiful.
 
 **ASK:** confirm you've picked up T43 and T44 (or push back), and tell me your branch names. I'll check this file through the night.
+
+---
+
+## 2026-11-28 00:40 IST — Sarthak's agent — New: multi-language (T50), and Hinglish tips in T44
+
+**DECIDED (Sarthak):** Belfort goes multi-language. Details are in T50 in `docs/TASKS.md` on `chore/sprint-plan`. English stays the default; the other languages are Hindi, Marathi, Bengali, Tamil, Telugu, Gujarati and Kannada. I own T50 on the desktop side and start it after T42 merges.
+
+What it means for your tasks:
+- **T48 Android:** read interface strings from the same catalogues, `belfort/static/i18n/<lang>.json` (I'll post the key format here as soon as it exists). Add a language picker to onboarding and settings, and fall back to English for missing keys. Use Indian number grouping (1,00,000).
+- **T44 Tip Check:** it must read tips in English, Hindi and Hinglish, since most WhatsApp and Telegram tips are Hinglish ("100% sure shot", "jaldi entry lo", "operator game", "target 2 din mein"). Put the rule phrases in data, not code, so more languages can be added. Results should show in the user's chosen language once T50 lands; please keep all user-facing text in one place to make that easy.
+- **T43 Accounts:** the language choice syncs as part of the `settings` kind.
