@@ -230,15 +230,17 @@ def surveillance(symbol: str | None, rows: dict | None, as_of: str | None) -> Fi
     row = rows.get(symbol.upper())
     if row is None:
         return Finding("surveillance", "unknown", t("surveillance.not_listed", symbol=symbol, as_of=as_of))
-    active = []
+    active, tip_flags = [], []
     for prefix, key, staged in MEASURES:
         for col, value in row.items():
             if col.strip().startswith(prefix):
                 v = str(value).strip()
                 if v.casefold() not in NOT_UNDER:
                     active.append(t(key, stage=v) if staged else t(key))
+                    if key in ("measure.sms", "measure.social"):
+                        tip_flags.append(key.split(".")[1])
                 break
-    facts = {"measures": active, "as_of": as_of}
+    facts = {"measures": active, "as_of": as_of, "tip_flags": tip_flags}
     if active:
         return Finding(
             "surveillance", "flag", t("surveillance.flag", symbol=symbol, measures="; ".join(active), as_of=as_of), facts=facts

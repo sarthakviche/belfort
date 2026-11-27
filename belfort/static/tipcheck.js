@@ -76,6 +76,22 @@
       </div></article>`;
   }
 
+  /* the tip as the user received it, with every flagged phrase underlined */
+  function bubble(text, phrases) {
+    const ranges = [];
+    phrases.forEach((p) => {
+      const re = new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+"), "giu");
+      for (const m of text.matchAll(re)) if (m[0]) ranges.push([m.index, m.index + m[0].length]);
+    });
+    ranges.sort((a, b) => a[0] - b[0]);
+    let html = "", at = 0;
+    ranges.forEach(([s, e]) => {
+      if (s < at) return;
+      html += esc(text.slice(at, s)) + `<mark class="tc-hit">${esc(text.slice(s, e))}</mark>`; at = e;
+    });
+    return html + esc(text.slice(at));
+  }
+
   function meter(d) {
     const steps = [["low", "No red flags"], ["some", "Some"], ["many", "Many"]];
     return `<div class="tc-meter lvl-${esc(d.level)}" role="img" aria-label="${esc(d.level_text)}">
@@ -93,6 +109,7 @@
     const links = (s) => s.links.map((l) => ` <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(" ·");
     $("tc-out").innerHTML = `
       <section class="tc-result">
+        ${d.lead ? `<div class="tc-lead" role="alert"><span class="tc-badge">!</span><b>${esc(d.lead)}</b></div>` : ""}
         <div class="panel glass tc-summary ${flagged ? "has-flags" : ""}">
           <img class="tc-mascot" src="${flagged ? MASCOT.shrug : MASCOT.suit}" alt="" width="110" height="110">
           <div class="tc-sum-main">
@@ -111,6 +128,8 @@
           <label class="tc-pick">${d.symbol ? "Not the right stock?" : "Which stock is it about?"}
             <input id="tc-symbol" placeholder="Type a company" maxlength="80" data-stock-picker></label>
         </div>
+        <figure class="tc-msg"><figcaption>The tip you checked</figcaption>
+          <blockquote class="tc-bubble" data-quoted-tip>${bubble(TC.text, d.findings.filter((f) => f.status === "flag").flatMap((f) => f.evidence))}</blockquote></figure>
         <div class="tc-cards">${d.findings.map(card).join("")}</div>
         <div class="panel glass tc-next">
           <h3>What to do next</h3>

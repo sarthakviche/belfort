@@ -26,6 +26,7 @@ COMPANIES = [
     ("IRFC", "Indian Railway Finance Corporation Limited"),
     ("PAKKA", "Pakka Limited"),
     ("PUMPCO", "Pump Company Limited"),
+    ("SOCIALCO", "Social Company Limited"),
 ]
 SCAM = (
     "🚀 SUZLON 100% SURE SHOT CALL 🚀 Buy above 52, Target 60/68 in 3 days. Jaldi entry lo, operator game chal raha "
@@ -283,6 +284,13 @@ def test_a_clean_note_shows_few_flags(offline):
     r = service.check("Research note by INH000012345 on TCS: results due 15 January. Not a recommendation.")
     assert r["symbol"] == "TCS" and r["flags"] == 0 and r["level"] == "low"
     assert "does not make the tip safe" in r["summary"]
+
+
+def test_nse_tip_campaign_flag_leads_the_results(offline):
+    r = service.check("SOCIALCO will fly, hurry")
+    assert r["findings"][0]["id"] == "surveillance" and r["findings"][0]["facts"]["tip_flags"] == ["social"]
+    assert r["lead"] == "NSE itself has flagged SOCIALCO as a stock named in social media tips."
+    assert service.check("TCS hurry")["lead"] is None
 
 
 def test_the_user_can_pick_the_stock(offline):

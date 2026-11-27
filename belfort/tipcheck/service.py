@@ -76,7 +76,15 @@ def check(text: str, symbol: str | None = None) -> dict:
     findings.append(rules.past_signature(chosen, bars))
 
     lvl, n = rules.level(findings)
+    lead = None
+    surv = next(f for f in findings if f.id == "surveillance")
+    if surv.facts.get("tip_flags"):
+        # NSE's own tip-campaign flag is the strongest finding there is, so it leads the results
+        lead = t(f"surveillance.lead.{surv.facts['tip_flags'][0]}", symbol=chosen)
+        findings.remove(surv)
+        findings.insert(0, surv)
     return {
+        "lead": lead,
         "symbol": chosen,
         "name": names.get(chosen) if chosen else None,
         "symbols_found": found,

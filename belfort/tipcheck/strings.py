@@ -52,6 +52,8 @@ EN = {
     "when their price or trading looks unusual, to protect investors.",
     "surveillance.clear": "{symbol} is not on NSE's ASM, GSM or ESM lists, and NSE has not flagged it for SMS or social "
     "media tips (NSE file of {as_of}).",
+    "surveillance.lead.sms": "NSE itself has flagged {symbol} as a stock named in unsolicited SMS tips.",
+    "surveillance.lead.social": "NSE itself has flagged {symbol} as a stock named in social media tips.",
     "surveillance.no_symbol": "No NSE stock was recognised in the tip, so the lists could not be checked. Pick the stock "
     "to check it.",
     "surveillance.not_listed": "{symbol} is not in NSE's surveillance file of {as_of}, so it could not be checked.",
