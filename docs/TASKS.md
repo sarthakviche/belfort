@@ -35,7 +35,7 @@
 | T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Ready |
 | T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | Ready |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
-| T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Ready |
+| T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Superseded by T42 |
 | T25 | Editable rule profiles | 3 Research and News | P1 | L | Blocked on D1 |
 | T26 | Watchlists and in-app alerts | 3 Research and News | P1 | M | Ready |
 | T27 | Market context panel | 3 Research and News | P2 | M | Ready |
@@ -53,7 +53,7 @@
 | T39 | Release workflow | 5 Ship | P0 | M | Blocked on T38 |
 | T40 | Ship Belfort 1.0 for Windows | 5 Ship | P0 | L | Blocked on all P0 and P1 tasks |
 | T41 | Apply the brand decision | 5 Ship | P1 | S | Blocked on D2 |
-| T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | In progress |
+| T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | Done ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)) |
 | T43 | Accounts and sync across devices | 6 Belfort 2 | P0 | L | In progress |
 | T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress |
 | T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | In progress |
@@ -175,7 +175,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Do:** A `::drill KIND` directive (for example `support`, `stop`, `trend`) that opens a replay chart inside the lesson with a specific question ("Where would the stop go?") and checks the answer against the engine's levels. Lagged data only.
 
 ### T24 · Module checkpoints and progress summary
-- **P2 · S · Status:** Ready · A short mixed quiz at the end of each module; a progress page per track.
+- **P2 · S · Status:** Superseded by [T42](#t42--gamified-learn-stages-locks-xp-streaks-hearts) · A short mixed quiz at the end of each module; a progress page per track. T42 adds a checkpoint node to every module and a stage test, and the path shows progress.
 
 ## Phase 3: Research and News
 
@@ -256,7 +256,7 @@ Shared contracts every Phase 6 task uses:
 - **New UI** goes in its own file under `belfort/static/` (for example `learn-game.js`, `auth.js`, `tipcheck.js`), with only a script tag and a nav hook added to `index.html` and `app.js`, so parallel branches do not collide.
 
 ### T42 · Gamified Learn: stages, locks, XP, streaks, hearts
-- **P0 · L · Owner:** Sarthak (agent) · **Status:** In progress · **Area:** learn, ui · Supersedes T24.
+- **P0 · L · Owner:** Sarthak (agent) · **Status:** Done ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)) · **Area:** learn, ui · Supersedes T24.
 - **Path:** a vertical map per stage: one node per lesson, a checkpoint node at the end of each module and a stage test at the end of the stage. Next node pulses; done nodes show a crown when the quiz was perfect.
 - **Locks:** a new user sees Beginner only. Intermediate and Advanced lessons show their title and a lock; their content and quiz are refused by the API (not only hidden in the page). A stage unlocks when its previous stage test is passed at 80% or more, or by passing the placement test (a 12-question mix from Beginner) on first open.
 - **Lesson flow:** the lesson is split into cards at each `## ` heading, one card per screen, with an exercise after the cards. Wrong answers cost a heart (5 per day); hearts refill each day or by finishing a Weak spots review (questions the user got wrong before).
@@ -311,6 +311,7 @@ Shared contracts every Phase 6 task uses:
 
 ## Done
 
+- T42 Gamified Learn: stage path, locks, cards, four exercise types, XP, streaks, hearts ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)).
 - v0.1 foundation (see README "What is built").
 - Production engineering setup: lint, format, coverage, pinned dependencies, CI on Windows and Linux, commit policy, conventions (PR #1).
 - T01 Onboarding steps checked on a clean clone and fixed ([#7](https://github.com/sarthakviche/belfort/pull/7)).
