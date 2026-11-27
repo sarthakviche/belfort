@@ -23,7 +23,7 @@ Belfort is free, open-source software for learning and research. These principle
 4. **Practice is points only.** Starting points are fixed, resets are free, and nothing is redeemable. There are no leaderboards of live calls, which could turn predictions into tips.
 5. **Lagged data in education.** See above.
 6. **Bring your own AI key.** Belfort holds no keys and has no AI account. The assistant explains what is on screen and is instructed never to give advice or predictions.
-7. **Local-first.** No account, no server, no telemetry. `ACCESS_CODES` exists only for sharing on a private network, knowingly.
+7. **Local-first, accounts optional.** Without an account Belfort stays local-only. With one (Supabase, T43), only the user's own practice and learning documents and non-secret settings sync to the project's database, protected by row-level security. No prices, no research output and no telemetry are sent. Accounts store personal data (an email address), so India's Digital Personal Data Protection Act 2023 applies: the sign-in screen and the docs carry a short privacy notice (what is stored, why, and how to delete it), and an account can be deleted from inside the app. Legal sign-off on that notice is decision D3. `ACCESS_CODES` exists only for sharing on a private network, knowingly.
 
 ## Things the project will not build
 
