@@ -56,7 +56,7 @@
 | T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | In progress |
 | T43 | Accounts and sync across devices | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress (Devansh) |
-| T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | Done ([#PR](https://github.com/sarthakviche/belfort/pull/PR)) |
+| T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | Done ([#33](https://github.com/sarthakviche/belfort/pull/33)) |
 | T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | In progress |
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
@@ -276,7 +276,7 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** text works offline with rules; a screenshot works with the user's own assistant key (vision); every check is a pure tested function with fixtures for the SEBI registers and the surveillance lists; it works in the running app.
 
 ### T45 · Dictionary search with an Ask and web fallback
-- **Owner:** Sarthak · **P1 · S · Status:** Done ([#PR](https://github.com/sarthakviche/belfort/pull/PR)) · **Area:** ui, assistant
+- **Owner:** Sarthak · **P1 · S · Status:** Done ([#33](https://github.com/sarthakviche/belfort/pull/33)) · **Area:** ui, assistant
 - **Do:** a search box over the glossary (fuzzy, by term and match phrases). When nothing matches, show the mascot shrugging and two choices: "Ask Belfort" (a short, plain explanation from the user's assistant key, labelled as AI and checked by the compliance filter) and "Search the web" (opens the default browser on a web search for the term plus "stock market").
 - **Done when:** tests cover matching and the fallback; it works in the running app with and without a key.
 
