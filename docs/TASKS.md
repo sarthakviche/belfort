@@ -57,7 +57,7 @@
 | T43 | Accounts and sync across devices | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | In progress |
-| T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | In progress |
+| T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | Done |
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Blocked on T42 |
@@ -281,7 +281,7 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** tests cover matching and the fallback; it works in the running app with and without a key.
 
 ### T46 · Startup loader and intro with the mascot
-- **Owner:** Sarthak · **P0 · M · Status:** In progress · **Area:** ui, platform
+- **Owner:** Sarthak · **P0 · M · Status:** Done (PR_LINK) · **Area:** ui, platform
 - **Do:** a loader that shows while the Windows app starts its server: black screen, a few candles draw in one by one, then the mascot settles in the centre and the Belfort wordmark fades in. Under 2.5 seconds, nothing else on screen. Then, on the first open only, a one-screen intro with the quote "Risk comes from not knowing what you're doing." (Warren Buffett) in a large serif, and a start button. The quote lives in one constant so it is easy to change. Respect `prefers-reduced-motion`.
 - **Done when:** the Windows app shows the loader from launch until the UI is ready and the intro on first open.
 
