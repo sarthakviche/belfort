@@ -1,7 +1,7 @@
 """Plain-language explanations built from the computed numbers. No language model is required."""
 
 from ...core.compliance import find_banned  # noqa: F401  (re-exported)
-from ...settings import Style
+from ...settings import Style, level_span
 
 
 def trend_sentence(t: dict) -> str:
@@ -60,14 +60,14 @@ def technical_text(
             f"{abs(s[0]['distance_pct']):.1f}% below, touched {s[0]['touches']} time(s)."
         )
     else:
-        out.append("No support level was found below the current price in the last year of swings.")
+        out.append(f"No support level was found below the current price in {level_span(st.key)} of swings.")
     if r:
         out.append(
             f"Nearest resistance (a price where sellers stepped in before) is ₹{r[0]['price']:.2f}, "
             f"{r[0]['distance_pct']:.1f}% above, touched {r[0]['touches']} time(s)."
         )
     else:
-        out.append("No resistance level sits above the current price in the last year of swings.")
+        out.append(f"No resistance level sits above the current price in {level_span(st.key)} of swings.")
     if vol.get("rel_volume") is not None:
         rv = vol["rel_volume"]
         tone = "well above" if rv >= 1.5 else "above" if rv > 1.1 else "below" if rv < 0.9 else "about equal to"

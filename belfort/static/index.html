@@ -8,8 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="dictionary.css">
+<link rel="stylesheet" href="style.css?v=2026-11-28">
+<link rel="stylesheet" href="tipcheck.css?v=2026-11-28">
+<link rel="stylesheet" href="learn-game.css?v=2026-11-28">
+<link rel="stylesheet" href="dictionary.css?v=2026-11-28">
 <script src="vendor/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
@@ -35,7 +37,8 @@
       <button type="button" class="ix" id="nav-learn" data-view="learn"><span class="no">02</span><span class="tx">Learn</span></button>
       <button type="button" class="ix" id="nav-practice" data-view="practice"><span class="no">03</span><span class="tx">Practice</span></button>
       <button type="button" class="ix" id="nav-news" data-view="news"><span class="no">04</span><span class="tx">News</span></button>
-      <button type="button" class="ix" id="nav-dictionary" data-view="dictionary"><span class="no">05</span><span class="tx">Dictionary</span></button>
+      <button type="button" class="ix" id="nav-tipcheck" data-view="tipcheck"><span class="no">05</span><span class="tx">Tip Check</span></button>
+      <button type="button" class="ix" id="nav-dictionary" data-view="dictionary"><span class="no">06</span><span class="tx">Dictionary</span></button>
     </nav>
     <div class="tools">
       <button type="button" class="tool" id="dict-btn">Dictionary</button>
@@ -43,7 +46,7 @@
       <button type="button" class="tool" id="settings-btn">Settings</button>
     </div>
 
-    <div class="drawer-label"><span>Open files</span><button type="button" id="files-clear" class="linkish" hidden>Clear</button></div>
+    <div class="drawer-label"><span>Recent stocks</span><button type="button" id="files-clear" class="linkish" hidden>Clear</button></div>
     <div class="files" id="files"></div>
 
     <div class="side-foot">End-of-day data. Not live prices.</div>
@@ -74,32 +77,37 @@
 
       <section id="report" hidden>
         <div class="quote panel" id="quote"></div>
+        <div class="panel glass company" id="company"></div>
+        <div class="panel chart-panel">
+          <div class="chart-head">
+            <div class="seg" id="style-seg" role="group" aria-label="Trading style">
+              <button type="button" data-style="swing">Swing <small>2 to 15 days</small></button>
+              <button type="button" data-style="positional">Positional <small>weeks to months</small></button>
+            </div>
+            <div class="seg" id="frame-seg" role="group" aria-label="Bar size">
+              <button type="button" data-frame="daily" class="on">Daily</button>
+              <button type="button" data-frame="weekly">Weekly</button>
+            </div>
+            <div class="legend" id="legend"></div>
+          </div>
+          <div id="chart" class="chart"></div>
+        </div>
         <div class="layout">
           <div class="col-main">
-            <div class="panel chart-panel">
-              <div class="chart-head">
-                <div class="seg" id="style-seg" role="group" aria-label="Trading style">
-                  <button type="button" data-style="swing">Swing <small>2 to 15 days</small></button>
-                  <button type="button" data-style="positional">Positional <small>weeks to months</small></button>
-                </div>
-                <div class="legend" id="legend"></div>
-              </div>
-              <div id="chart" class="chart"></div>
-            </div>
-            <div class="panel glass" id="agree"></div>
+            <div class="panel glass glow" id="verdict"></div>
           </div>
           <aside class="col-side">
-            <div class="panel glass glow" id="verdict"></div>
-            <div class="panel glass" id="calc">
-              <h3>Position size</h3>
-              <p class="hint">These two numbers decide how many shares you can hold without losing more than you chose if the stop is hit. They do not change the label.</p>
+            <div class="panel glass" id="agree"></div>
+            <details class="panel glass plan" id="calc">
+              <summary><span><b>Plan a trade</b> <small>optional</small></span><span class="hint">Position size for your own capital and risk</span></summary>
+              <p class="hint">Your capital and risk only decide how many shares fit your loss limit if the stop is hit. They never change the label or the checks.</p>
               <div class="fields">
                 <label>Your capital (₹)<input id="capital" type="number" min="1" step="any" value="100000"></label>
                 <label>Risk per trade (%)<input id="risk" type="number" min="0.05" max="100" step="0.05" value="1"></label>
                 <label class="wide">Your own stop (₹, optional)<input id="stop" type="number" min="0" step="0.05" placeholder="uses the suggested stop"></label>
               </div>
               <div id="calc-out"></div>
-            </div>
+            </details>
           </aside>
         </div>
 
@@ -136,6 +144,7 @@
         <div id="practice-body"></div>
       </section>
 
+      <section id="tipcheck" hidden></section>
       <section id="news" hidden>
         <div class="intro">
           <h1>The market, <em>explained</em>.</h1>
@@ -194,9 +203,11 @@
   <p class="hint" id="about"></p>
 </div>
 <div id="tip" class="tip" hidden></div>
-<script src="app.js"></script>
-<script src="stock-picker.js"></script>
-<script src="verticals.js"></script>
-<script src="dictionary.js"></script>
+<script src="app.js?v=2026-11-28"></script>
+<script src="stock-picker.js?v=2026-11-28"></script>
+<script src="verticals.js?v=2026-11-28"></script>
+<script src="learn-game.js?v=2026-11-28"></script>
+<script src="tipcheck.js?v=2026-11-28"></script>
+<script src="dictionary.js?v=2026-11-28"></script>
 </body>
 </html>
