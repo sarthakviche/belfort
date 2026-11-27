@@ -76,8 +76,21 @@ _lock = threading.Lock()
 _ready: set[str] = set()
 
 
+def path_for(user_id: str) -> Path:
+    """Each signed-in user has their own database file next to the local one (T43). One file per user keeps every
+    user's practice and learning apart without a filter in each query; the local user keeps belfort.db."""
+    from .users import LOCAL_USER
+
+    if user_id == LOCAL_USER:
+        return settings.DB_FILE
+    safe = "".join(c for c in user_id if c.isalnum() or c == "-")[:64]
+    return settings.DB_FILE.parent / "users" / f"{safe}.db"
+
+
 def _path() -> Path:
-    return settings.DB_FILE
+    from .users import current_user_id
+
+    return path_for(current_user_id())
 
 
 def _migrate(con: sqlite3.Connection):

@@ -2,6 +2,56 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T43 Accounts and sync (Devansh's agent, branch `feat/T43-accounts-sync`)
+
+### Decisions
+- **Supabase Auth** (email and password, Google with PKCE). The provider sits behind `belfort/core/auth.py` only.
+- **One SQLite file per signed-in user** (`users/<id>.db`), chosen in the single `db._path()` hook, instead of a `user_id` filter in every query.
+  - No cross-user leaks through a forgotten filter.
+  - No changes to practice or learn queries.
+  - T42's new tables are scoped for free.
+  - The contract's `user_id` columns stay valid (inside a file every row is the file's user).
+- **Sync:** whole documents per kind (`practice` = the T10 backup, `learn` = lesson progress plus `LEARN_PARTS` for T42's game state, `settings` = whitelisted interface choices, never an AI key).
+  - Last write wins, with the server clock (a trigger sets `updated_at`).
+  - On a new computer, the account copy wins.
+  - The losing copy is saved in `sync-backups/`.
+- **When it syncs:** on sign-in, every 60 seconds while signed in (`SYNC_INTERVAL_SECONDS`), on Sync now, and on app shutdown.
+- **New account:** if this computer has local data, the user is asked whether to bring it in.
+- **Shared mode:** accounts switch off when `ACCESS_CODES` is set (one app = one user).
+- **Privacy:** the DPDP Act notice is on the sign-in screen, and the account can be deleted from the menu (`delete_my_account()` SQL function, the caller only).
+
+### Changes
+- **New:**
+  - `belfort/core/auth.py`, `sync.py` and `accounts_router.py`
+  - `supabase/migrations/20261128000000_user_state.sql`
+  - `belfort/static/auth.js` and `auth.css`
+  - `docs/ACCOUNTS.md` (setup, design, payload shapes for Android)
+- **Changed:**
+  - `users.py`: only the body of `current_user_id`
+  - `db.py`: `path_for()` and `_path()`
+  - `main.py`: router, a lifespan for background sync, and `accounts` in `/api/config`
+  - `settings.py`: `SYNC_INTERVAL_SECONDS`
+  - `index.html`: one stylesheet and one script tag
+  - `.env.example`, CHANGELOG, ARCHITECTURE, STATUS
+- **Tests:** `tests/test_accounts.py`, 23 tests against an in-memory fake Supabase. They cover:
+  - sign-up, sign-in and sign-out, plus error wording
+  - token refresh: refused, and offline
+  - Google PKCE
+  - per-user scoping and path safety
+  - first push, a second computer pulling the same paper account
+  - both conflict directions, with backups
+  - `LEARN_PARTS`, import of local data, every API route, and background sync
+
+### Checked
+- `ruff check`, `ruff format --check`, `pytest --cov` (80.8%).
+- In the running app (port 8767) against a local fake of the Supabase API:
+  - the first-launch sign-in screen
+  - create an account, then the header menu, then Sync now ("just now")
+  - sign out (the menu shows "Sign in", no screen again)
+  - Google: authorize, then `/auth/callback`, then signed in and back on the app
+  - no console errors
+- Not yet checked against a real Supabase project, because none exists yet.
+
 ## 2026-11-27 — sprint set-up (Sarthak's agent)
 
 ### Decisions

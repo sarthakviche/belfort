@@ -101,3 +101,6 @@ AI_MAX_OUTPUT_TOKENS = 800
 AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
 
 PREDICTION_HORIZONS = {"1 week": 5, "2 weeks": 10, "4 weeks": 20, "3 months": 63}
+
+# ---------------- Accounts and sync (T43) ----------------
+SYNC_INTERVAL_SECONDS = 60  # while signed in, local changes are pushed this often (and once when the app closes)

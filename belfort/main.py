@@ -6,6 +6,7 @@ Belfort is not designed to be run as a public service (see docs/COMPLIANCE.md).
 """
 
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -13,6 +14,8 @@ from fastapi.staticfiles import StaticFiles
 
 from .assistant import chat
 from .assistant.router import router as assistant_router
+from .core import auth, sync
+from .core.accounts_router import router as accounts_router
 from .core.compliance import AI_NOTICE, DISCLAIMER
 from .core.glossary import GLOSSARY
 from .data.universe import UNIVERSE
@@ -33,7 +36,14 @@ def require_access(x_access_code: str | None = Header(default=None)):
         raise HTTPException(status_code=401, detail="A valid access code is required.")
 
 
-app = FastAPI(title="Belfort", version=VERSION, docs_url="/api/docs", redoc_url=None)
+@asynccontextmanager
+async def lifespan(_app):
+    sync.background.start()  # while signed in: push changes every minute
+    yield
+    sync.background.stop()  # and once more as the app closes
+
+
+app = FastAPI(title="Belfort", version=VERSION, docs_url="/api/docs", redoc_url=None, lifespan=lifespan)
 
 
 @app.get("/api/config")
@@ -47,6 +57,7 @@ def config():
         "universe": UNIVERSE,
         "glossary": GLOSSARY,
         "chat_env_ready": chat.configured(),
+        "accounts": auth.configured(),
         "practice": {"start_points": PAPER_START_POINTS, "horizons": list(PREDICTION_HORIZONS)},
         "edu_lag_days": EDU_LAG_DAYS,
     }
@@ -55,4 +66,5 @@ def config():
 for r in (research_router, learn_router, practice_router, news_router, assistant_router):
     app.include_router(r, dependencies=[Depends(require_access)])
 
+app.include_router(accounts_router, dependencies=[Depends(require_access)])
 app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")
