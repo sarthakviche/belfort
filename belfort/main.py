@@ -25,6 +25,7 @@ from .news.router import router as news_router
 from .practice.router import router as practice_router
 from .research.router import router as research_router
 from .settings import EDU_LAG_DAYS, PAPER_START_POINTS, PREDICTION_HORIZONS, STYLES, VERSION
+from .tipcheck.router import router as tipcheck_router
 
 
 def _codes() -> set[str]:
@@ -58,7 +59,31 @@ def config():
     }
 
 
-for r in (research_router, learn_router, practice_router, news_router, assistant_router, glossary_router, prefs_router):
+for r in (
+    research_router,
+    learn_router,
+    practice_router,
+    news_router,
+    assistant_router,
+    tipcheck_router,
+    glossary_router,
+    prefs_router,
+):
     app.include_router(r, dependencies=[Depends(require_access)])
 
-app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")
+
+class AppFiles(StaticFiles):
+    """The page's own files, sent with Cache-Control: no-cache.
+
+    Without it the browser guesses a freshness time from Last-Modified and keeps using an old app.js after Belfort is
+    updated, so the page shows old text and layout. no-cache still lets it reuse its copy, but only after the server
+    confirms (by ETag) that the file has not changed, which is a tiny local request.
+    """
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
+app.mount("/", AppFiles(directory=Path(__file__).parent / "static", html=True), name="static")

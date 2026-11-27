@@ -7,7 +7,7 @@ Markets are full of stories that sound true. Each myth below has a cost, and eac
 
 ## 1. "You can get rich quick"
 
-Social media shows the winners and hides the rest. SEBI's own studies of individual traders have found that most of them lose money; the survivors are the ones who keep the risk per trade small and stay in the game. Slow compounding with controlled losses is the plan that survives.
+Social media shows the winners and hides the rest. SEBI's own studies found that about 9 in 10 individual traders in futures and options lost money in each year from 2021-22 to 2023-24, and that about 7 in 10 individual intraday traders in shares lost money in 2022-23. The survivors are the ones who keep the risk per trade small and stay in the game. Slow compounding with controlled losses is the plan that survives.
 *Test it:* the lessons on position sizing, R multiples and risk of ruin show how quickly big bets wipe out an account.
 
 ## 2. "Indicators predict the next move"
@@ -43,7 +43,7 @@ Before acting on any claim, ask three questions:
 2. What would prove it wrong, and what is my stop?
 3. Who gains if I believe it?
 
-Sources: SEBI studies of individual trader outcomes (stated from memory of the published studies; check them on sebi.gov.in); Belfort's own pattern backtest and lessons referred to above; SEBI's October 2026 warning on invitation-only groups and its registration rules, as described in the previous lessons.
+Sources: SEBI's studies of individual traders' results in equity futures and options (January 2023 and September 2024) and in intraday cash trading (July 2023), published on sebi.gov.in; Belfort's own pattern backtest and lessons referred to above; SEBI's October 2026 warning on invitation-only groups and its registration rules, as described in the previous lessons.
 
 ::try replay
 
@@ -52,6 +52,8 @@ Sources: SEBI studies of individual trader outcomes (stated from memory of the p
   {"q": "A course says its secret method predicts reversals, but its rules change to fit each result. What is the problem?", "options": ["Nothing; flexible rules are a sign of skill", "Rules that can explain any outcome cannot be tested", "The course is too cheap"], "answer": 1, "why": "A method that can always explain itself afterwards cannot be tested on old charts, so you cannot know whether it works."},
   {"q": "Your share has fallen below your stop. A friend says to buy more to average down. What does that do?", "options": ["Puts more money into a trade that is already wrong", "Makes a recovery certain", "Removes the loss"], "answer": 0, "why": "Averaging down raises the amount at risk on a trade that is going against you. Your stop was the plan."},
   {"q": "A company is excellent and its profits are rising. Does that mean its share price must rise?", "options": ["Yes, always", "No; the price reflects expectations as well as quality", "Only on Mondays"], "answer": 1, "why": "A strong business can still have a share that falls or stays flat if its price already expects a lot."},
-  {"q": "What does RSI or MACD tell you?", "options": ["What will happen next", "A summary of recent price momentum", "Whether a company is honest"], "answer": 1, "why": "They are calculations on past prices. They describe momentum and do not predict the next move."}
+  {"q": "What does RSI or MACD tell you?", "options": ["What will happen next", "A summary of recent price momentum", "Whether a company is honest"], "answer": 1, "why": "They are calculations on past prices. They describe momentum and do not predict the next move."},
+  {"type": "order", "q": "Put the three questions that catch myths in the order the lesson asks them.", "items": ["Can this be written as a rule and tested on old data?", "What would prove it wrong, and what is my stop?", "Who gains if I believe it?"], "why": "The lesson lists them in this order: testable rule, what proves it wrong, who gains."},
+  {"type": "tf", "q": "A large following is evidence that an influencer has a good track record.", "answer": false, "why": "A large following is not skill and not a record. Followers, praise and screenshots say nothing about results."}
 ]
 ```

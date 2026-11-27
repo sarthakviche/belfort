@@ -63,10 +63,13 @@ belfort/
                           XP, streak and freezes, hearts, stage unlocks, the path), game.py (SQLite layer, locks, tests, weak spots), router.py
   practice/               engine.py (pure settlement and scoring), service.py (accounts, journal, replay), router.py
   news/                   feeds.py (RSS reader, categories, company tags, tip filter), router.py
-  assistant/              chat.py (bring-your-own-key provider adapter), router.py
+  assistant/              chat.py (bring-your-own-key provider adapter), vision.py (screenshot to text, same keys), router.py
+  tipcheck/               rules.py (pure red-flag checks), phrases.json (tip wording by language), strings.py (every
+                          sentence it shows), sources.py (NSE surveillance file, SEBI register copy), register.py
+                          (import SEBI's lists), service.py, router.py
   static/                 index.html, app.js (shell + research), verticals.js (practice, news, settings),
                           learn-game.js and learn-game.css (the Learn path, lesson player and rewards),
-                          stock-picker.js (reusable company picker), style.css
+                          stock-picker.js (reusable company picker), tipcheck.js and tipcheck.css (Tip Check), style.css
 content/
   learn/syllabus.json     tracks -> modules -> lessons
   learn/lessons/*.md      one lesson per file, with a quiz block
@@ -83,6 +86,8 @@ tests/                    offline tests; no network, every source replaced by sy
 | **Learn** | A screened syllabus shown as a path in three stages (Beginner, Intermediate, Advanced), short lessons split into cards, exercises (multiple choice, true or false, order, number) graded on the server, XP, a daily goal, a streak with freezes, hearts and a Weak spots review, lessons that jump into Practice. Later stages are locked by the API until a stage test or the placement test is passed at 80%. | Charts in lessons only use prices at least 30 days old (`market.lagged`), following SEBI's 2026 education norms. |
 | **Practice** | Paper account (long only, end-of-day fills, costs), prediction journal scored with the Brier score, chart-replay trainer on hidden historical charts. | Pure settlement engine with no I/O, so every fill rule is unit-tested. Points can never be redeemed. |
 | **News** | Public RSS feeds merged, de-duplicated, categorised, tagged with companies, explained on demand. | Shows only what the feed provides and links out. Headlines that relay buy/sell calls or targets are hidden by default. |
+
+**Tip Check** (T44) reads a forwarded stock tip and reports red flags found and not found. The text checks are pure functions over `tipcheck/phrases.json`, so they work offline and new languages are data, not code. The stock checks read NSE's daily regulatory-indicator file (`REG1_IND<ddmmyy>.csv` on nsearchives, one column per surveillance measure, 100 meaning not under it), daily bars and market value, in parallel with an eight-second budget; anything slower is shown as not checked. SEBI has no download for its adviser and analyst registers, so Belfort compares numbers with a local copy the user imports (`python -m belfort.tipcheck.register`), stored in the data folder. A screenshot is turned into text by `assistant/vision.py` with the user's own key, and the user sees that text before the rules run. The tip's own words are shown only as quoted evidence (`data-quoted-tip`); Belfort's wording lives in `tipcheck/strings.py` and is tested for banned phrases.
 
 The **assistant** serves all four: the page sends the context on screen (a report, a lesson, or a news headline and description) and the mode, plus the user's own provider and key in `X-AI-*` headers.
 

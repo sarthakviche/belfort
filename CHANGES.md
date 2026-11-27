@@ -16,6 +16,46 @@ Branch `feat/T50-languages`, built on `feat/T42-gamified-learn` with T22 (safety
 - **Not translated:** strings the Python engines write (verdicts, rule explanations, glossary meanings, news, practice notes).
 - **Tests:** `tests/test_i18n.py`. One existing test no longer looks for a planned Beginner lesson (none are left after T22).
 
+## 2026-11-28 — T46 startup loader and intro
+
+Branch `feat/T46-startup-loader`.
+
+### Decisions
+- The Windows launcher loads `belfort/static/splash.html` from disk straight away, starts the server in a thread and, once the server answers and 2.3 s have passed, calls `window.load_url(app_url)`. The URL carries `?splash=0` so the app does not play the loader a second time.
+- In a browser, `index.html` carries the same loader as an overlay at half duration (`--k: .5`), shown for at least 1.2 s and until `app.js` fires `belfort:app-ready`; a 9 s safety timer removes it regardless.
+- The intro runs after `belfort:splash-done`, is remembered in `localStorage` (`belfort.intro.seen`, in try/catch) and fires `belfort:intro-done` (detail `{action}`) for T43 to hook its sign-in screen. There is no server-side settings store, so there is no server flag.
+- The quote lives in `INTRO_QUOTE` in `intro.js`. System serif fonts (Instrument Serif where the app already loads it, then Georgia).
+
+### Changes
+- New: `belfort/static/splash.html`, `splash.css`, `splash.js`, `intro.css`, `intro.js`, `tests/test_desktop.py`.
+- `run_desktop.py`: `splash_url`, `app_url`, `navigate_when_ready`; the window opens on the loader.
+- `belfort/static/index.html` (loader div and four includes) and `app.js` (one event after init).
+## 2026-11-28 — T45 dictionary search
+
+### Decisions
+- **Own router and module.** `belfort/assistant/glossary_router.py` (`/api/glossary/search`, `/ask`, `/web-search`) and the pure ranking in `belfort/core/glossary_search.py`; `assistant/chat.py` and `core/glossary.py` are untouched. `ask()` is called in `general` mode, so the existing compliance filter applies.
+- **Web search from pywebview.** The desktop window does not open new browser windows, so inside it the page asks the backend (`POST /api/glossary/web-search`, loopback only) to call `webbrowser.open`; in a normal browser it uses `window.open`. The URL is `https://www.google.com/search?q=<term> stock market meaning`, URL-encoded.
+- **Ranking.** Exact term, exact phrase, prefix, word prefix, substring, difflib closeness (0.75 cutoff), then a whole word in the explanation. Empty query returns the full glossary for browsing by category.
+- **Old drawer.** The sidebar Dictionary button now opens the new page; the old drawer markup is left in place, unused.
+- **Privacy.** Nothing about a query leaves the computer except on the user's own click on Ask Belfort (their AI provider) or Search the web (their browser).
+
+### Changes
+- New: `belfort/static/dictionary.js`, `dictionary.css`, `tests/test_dictionary.py`.
+- Touched: `belfort/main.py` (router), `belfort/static/index.html` (nav item, section, links), `belfort/static/app.js` (view list, button, start hash), `CHANGELOG.md`, `docs/STATUS.md`, `docs/TASKS.md`.
+
+## 2026-11-28 — T49 exercise types
+
+Branch `content/T49-exercise-types`, built on `feat/T42-gamified-learn` (#37) with `content/T21-taxes-records` (#35) and `content/T22-safety` (#36) merged in. PR #38.
+
+### What changed
+- **Content:** 97 new exercises in all 38 lessons: 45 `number`, 41 `tf`, 11 `order`. Existing multiple-choice items are untouched. Every lesson has at least two new items of at least two types, each with a `why`. Numbers come from the lesson's own figures (position sizing, R multiples, expectancy, ATR stops, P/E, LTCG, Brier points).
+- **Merge:** lesson counts now read "38 of 38"; both T21 and T22 are Done in `docs/TASKS.md`. A missing `),` and `(` between two glossary entries from the merge was fixed in `belfort/core/glossary.py`.
+- **Tests:** new `tests/test_learn_exercises.py`. `test_quiz_grading_and_progress` falls back to an unknown id, because no planned lesson is left.
+
+### Decisions
+- Lessons with no calculation (biases, flows-and-events, myths, tip-scams, trend) use tf and order only.
+- Wording avoids the banned phrases the content tests reject, for example "cannot lose" and "guarantee" were rephrased.
+
 ## 2026-11-28 — T42 gamified Learn
 
 Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
@@ -24,7 +64,7 @@ Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
 - **Engine (pure, no I/O):** `belfort/learn/engine.py` holds XP, the daily goal and streak with freezes, hearts, stage unlock rules, test sampling and the path builder. Dates are passed in. `belfort/learn/game.py` is the thin SQLite layer around it; `belfort/learn/router.py` gains `/path`, `/lessons/{id}/check`, `/tests/{kind}/{key}`, `/sessions/{id}/grade`, `/weak-spots`, `/goal` and `/placement/dismiss`. Thresholds are named constants in `belfort/settings.py`.
 - **Exercise types:** `curriculum.py` validates and grades `mc`, `tf`, `order` and `number`. The public quiz payload has no answers; `order` items are shuffled on the server; grading is server side.
 - **Locks:** the API returns 403 with a friendly sentence for the content, check and quiz of a lesson in a locked stage, and for starting a checkpoint or stage test there. Beginner is always open.
-- **Database:** migration 7 adds `learn_profile`, `learn_xp_days`, `learn_lessons`, `learn_tests`, `learn_weak` and `learn_sessions`, each with `user_id` (default `local`).
+- **Database:** migration 8 (renumbered at merge; 7 is the optional stop-loss from #40) adds `learn_profile`, `learn_xp_days`, `learn_lessons`, `learn_tests`, `learn_weak` and `learn_sessions`, each with `user_id` (default `local`).
 - **UI:** new `belfort/static/learn-game.js` and `learn-game.css` (path, lesson cards, exercises, results, confetti) and two still mascot PNGs for reduced motion. Only `index.html` changed (a link and a script tag).
 
 ### Decisions
@@ -41,7 +81,13 @@ Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
 - **Order exercises** use tap-to-order (no drag), which also works on touch screens.
 - **Hooks into other files:** the old Learn loader in `verticals.js` is left in place; `learn-game.js` loads after it, replaces `onView.learn` and makes `renderSyllabus` a no-op.
 - **Tests:** an existing test now looks for a planned lesson in the Beginner stage, because planned lessons in locked stages answer 403 before 404.
+## 2026-11-28 — T21 taxes and records lessons (Sarthak's agent)
 
+### Changes
+- `content/learn/lessons/capital-gains.md` and `records.md`: the two Taxes and records lessons, each with a quiz and a Sources line. Facts checked: STCG 20%, LTCG 12.5% above 1.25 lakh and the 12-month rule (Budget 2024, effective 23 July 2024, unchanged in Budget 2026 reporting), STT on delivery trades, loss set-off and 8-year carry-forward (Income Tax Department), intraday as speculative and F&O as non-speculative business income, ITR-2 against ITR-3.
+- Left out because sources disagreed or could not be verified: tax audit turnover thresholds, exact reassessment time limits (the lesson says to check the current rule), exact STT percentages (the lesson points to the official sites).
+- `content/learn/syllabus.json`: removed `planned` from both lessons. `belfort/core/glossary.py`: added STCG, LTCG, ITR.
+- `CHANGELOG.md`, `docs/STATUS.md`, `docs/ABOUT.md`, `docs/TASKS.md`: 35 of 38 lessons written; T21 Done.
 ## 2026-11-28 — T22 scams, tips and your rights lessons (Sarthak's agent)
 
 ### Changes
@@ -51,21 +97,60 @@ Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
 - Tip Check (T44) is referred to in words only; it may not have shipped when this merges.
 - `content/learn/syllabus.json`: removed `planned` from the three lessons. `belfort/core/glossary.py`: added Pump and dump, Investment adviser, Research analyst, SCORES.
 - `CHANGELOG.md`, `docs/STATUS.md`, `docs/ABOUT.md`, `docs/TASKS.md`: 36 of 38 on this branch alone (38 of 38 once T21 merges too; the count lines will need a trivial merge fix).
-
-## 2026-11-28 — T46 startup loader and intro
-
-Branch `feat/T46-startup-loader`.
+## 2026-11-28 — T44 Tip Check (Devansh's agent, branch `feat/T44-tip-check`)
 
 ### Decisions
-- The Windows launcher loads `belfort/static/splash.html` from disk straight away, starts the server in a thread and, once the server answers and 2.3 s have passed, calls `window.load_url(app_url)`. The URL carries `?splash=0` so the app does not play the loader a second time.
-- In a browser, `index.html` carries the same loader as an overlay at half duration (`--k: .5`), shown for at least 1.2 s and until `app.js` fires `belfort:app-ready`; a 9 s safety timer removes it regardless.
-- The intro runs after `belfort:splash-done`, is remembered in `localStorage` (`belfort.intro.seen`, in try/catch) and fires `belfort:intro-done` (detail `{action}`) for T43 to hook its sign-in screen. There is no server-side settings store, so there is no server flag.
-- The quote lives in `INTRO_QUOTE` in `intro.js`. System serif fonts (Instrument Serif where the app already loads it, then Georgia).
+- **Nine checks, in a fixed order:**
+  1. SEBI registration
+  2. Promised returns
+  3. A price target with a deadline
+  4. Pressure to hurry
+  5. Claimed insider or secret information
+  6. Requests for money or a move to a private group (added: this is where most tip scams take the money)
+  7. NSE surveillance lists
+  8. Pump pattern
+  9. What the stock did the last time it looked like this
+
+  The first eight count as red flags. The ninth is context only. Status per card: flag (red), clear (green), not checked (grey), context (yellow).
+- **Surveillance data comes from NSE's daily `REG1_IND<ddmmyy>.csv`** on nsearchives (the host the app already uses). It has one column per measure: GSM, long- and short-term ASM, ESM, NSE's own flags for stocks named in unsolicited SMS and social-media tips, and insolvency. A value of 100 means "not under the measure"; any other value is the stage. Checked against the live file of 27 Nov 2026 (3,599 symbols).
+- **SEBI registers:** SEBI has no download and no API, and its site refused scripted requests. So numbers get an offline shape check (INA or INH plus nine digits; INZ broker and INP portfolio-manager numbers are flagged as the wrong kind). They are compared with a local copy the user imports with `python -m belfort.tipcheck.register <saved lists>` (kept in the data folder, never in git). A match is reported as "in the copy of <date>, confirm the sender really is them", never as proof. Claims that SEBI "approved" a tip are always a flag.
+- **Pump pattern** = at least two of three signals:
+  - a session in the last 5 with volume at least 5× its 50-session average
+  - a rise of at least 30% in 20 sessions or 60% in 60
+  - a market value under ₹5,000 crore
+
+  All thresholds are in `settings.py`.
+- **"Last time"** uses only bars at least 30 days old, for both the episode and its outcome (20 and 60 sessions later, and the lowest close). It always ends with "This is what happened once before, not what will happen now."
+- **Languages:** the tip's wording is matched from `belfort/tipcheck/phrases.json`, split by flag and language (`en`, `hinglish`, `hi`), so adding a language is a data change. Overlapping matches merge into one quote ("100% sure shot"). Every sentence Belfort shows is in `belfort/tipcheck/strings.py`, ready for T50's catalogues.
+- **Compliance:** the tip's own words (which include banned phrases such as "sure shot") are shown only as quoted evidence in `<q data-quoted-tip>`. Belfort's wording is tested free of banned phrases. Every result says Belfort can't tell whether a trade will work and never calls a stock good, safe, or one to buy or sell. `compliance.py` and `chat.py` are unchanged.
+- **Screenshots:** they're read by a new `belfort/assistant/vision.py` with the user's own key (Gemini or any OpenAI-compatible model). It only transcribes, and the text is put in the box for the user to see before the rules run.
+- **Speed:** the stock checks run in parallel with an eight-second budget; a slow source shows as "not checked". A live check of a SUZLON tip took 1.3 s.
 
 ### Changes
-- New: `belfort/static/splash.html`, `splash.css`, `splash.js`, `intro.css`, `intro.js`, `tests/test_desktop.py`.
-- `run_desktop.py`: `splash_url`, `app_url`, `navigate_when_ready`; the window opens on the loader.
-- `belfort/static/index.html` (loader div and four includes) and `app.js` (one event after init).
+- New `belfort/tipcheck/`: `rules.py` (pure checks), `phrases.json`, `strings.py`, `sources.py`, `register.py`, `service.py`, `router.py` (`POST /api/tipcheck`, `POST /api/tipcheck/image`).
+- New `belfort/assistant/vision.py`.
+- `belfort/settings.py`: the `TIP_*` thresholds.
+- `belfort/main.py`: mounts the router.
+- New `belfort/static/tipcheck.js` and `tipcheck.css`. `index.html` gets one nav item, one section, a stylesheet and a script tag; `app.js` gets the view name only. They add:
+  - a "Paste a tip" box on the Research home
+  - the Tip Check page with paste, upload, drop or paste-in screenshots
+  - flag cards that flip in one by one (none under reduced motion)
+  - a three-step risk meter
+  - the mascot shrugging when flags are found
+  - a stock picker to correct the stock
+  - next steps with links to SEBI and SCORES, and the Safety lessons (shown as "coming soon" until T22 lands)
+  - a 9:16 share card through the share sheet (or a download), and "Copy as text"
+- Tests: `tests/test_tipcheck.py` (31 offline tests), with fixtures `tests/fixtures/reg1_ind_sample.csv` (NSE's real column header, made-up rows) and `tests/fixtures/sebi_register_sample.csv`.
+- Docs: CHANGELOG, `docs/ARCHITECTURE.md`, `docs/STATUS.md`.
+
+### Checked
+- `ruff check`, `ruff format --check`, and `pytest --cov`: all pass, coverage 81.9%.
+- In the running app (port 8766, live NSE and Yahoo data):
+  - an English and Hinglish SUZLON tip gave 6 red flags in 8 checks, with SUZLON's 30 Nov 2023 volume spike shown as context
+  - a Hindi (Devanagari) IRFC tip gave 4 red flags
+  - a tip with no stock named offered the picker; picking Yes Bank re-ran the checks
+  - the share card was generated and inspected
+  - the page was checked at 375 px wide with no sideways scroll
 
 ## 2026-11-27 — sprint set-up (Sarthak's agent)
 
@@ -78,6 +163,7 @@ Branch `feat/T46-startup-loader`.
 - **Look:** neon green and red candles drawing on black (from the intro inspiration), large editorial serif type for the quote, Belfort yellow (#facc15) for the accent.
 - **Inspiration videos and images** in `design assets/intro animation inspos/` stay out of git: they are third-party downloads, for reference only.
 - **Work split (equal):** Devansh's side takes T48 Android, T43 accounts and sync, T44 Tip Check (technical architecture and market-domain data). Sarthak's side takes T42 gamified Learn, T45 dictionary, T46 loader, T47 landing site, T21 and T22 lessons, T49 exercises (design, UI and content).
+- **Multi-language (T50):** English first, with Hindi, Marathi, Bengali, Tamil, Telugu, Gujarati and Kannada. Interface strings in shared catalogues for desktop and Android; Beginner lessons in Hindi first; Ask Belfort, Tip Check and the dictionary answer in the chosen language. Tip Check reads Hinglish tips. Owned by Sarthak's side, starting after T42 to avoid editing every screen twice.
 - **Agent coordination** happens in `conversations.md` on the `collab` branch. The Android app (T48) is built on Devansh's machine.
 
 ### Changes
@@ -85,16 +171,3 @@ Branch `feat/T46-startup-loader`.
 - `content/learn/syllabus.json`: every module has a `stage`.
 - `belfort/core/users.py`: `current_user_id()` stub that returns `"local"` until T43.
 - `belfort/static/img/mascot/`: the two mascot GIFs.
-
-## 2026-11-28 — T45 dictionary search
-
-### Decisions
-- **Own router and module.** `belfort/assistant/glossary_router.py` (`/api/glossary/search`, `/ask`, `/web-search`) and the pure ranking in `belfort/core/glossary_search.py`; `assistant/chat.py` and `core/glossary.py` are untouched. `ask()` is called in `general` mode, so the existing compliance filter applies.
-- **Web search from pywebview.** The desktop window does not open new browser windows, so inside it the page asks the backend (`POST /api/glossary/web-search`, loopback only) to call `webbrowser.open`; in a normal browser it uses `window.open`. The URL is `https://www.google.com/search?q=<term> stock market meaning`, URL-encoded.
-- **Ranking.** Exact term, exact phrase, prefix, word prefix, substring, difflib closeness (0.75 cutoff), then a whole word in the explanation. Empty query returns the full glossary for browsing by category.
-- **Old drawer.** The sidebar Dictionary button now opens the new page; the old drawer markup is left in place, unused.
-- **Privacy.** Nothing about a query leaves the computer except on the user's own click on Ask Belfort (their AI provider) or Search the web (their browser).
-
-### Changes
-- New: `belfort/static/dictionary.js`, `dictionary.css`, `tests/test_dictionary.py`.
-- Touched: `belfort/main.py` (router), `belfort/static/index.html` (nav item, section, links), `belfort/static/app.js` (view list, button, start hash), `CHANGELOG.md`, `docs/STATUS.md`, `docs/TASKS.md`.

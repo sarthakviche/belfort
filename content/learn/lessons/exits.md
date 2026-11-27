@@ -46,6 +46,9 @@ Practice has no automatic time stop. Write the number of sessions in your journa
 [
   {"q": "You trail a stop at 2 ATR. ATR is ₹15 and today's close is ₹620. Where is the stop, if it was lower before?", "options": ["₹590", "₹605", "₹650"], "answer": 0, "why": "2 × ₹15 = ₹30 below the close: ₹620 − ₹30 = ₹590."},
   {"q": "What is the main weakness of a fixed target?", "options": ["It never locks in profit", "It caps the trades that keep running", "It raises the risk on every trade"], "answer": 1, "why": "Selling everything at a set price means a trade that keeps going has no part left in it."},
-  {"q": "Price falls after you set a trailing stop. What happens to the stop?", "options": ["It moves down with price", "It stays where it is", "It is removed"], "answer": 1, "why": "A trailing stop only moves up. When price falls, it stays put until price reaches it."}
+  {"q": "Price falls after you set a trailing stop. What happens to the stop?", "options": ["It moves down with price", "It stays where it is", "It is removed"], "answer": 1, "why": "A trailing stop only moves up. When price falls, it stays put until price reaches it."},
+  {"type": "number", "q": "A trade closes at ₹600 and ATR is ₹15. Where does a 2 ATR trailing stop sit?", "answer": 570, "tolerance": 0, "unit": "₹", "why": "2 × ₹15 = ₹30 below the close of ₹600 gives ₹570."},
+  {"type": "tf", "q": "When a stock becomes more volatile, you may lower a trailing stop to give the trade room.", "answer": false, "why": "A stop is raised as closes rise and never lowered. The Practice account refuses a lower stop."},
+  {"type": "tf", "q": "Belfort's Practice account has an automatic time stop.", "answer": false, "why": "Practice has none. Write the number of sessions in your journal note and use Sell when the trade has done nothing by then."}
 ]
 ```

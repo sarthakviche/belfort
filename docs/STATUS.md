@@ -26,10 +26,11 @@
 | Area | Limitation | Task |
 |---|---|---|
 | Practice | Long only, one account, end-of-day fills | |
-| Learn | 36 of 38 lessons written. Existing lessons only have multiple-choice exercises; the true or false, order and number types work but wait for content | T21 to T22, T49 |
+| Learn | 38 of 38 lessons written, each with multiple-choice plus true or false, order and number exercises | |
 | Learn | Stage progress is per local user; XP, hearts and streaks use the device's date. Moving between devices waits for accounts | T43 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
 | Research | Rule thresholds can be changed only in code | T25 |
+| Tip Check | Phrase rules miss wording they do not list; SEBI registration numbers are checked against a copy the user must import from SEBI's site (shape only until then); company size comes from Yahoo and may be missing | T44 |
 | Front end | No browser tests; JavaScript is checked only by syntax check and clicking through | T31 |
 | Packaging | `Belfort.exe` builds and runs (single file, unsigned, no installer or uninstaller yet); fonts still load from Google Fonts | T36, T38, T39, D7 |
 | Data | Yahoo Finance and NSE archive files are unofficial and can change or block access | D4 |

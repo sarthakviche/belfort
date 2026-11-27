@@ -1,5 +1,10 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
+/* Charts never take the mouse wheel, so scrolling over one scrolls the page. Drag to pan; pinch or drag an axis to zoom. */
+const CHART_POINTER = {
+  handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+  handleScale: { mouseWheel: false, pinch: true, axisPressedMouseMove: true, axisDoubleClickReset: true },
+};
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const inr = (x, d = 2) => (x == null ? T("common.na") : formatMoney(x, d));
 const num = (x, d = 2) => (x == null ? T("common.na") : formatNumber(x, { max: d }));
@@ -13,7 +18,7 @@ const compact = (x) => (x == null ? T("common.na") : x >= 1e7 ? (x / 1e7).toFixe
 const S = { report: null, symbol: null, style: localStorage.getItem("style") || "swing", tab: null, list: "large", screens: null,
   chat: [], cfg: null, view: "home", chatCtx: null };
 
-/* ---------- sidebar: index, open files, breadcrumb ---------- */
+/* ---------- sidebar: index, recent stocks, breadcrumb ---------- */
 const FILES_KEY = "belfortFiles";
 const readFiles = () => { try { return JSON.parse(localStorage.getItem(FILES_KEY)) || []; } catch (e) { return []; } };
 function rememberFile(d) {
@@ -31,7 +36,7 @@ function renderFiles() {
     : `<div class="files-empty">${T("files.empty")}</div>`;
 }
 /* ---------- views: research (home, report), learn, practice, news ---------- */
-const VIEWS = ["home", "report", "learn", "practice", "news", "dictionary"];
+const VIEWS = ["home", "report", "learn", "practice", "news", "tipcheck", "dictionary"];
 const viewName = (v) => T("nav." + (v === "report" ? "research" : v));
 const onView = {};   // verticals.js registers a loader per view
 function setCrumb(extra) {
@@ -188,11 +193,13 @@ async function load(symbol) {
   try {
     const d = await api("/api/analyze?" + q);
     if (id !== reqId) return;
-    if (S.report && S.report.symbol !== d.symbol) S.tab = null;
+    // Same stock in the same view (a style, capital, risk or stop change): keep the reader where they were.
+    const sameStock = S.view === "report" && S.report && S.report.symbol === d.symbol;
+    if (!sameStock) S.tab = null;
     S.report = d; S.symbol = d.symbol; $("q").value = "";
     localStorage.setItem("capital", $("capital").value); localStorage.setItem("risk", $("risk").value); localStorage.setItem("style", S.style);
     S.view = "report"; VIEWS.forEach((v) => { $(v).hidden = v !== "report"; });
-    render(d); status(""); rememberFile(d); setCrumb(); $("side").classList.remove("open");
+    render(d, sameStock); status(""); rememberFile(d); setCrumb(); $("side").classList.remove("open");
   } catch (e) { if (id === reqId) status(e.message || T("err.generic"), true); }
 }
 const reload = () => { if (S.symbol) load(S.symbol); };
@@ -231,10 +238,13 @@ $("folders").addEventListener("click", (e) => { const b = e.target.closest("butt
 $("tabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-tab]"); if (b) { S.tab = b.dataset.tab; dossier(S.report); } });
 $("dback").addEventListener("click", () => { S.tab = null; dossier(S.report); $("dossier").scrollIntoView({ behavior: "smooth", block: "start" }); });
 
-function render(d) {
+/* A new stock opens at the top. Re-rendering the same stock (switching swing and positional, or changing capital, risk
+   or stop) keeps the scroll position, so the reader stays at the chart or section they were looking at. */
+function render(d, keepScroll = false) {
+  const y = scrollY;
   document.querySelectorAll("#style-seg button").forEach((b) => b.classList.toggle("on", b.dataset.style === d.style.key));
-  quote(d); verdictCard(d); calc(d); agreeCard(d); dossier(d); drawChart(d);
-  scrollTo(0, 0);
+  quote(d); companyCard(d); verdictCard(d); calc(d); agreeCard(d); dossier(d); drawChart(d);
+  scrollTo({ top: keepScroll ? y : 0, behavior: "instant" });
 }
 
 function quote(d) {
@@ -250,18 +260,86 @@ function quote(d) {
         <div class="ends"><span>${num(q.low_52w)}</span><span>${num(q.high_52w)}</span></div></div></div>`;
 }
 
+/* What the company does, before any chart: the source's own description, then the business read, its strengths and
+   weaknesses, and a few headline numbers from the latest year. */
+function companyCard(d) {
+  const p = d.profile || {}, f = d.fundamental, el = $("company");
+  const site = p.website ? p.website.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
+  const facts = [p.industry && esc(p.industry), p.employees && `${Number(p.employees).toLocaleString("en-IN")} employees`,
+    p.website && `<a href="${esc(p.website)}" target="_blank" rel="noopener noreferrer">${esc(site)} ↗</a>`].filter(Boolean);
+  let biz = `<p>${missing(f.missing_reason || "Business figures not available.")}</p>`;
+  if (f.available) {
+    const kind = { constructive: "ok", cautious: "no" }[f.verdict] || "plain";
+    const latest = (name) => { const r = f.table.rows.find((x) => x.metric === name); return r ? r.values[r.values.length - 1] : null; };
+    /* Headline numbers from the latest year, each with the comparison that gives it meaning: last year's value, or
+       the sector's peer median. Rows the source did not return (banks have no operating margin) are left out. */
+    const row = (name) => f.table.rows.find((x) => x.metric === name);
+    const prev = (name) => { const r = row(name); return r && r.values.length > 1 ? r.values[r.values.length - 2] : null; };
+    const peer = f.peers && f.peers.available ? f.peers : null, yr = f.table.periods[f.table.periods.length - 2];
+    const was = (name, d, u = "") => prev(name) == null ? "" : `${esc(yr)}: ${num(prev(name), d)}${u}`;
+    const kv = [
+      ["Sales", latest("Sales (₹ cr)"), (v) => inr(v, 0) + " cr", latest("Sales growth %") == null ? "" : `${latest("Sales growth %") >= 0 ? "up" : "down"} ${num(Math.abs(latest("Sales growth %")), 1)}% on the year`],
+      ["Net profit", latest("Net profit (₹ cr)"), (v) => inr(v, 0) + " cr", prev("Net profit (₹ cr)") ? `${esc(yr)}: ${inr(prev("Net profit (₹ cr)"), 0)} cr` : ""],
+      ["Net margin", latest("Net margin %"), (v) => num(v, 1) + "%", was("Net margin %", 1, "%")],
+      ["Operating margin", latest("Operating margin %"), (v) => num(v, 1) + "%", was("Operating margin %", 1, "%")],
+      ["Return on equity", latest("Return on equity %"), (v) => num(v, 1) + "%", peer && peer.median_roe_pct != null ? `${esc(peer.sector)} median ${num(peer.median_roe_pct, 1)}%` : was("Return on equity %", 1, "%")],
+      ["Debt to equity", latest("Debt to equity"), (v) => num(v, 2), was("Debt to equity", 2)],
+      ["P/E", f.valuation.pe, (v) => num(v, 1), peer && peer.median_pe != null ? `${esc(peer.sector)} median ${num(peer.median_pe, 1)}` : ""],
+      ["Price to book", f.valuation.price_to_book, (v) => num(v, 2), ""],
+      ["Market value", f.valuation.market_cap_cr, (v) => inr(v, 0) + " cr", ""],
+    ].filter((x) => x[1] != null)
+      .map(([k, v, fmt, note]) => `<div class="stat"><div class="k">${k}</div><div class="v">${fmt(v)}</div>${note ? `<div class="n">${note}</div>` : ""}</div>`).join("");
+    const top = (xs, empty) => xs.length ? `<ul class="plain">${xs.slice(0, 3).map((x) => `<li><b>${esc(x.title)}.</b> ${esc(x.detail)}</li>`).join("")}</ul>` : `<p class="muted">${empty}</p>`;
+    biz = `<div class="biz-head">${chip(kind, "Business read: " + f.verdict)}<span class="muted">${esc(f.table.periods[f.table.periods.length - 1] || "")} figures · ${esc(f.source)}</span></div>
+      <div class="kstats">${kv}</div>
+      <div class="two"><div><h4>Strengths</h4>${top(f.pros, "No strength met the thresholds.")}</div><div><h4>Weaknesses</h4>${top(f.cons, "No weakness was flagged by the checks that ran.")}</div></div>
+      <p class="muted">Latest quarter: ${quarterText(f.quarter)}${f.quarter.stale_note ? ` <span class="missing">${esc(f.quarter.stale_note)}</span>` : ""}</p>`;
+  }
+  el.innerHTML = `<div class="eyebrow">What the company does</div>
+    <p class="profile">${p.available ? esc(p.summary) : missing(p.missing_reason || "No company description from the source.")}</p>
+    ${facts.length ? `<p class="muted facts">${facts.join(" · ")}</p>` : ""}${biz}
+    <div class="src">The full business table, peers and valuation are in the dossier below.</div>`;
+  glossify(el);
+}
+
+/* The verdict with a navigator over the rule's checks. The first unmet check opens first; each shows what the numbers
+   say and, for an unmet check, the context behind it. Navigating never changes the label. */
+let checkAt = 0;
 function verdictCard(d) {
-  const v = d.verdict, met = v.checks.filter((c) => c.passed).length;
-  $("verdict").innerHTML = `<h3>${esc(T("verdict.view", { style: T("style." + d.style.key, null, d.style.name), holds: T("style." + d.style.key + "_days", null, d.style.holds) }))}</h3>
-    <div class="badge ${badgeClass(v.label_key)}">${esc(T("verdict.label." + v.label_key, null, v.label))}</div>
-    ${v.checks.length ? `<div class="meter">${v.checks.map((c) => `<i class="${c.passed ? "on" : ""}"></i>`).join("")}</div>` : ""}
+  const v = d.verdict, cs = v.checks;
+  const firstFail = cs.findIndex((c) => !c.passed);
+  checkAt = firstFail >= 0 ? firstFail : 0;
+  $("verdict").innerHTML = `<h3>${esc(d.style.name)} view · ${esc(d.style.holds)}</h3>
+    <div class="badge ${badgeClass(v.label_key)}">${esc(v.label)}</div>
     <p>${esc(v.summary)}</p>
-    ${v.checks.length ? `<p class="muted">${T("verdict.conditions_met", { met, total: v.checks.length })}</p>` : ""}
-    <div class="note ${v.label_key === "excluded" ? "bad" : ""}"><b>${T("verdict.main_risk")}</b>${esc(v.main_risk)}</div>
-    <div class="note plain"><b>${T("verdict.wrong_if")}</b>${esc(v.invalidation.text)}</div>
-    <div class="src">${T("verdict.note")}</div>`;
+    ${cs.length ? `<div class="checknav"><div class="steps" role="tablist" aria-label="Rule checks">${cs.map((c, i) => `<button type="button" role="tab" data-check="${i}" class="${c.passed ? "ok" : "no"}" title="${esc(c.name)}" aria-label="Check ${i + 1}: ${esc(c.name)}, ${c.passed ? "met" : "not met"}">${i + 1}</button>`).join("")}</div>
+      <p class="muted">Yellow is met, red is not. Select a number to read that check.</p><div id="check-view"></div></div>` : ""}
+    ${v.context && v.context.facts.length ? `<div class="note plain"><b>What else the numbers show</b><ul class="plain">${v.context.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul><span class="muted">${esc(v.context.note)}</span></div>` : ""}
+    <div class="two"><div class="note ${v.label_key === "excluded" ? "bad" : ""}"><b>Main risk</b>${esc(v.main_risk)}</div>
+      <div class="note plain"><b>The view is wrong if</b>${esc(v.invalidation.text)}</div></div>
+    <div class="src">A fixed, published rule produces this label from the numbers on this page. It states which conditions hold. It is not a recommendation to buy, sell or hold.</div>`;
+  if (cs.length) showCheck(d);
   glossify($("verdict"));
 }
+
+function showCheck(d) {
+  const cs = d.verdict.checks, c = cs[checkAt];
+  document.querySelectorAll("#verdict .steps button").forEach((b, i) => { b.classList.toggle("on", i === checkAt); b.setAttribute("aria-selected", String(i === checkAt)); });
+  $("check-view").innerHTML = `<div class="check ${c.passed ? "ok" : "no"}">
+      <div class="check-head"><span class="muted">Check ${checkAt + 1} of ${cs.length}</span>${chip(c.passed ? "ok" : "no", c.passed ? "met" : "not met")}</div>
+      <h4>${esc(c.name)}</h4><p>${esc(c.detail)}</p>
+      ${c.context ? `<div class="ctx"><b>Context</b>${esc(c.context)}</div>` : ""}
+      <div class="check-nav"><button type="button" data-step="-1" ${checkAt === 0 ? "disabled" : ""}>← Previous</button><button type="button" data-step="1" ${checkAt === cs.length - 1 ? "disabled" : ""}>Next →</button></div></div>`;
+  glossify($("check-view"));
+}
+
+$("verdict").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-check], button[data-step]");
+  if (!b || !S.report) return;
+  const n = S.report.verdict.checks.length;
+  checkAt = b.dataset.check != null ? Number(b.dataset.check) : Math.min(n - 1, Math.max(0, checkAt + Number(b.dataset.step)));
+  showCheck(S.report);
+});
 
 function calc(d) {
   const s = d.sizing;
@@ -285,15 +363,18 @@ function agreeCard(d) {
 
 function pane(d) {
   const el = $("pane");
+  levelCharts.forEach((c) => c.remove());
+  levelCharts = [];
   el.innerHTML = ({ overview, levels, business, risks, patterns: patternStats, sources })[S.tab](d);
   glossify(el);
+  if (S.tab === "levels") drawLevelCharts(d);
 }
 
 function overview(d) {
   const t = d.technical, v = d.verdict;
-  return `<h4>${T("overview.rule")}</h4>
-    <div class="scroll"><table><thead><tr><th>${T("overview.condition")}</th><th>${T("overview.met")}</th><th>${T("overview.numbers")}</th></tr></thead><tbody>
-      ${v.checks.length ? v.checks.map((c) => `<tr><td>${esc(c.name)}</td><td>${chip(c.passed ? "ok" : "no", c.passed ? T("common.yes") : T("common.no"))}</td><td>${esc(c.detail)}</td></tr>`).join("")
+  return `<h4>The rule behind the label</h4>
+    <div class="scroll"><table><thead><tr><th>Condition</th><th>Met?</th><th>What the numbers say</th></tr></thead><tbody>
+      ${v.checks.length ? v.checks.map((c) => `<tr><td>${esc(c.name)}</td><td>${chip(c.passed ? "ok" : "no", c.passed ? "yes" : "no")}</td><td>${esc(c.detail)}${c.context ? `<div class="ctx"><b>Context</b>${esc(c.context)}</div>` : ""}</td></tr>`).join("")
         : `<tr><td colspan="3" class="missing">${esc(v.reasons[0] || "")}</td></tr>`}</tbody></table></div>
     <div class="src">${T("overview.explain")}</div>
     <h4>${T("overview.chart_doing")}</h4>
@@ -304,25 +385,136 @@ function overview(d) {
 function levels(d) {
   const t = d.technical;
   const lv = (rows, kind) => rows.length ? rows.map((l) => `<tr><td>${kind}</td><td class="num">${inr(l.price)}</td><td class="num">${l.distance_pct}%</td>
-      <td class="num">${l.touches}</td><td>${esc(l.dates.join(", "))}</td></tr>`).join("") : `<tr><td>${kind}</td><td colspan="4" class="missing">${T("common.none_found")}</td></tr>`;
+      <td class="num">${l.touches}</td><td>${esc(l.dates.join(", "))}</td></tr>`).join("") : `<tr><td>${kind}</td><td colspan="4" class="missing">none found in ${d.style.key === "swing" ? "the last year" : "the last 2 years"} of swings</td></tr>`;
   const pats = t.patterns.length ? t.patterns.map((p) => `<tr><td><b>${esc(p.name)}</b><div class="src">${esc(p.note)}</div></td><td>${esc(p.direction)}</td>
       <td>${esc(p.status)}${p.confirm_date ? `<div class="src">${esc(p.confirm_date)}</div>` : ""}</td><td class="num">${p.score.toFixed(2)}</td>
       <td class="num">${p.target == null ? "n/a" : inr(p.target)}</td><td class="num">${p.invalidation == null ? "n/a" : inr(p.invalidation)}</td>
-      <td class="no-gloss">${p.points.map((q) => T("levels.on", { role: esc(q.role), price: inr(q.price), date: esc(q.date) })).join("<br>")}</td></tr>`).join("")
-    : `<tr><td colspan="7" class="missing">${T("levels.no_pattern")}</td></tr>`;
-  const fib = t.fib ? `<p>${T("levels.fib_text", { direction: esc(t.fib.direction), low: inr(t.fib.low), low_date: esc(t.fib.low_date), high: inr(t.fib.high), high_date: esc(t.fib.high_date) })}
-      ${t.fib.levels.map((l) => `${(l.ratio * 100).toFixed(1)}% = ${inr(l.price)}`).join(" · ")}</p>` : `<p>${missing(T("levels.fib_missing"))}</p>`;
-  return `<h4>${T("levels.sr")}</h4>
-    <div class="scroll"><table><thead><tr><th>${T("levels.type")}</th><th class="num">${T("levels.price")}</th><th class="num">${T("levels.distance")}</th><th class="num">${T("levels.touches")}</th><th>${T("levels.swing_dates")}</th></tr></thead>
-      <tbody>${lv(t.levels.resistances.slice().reverse(), T("levels.resistance"))}${lv(t.levels.supports, T("levels.support"))}</tbody></table></div>
-    <h4>${T("levels.patterns")}</h4>
-    <div class="scroll"><table><thead><tr><th>${T("levels.pattern")}</th><th>${T("levels.bias")}</th><th>${T("levels.status")}</th><th class="num">${T("levels.fit")}</th><th class="num">${T("levels.target")}</th><th class="num">${T("levels.fails")}</th><th>${T("levels.bars_used")}</th></tr></thead>
+      <td class="no-gloss">${p.points.map((q) => `${esc(q.role)}: ${inr(q.price)} on ${esc(q.date)}`).join("<br>")}</td></tr>`).join("")
+    : `<tr><td colspan="7" class="missing">No pattern detected on the current chart.</td></tr>`;
+  const fib = t.fib ? `<p>${fibText(t.fib, t.trend.close)}</p><div class="mini-chart" id="fib-chart"></div>
+      <div class="src">Fibonacci levels are fixed fractions of the swing, drawn as lines. They are a common reference, not a forecast, and are not part of the rule.</div>`
+    : `<p>${missing("too little history for a swing")}</p>`;
+  return `<h4>Support and resistance</h4>
+    <div class="scroll"><table><thead><tr><th>Type</th><th class="num">Price</th><th class="num">Distance</th><th class="num">Touches</th><th>Swing dates used</th></tr></thead>
+      <tbody>${lv(t.levels.resistances.slice().reverse(), "Resistance")}${lv(t.levels.supports, "Support")}</tbody></table></div>
+    <h4>Patterns detected</h4>
+    <div class="scroll"><table><thead><tr><th>Pattern</th><th>Bias</th><th>Status</th><th class="num">Fit score</th><th class="num">Measured target</th><th class="num">Fails at</th><th>Exact bars used</th></tr></thead>
       <tbody>${pats}</tbody></table></div>
-    <div class="src">${T("levels.fit_note")}</div>
-    <h4>${T("levels.fib")}</h4>${fib}
-    <h4>${T("levels.momentum")}</h4>
-    <p>${T("levels.momentum_text", { rsi: t.momentum.rsi.toFixed(1), macd: t.momentum.macd.toFixed(2), signal: t.momentum.macd_signal.toFixed(2), atr: inr(t.atr) })}</p>
-    <div class="src">${T("common.source", { source: esc(d.price.source) })}${T("common.as_of", { date: esc(d.as_of) })}</div>`;
+    <div class="src">The fit score (0 to 1) says how closely the shape matches its definition. It is not a chance of profit. A measured target is a textbook projection, not a forecast.</div>
+    <h4>Fibonacci retracements</h4>${fib}
+    <h4>Momentum and daily range</h4>${momentumHtml(d)}
+    <div class="src">Source: ${esc(d.price.source)} · as of ${esc(d.as_of)}</div>`;
+}
+
+/* ---- Charts in the Levels section ---- */
+let levelCharts = [];
+const fmtDate = (s) => new Date(s + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+
+function fibText(f, close) {
+  const move = f.direction === "up"
+    ? `the rise from ${inr(f.low)} on ${fmtDate(f.low_date)} to ${inr(f.high)} on ${fmtDate(f.high_date)}`
+    : `the fall from ${inr(f.high)} on ${fmtDate(f.high_date)} to ${inr(f.low)} on ${fmtDate(f.low_date)}`;
+  const lv = f.levels.map((l) => ({ ...l, pct: (l.ratio * 100).toFixed(1) + "%" })).sort((a, b) => a.price - b.price);
+  const below = lv.filter((l) => l.price <= close).pop(), above = lv.find((l) => l.price > close);
+  const where = below && above ? `between the ${below.pct} (${inr(below.price)}) and ${above.pct} (${inr(above.price)}) levels`
+    : below ? `above every level; the nearest is ${below.pct} at ${inr(below.price)}` : `below every level; the nearest is ${above.pct} at ${inr(above.price)}`;
+  return `Levels for ${move}. Today's close of ${inr(close)} is ${where}.`;
+}
+
+function momentumHtml(d) {
+  const t = d.technical, m = t.momentum, r = m.rsi, close = t.trend.close;
+  const rsiRead = r >= 70 ? "above 70: over the last 14 sessions, gains have been much larger than losses"
+    : r <= 30 ? "below 30: over the last 14 sessions, losses have been much larger than gains" : "between 30 and 70: neither gains nor losses have dominated the last 14 sessions";
+  const macdRead = m.macd >= m.macd_signal ? "above its signal line: MACD has risen above its own 9-day average"
+    : "below its signal line: MACD has fallen below its own 9-day average";
+  return `<div class="mom"><div class="mom-head"><b>RSI(14)</b> ${num(r, 1)} · ${rsiRead}.</div><div class="mini-chart short" id="rsi-chart"></div></div>
+    <div class="mom"><div class="mom-head"><b>MACD(12,26,9)</b> ${num(m.macd, 2)}, signal ${num(m.macd_signal, 2)} · ${macdRead}.</div>
+      <div class="legend"><span><i style="background:#facc15"></i>MACD</span><span><i style="background:#f4f4f2"></i>signal</span><span><i style="background:#16c47f"></i>difference</span></div>
+      <div class="mini-chart short" id="macd-chart"></div></div>
+    <div class="mom"><div class="mom-head"><b>ATR(14)</b> ${inr(t.atr)} · a normal day's range is ${num((t.atr / close) * 100, 1)}% of the price. The rule's stop and stretch checks are measured in ATRs.</div>
+      <div class="mini-chart short" id="atr-chart"></div></div>
+    <div class="src">Last year of daily values. These describe what price has done; they are not part of the rule and do not predict a move.</div>`;
+}
+
+function miniChart(el, height) {
+  if (!el || !window.LightweightCharts) return null;
+  el.innerHTML = "";
+  const c = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
+    grid: { vertLines: { color: "rgba(255,255,255,.03)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" },
+    timeScale: { borderColor: "rgba(255,255,255,.08)" }, crosshair: { mode: LightweightCharts.CrosshairMode.Normal }, handleScroll: false, handleScale: false });
+  levelCharts.push(c);
+  return c;
+}
+
+function drawLevelCharts(d) {
+  const t = d.technical, m = d.chart.momentum, f = t.fib;
+  const plain = { priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false };
+  if (f) {
+    const c = miniChart($("fib-chart"));
+    if (c) {
+      const first = [f.low_date, f.high_date].sort()[0], i = Math.max(0, d.chart.candles.findIndex((x) => x.time >= first) - 15);
+      const bars = d.chart.candles.slice(i);
+      const s = c.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444", priceLineVisible: false });
+      s.setData(bars);
+      /* One label per line, on the line itself (ratio and price), so the right axis keeps only the price scale and
+         today's close. Swing high and low are solid; the retracement levels dashed, from light to strong yellow. */
+      const line = (price, title, color, style, width = 1) =>
+        s.createPriceLine({ price, color, lineWidth: width, lineStyle: style, axisLabelVisible: false, title, lineVisible: true });
+      line(f.high, `swing high ${num(f.high, 2)}`, "rgba(244,244,242,.55)", 0);
+      line(f.low, `swing low ${num(f.low, 2)}`, "rgba(244,244,242,.55)", 0);
+      const shade = { 0.236: ".45", 0.382: ".6", 0.5: ".75", 0.618: ".9", 0.786: ".6" };
+      f.levels.forEach((l) => line(l.price, `${(l.ratio * 100).toFixed(1)}%  ${num(l.price, 2)}`, `rgba(250,204,21,${shade[l.ratio] || ".7"})`, 2));
+      s.priceScale().applyOptions({ scaleMargins: { top: 0.06, bottom: 0.06 } });
+      s.setMarkers([{ time: f.high_date, position: "aboveBar", color: "#f4f4f2", shape: "circle", size: 0.6 },
+        { time: f.low_date, position: "belowBar", color: "#f4f4f2", shape: "circle", size: 0.6 }].sort((a, b) => (a.time < b.time ? -1 : 1)));
+      // Labels at the left end of each line, placed from the chart's own price scale and kept in place on resize.
+      const el = $("fib-chart"), marks = [
+        { price: f.high, text: `swing high ${inr(f.high)}`, cls: "edge" }, { price: f.low, text: `swing low ${inr(f.low)}`, cls: "edge" },
+        ...f.levels.map((l) => ({ price: l.price, text: `${(l.ratio * 100).toFixed(1)}%  ${inr(l.price)}`, cls: "" }))];
+      const place = () => {
+        el.querySelectorAll(".fib-label").forEach((n) => n.remove());
+        marks.forEach((m) => {
+          const y = s.priceToCoordinate(m.price);
+          if (y == null) return;
+          const n = document.createElement("span");
+          n.className = `fib-label ${m.cls}`; n.textContent = m.text; n.style.top = `${y}px`;
+          el.appendChild(n);
+        });
+      };
+      requestAnimationFrame(place);
+      new ResizeObserver(() => requestAnimationFrame(place)).observe(el);
+      c.timeScale().fitContent();
+    }
+  }
+  if (!m) return;
+  const rc = miniChart($("rsi-chart"));
+  if (rc) {
+    const s = rc.addLineSeries({ color: "#facc15", lineWidth: 2, ...plain });
+    s.setData(m.rsi);
+    [[70, "70"], [30, "30"]].forEach(([p, title]) => s.createPriceLine({ price: p, color: "rgba(244,244,242,.35)", lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title }));
+    s.applyOptions({ autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
+    rc.timeScale().fitContent();
+  }
+  const mc = miniChart($("macd-chart"));
+  if (mc) {
+    mc.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false })
+      .setData(m.hist.map((x) => ({ ...x, color: x.value >= 0 ? "rgba(22,196,127,.5)" : "rgba(239,68,68,.5)" })));
+    mc.addLineSeries({ color: "#facc15", lineWidth: 2, ...plain }).setData(m.macd);
+    mc.addLineSeries({ color: "#f4f4f2", lineWidth: 1, ...plain }).setData(m.signal);
+    mc.timeScale().fitContent();
+  }
+  const ac = miniChart($("atr-chart"));
+  if (ac) {
+    ac.addLineSeries({ color: "#8b8b90", lineWidth: 2, ...plain, priceFormat: { type: "price", precision: 2, minMove: 0.01 } }).setData(m.atr);
+    ac.timeScale().fitContent();
+  }
+}
+
+function quarterText(q) {
+  if (!q.available) return missing(q.missing_reason);
+  const vs = q.basis === "year" ? "the same quarter a year earlier" : `the quarter before (${esc(q.compared_with)}; the year-ago quarter is missing from the source)`;
+  const move = (x) => `${x >= 0 ? "up" : "down"} ${Math.abs(x)}%`;
+  return `${esc(q.quarter)}: sales ${move(q.sales_growth_pct)} on ${vs}${q.profit_growth_pct == null ? "" : `, profit ${move(q.profit_growth_pct)}`}.`;
 }
 
 function business(d) {
@@ -343,11 +535,11 @@ function business(d) {
     <div class="scroll"><table><thead><tr><th>${T("business.figure")}</th>${tbl.periods.map((x) => `<th class="num">${esc(x)}</th>`).join("")}</tr></thead><tbody>
       ${tbl.rows.map((r) => `<tr><td>${esc(r.metric)}</td>${r.values.map((x) => `<td class="num">${x == null ? '<span class="missing">${T("common.missing")}</span>' : num(x, 2)}</td>`).join("")}</tr>`).join("")}
     </tbody></table></div>
-    <div class="src">${T("business.history_note", { note: esc(f.history_note), source: esc(f.source), date: esc(f.as_of) })}</div>
-    <h4>${T("business.quarter")}</h4>
-    <p>${q.available ? T("business.quarter_text", { quarter: esc(q.quarter), sdir: T(q.sales_growth_pct >= 0 ? "business.up" : "business.down"), sales: Math.abs(q.sales_growth_pct), profit: q.profit_growth_pct == null ? "" : T("business.quarter_profit", { pdir: T(q.profit_growth_pct >= 0 ? "business.up" : "business.down"), profit: Math.abs(q.profit_growth_pct) }) }).replace("{profit}", "") : missing(q.missing_reason)}</p>
-    <h4>${T("business.valuation")}</h4>
-    <p>${T("business.pe")}: ${val.pe == null ? missing(val.missing_reason) : "<b>" + num(val.pe, 1) + "</b>"} · ${T("business.market_value")}: ${val.market_cap_cr == null ? T("common.na") : inr(val.market_cap_cr, 0) + " " + T("common.cr")}</p>
+    <div class="src">${esc(f.history_note)} “missing” means the source did not return that figure. Source: ${esc(f.source)} · latest year ends ${esc(f.as_of)}</div>
+    <h4>Latest quarter</h4>
+    <p>${quarterText(q)}</p>${q.stale_note ? `<p class="missing">${esc(q.stale_note)}</p>` : ""}
+    <h4>Valuation and peers</h4>
+    <p>P/E: ${val.pe == null ? missing(val.missing_reason) : "<b>" + num(val.pe, 1) + "</b>"} · Market value: ${val.market_cap_cr == null ? "n/a" : inr(val.market_cap_cr, 0) + " cr"}</p>
     ${peers}`;
 }
 
@@ -391,35 +583,61 @@ function sources(d) {
   </tbody></table></div>`;
 }
 
+/* The chart shows the whole history the source returned (about five years). Daily opens on the recent months the
+   style looks at; Weekly opens on about three years. Drag the chart or the time axis to see more. Pattern markers are
+   found on daily bars, so they only appear on the daily chart. */
+let chartFrame = "daily";
 function drawChart(d) {
-  const el = $("chart"), t = d.technical;
+  const el = $("chart"), t = d.technical, weekly = chartFrame === "weekly", s = weekly ? d.chart.weekly : d.chart;
+  const unit = weekly ? "week" : "day";
   if (chart) { chart.remove(); chart = null; }
-  $("legend").innerHTML = `<span><i style="background:#facc15"></i>${T("chart.avg", { n: t.trend.fast_n })}</span><span><i style="background:#f4f4f2"></i>${T("chart.avg", { n: t.trend.slow_n })}</span>
-    <span><i style="background:#16c47f"></i>${T("chart.support")}</span><span><i style="background:#ef4444"></i>${T("chart.resistance")}</span><span><i style="background:#8b8b90"></i>${T("chart.stop")}</span>`;
-  if (!window.LightweightCharts) { el.innerHTML = `<p class="missing">${T("chart.lib_missing")}</p>`; return; }
+  document.querySelectorAll("#frame-seg button").forEach((b) => b.classList.toggle("on", b.dataset.frame === chartFrame));
+  $("legend").innerHTML = `<span><i style="background:#facc15"></i>${s.fast_n}-${unit} average</span><span><i style="background:#f4f4f2"></i>${s.slow_n}-${unit} average</span>
+    <span><i style="background:#16c47f"></i>support</span><span><i style="background:#ef4444"></i>resistance</span><span><i style="background:#8b8b90"></i>stop</span>
+    <span class="muted">${d.chart.years} years of history · drag to scroll${weekly ? " · patterns show on Daily" : ""}</span>`;
+  if (!window.LightweightCharts) { el.innerHTML = '<p class="missing">The chart library could not be loaded (it needs an internet connection). All numbers on this page are unaffected.</p>'; return; }
   el.innerHTML = "";
   chart = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
     grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" }, timeScale: { borderColor: "rgba(255,255,255,.08)" },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal } });
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal }, ...CHART_POINTER });
   const candles = chart.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444" });
-  candles.setData(d.chart.candles);
+  candles.setData(s.candles);
   const vol = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "vol", lastValueVisible: false, priceLineVisible: false });
   chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.84, bottom: 0 } });
-  vol.setData(d.chart.volume.map((v, i) => ({ time: v.time, value: v.value, color: d.chart.candles[i].close >= d.chart.candles[i].open ? "rgba(22,196,127,.35)" : "rgba(239,68,68,.35)" })));
-  chart.addLineSeries({ color: "#facc15", lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(d.chart.fast);
-  chart.addLineSeries({ color: "#f4f4f2", lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(d.chart.slow);
+  vol.setData(s.volume.map((v, i) => ({ time: v.time, value: v.value, color: s.candles[i].close >= s.candles[i].open ? "rgba(22,196,127,.35)" : "rgba(239,68,68,.35)" })));
+  chart.addLineSeries({ color: "#facc15", lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(s.fast);
+  chart.addLineSeries({ color: "#f4f4f2", lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(s.slow);
   const line = (price, color, title, style) => candles.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title });
   t.levels.supports.slice(0, 2).forEach((l) => line(l.price, "#16c47f", T("chart.support"), 2));
   t.levels.resistances.slice(0, 2).forEach((l) => line(l.price, "#ef4444", T("chart.resistance"), 2));
   line(d.sizing.stop, "#8b8b90", T("chart.stop"), 0);
-  const first = d.chart.first_date, marks = [];
-  t.patterns.filter((p) => !p.name.includes("trend line")).forEach((p) => p.points.forEach((q) => {
-    if (q.date >= first) marks.push({ time: q.date, position: "aboveBar", color: p.direction === "bearish" ? "#ef4444" : p.direction === "bullish" ? "#16c47f" : "#facc15", shape: "circle", text: q.role });
-  }));
-  marks.sort((a, b) => (a.time < b.time ? -1 : a.time > b.time ? 1 : 0));
-  candles.setMarkers(marks);
-  const n = d.chart.candles.length, show = d.style.key === "swing" ? 130 : 260;
-  chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + 5 });
+  if (!weekly) candles.setMarkers(patternMarkers(t.patterns, s.candles, s.first_date));
+  const n = s.candles.length, show = weekly ? 156 : d.style.key === "swing" ? 130 : 260;
+  chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + (weekly ? 4 : 14) });
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("#frame-seg button");
+  if (!b || b.dataset.frame === chartFrame) return;
+  chartFrame = b.dataset.frame;
+  if (S.report) drawChart(S.report);
+});
+
+/* Pattern markers: one name per pattern at its last point, other points as plain dots. Bullish patterns sit below the
+   bars and the rest above, and a name is dropped when another one on the same side is within LABEL_GAP bars, so labels
+   never pile up. Each point's role (first peak, neckline...) stays in the Levels and patterns section. */
+const LABEL_GAP = 12;
+function patternMarkers(patterns, candles, first) {
+  const index = new Map(candles.map((c, i) => [c.time, i])), marks = [], labelled = { aboveBar: [], belowBar: [] };
+  const shown = patterns.filter((p) => !p.name.includes("trend line")).map((p) => ({ p, pts: p.points.filter((q) => q.date >= first && index.has(q.date)) }))
+    .filter((x) => x.pts.length).sort((a, b) => index.get(b.pts[b.pts.length - 1].date) - index.get(a.pts[a.pts.length - 1].date));
+  shown.forEach(({ p, pts }) => {
+    const position = p.direction === "bullish" ? "belowBar" : "aboveBar";
+    const color = p.direction === "bearish" ? "#ef4444" : p.direction === "bullish" ? "#16c47f" : "#facc15";
+    const at = index.get(pts[pts.length - 1].date), free = labelled[position].every((i) => Math.abs(i - at) >= LABEL_GAP);
+    if (free) labelled[position].push(at);
+    pts.forEach((q, i) => marks.push({ time: q.date, position, color, shape: "circle", size: 0.6, text: free && i === pts.length - 1 ? p.name : "" }));
+  });
+  return marks.sort((a, b) => index.get(a.time) - index.get(b.time));
 }
 
 /* ---------- chat ---------- */
@@ -488,7 +706,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("dict"
   renderFiles(); setCrumb();
   loadScreens();
   const start = location.hash.slice(1);
-  if (["learn", "practice", "news", "dictionary"].includes(start)) go(start);
+  if (["learn", "practice", "news", "tipcheck", "dictionary"].includes(start)) go(start);
   document.dispatchEvent(new CustomEvent("belfort:app-ready")); // lets the startup loader fade (splash.js)
 })();
 

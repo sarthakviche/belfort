@@ -358,9 +358,17 @@ def test_quiz_grading_and_progress(fresh_db):
     prog = c.get("/api/learn/syllabus").json()
     assert prog["completed"] == 1 and prog["streak_days"] == 1
     assert c.get("/api/learn/lessons/../../etc").status_code == 404
-    # planned lessons sit in the locked Intermediate stage: refused (403) before "not written" (404)
-    assert c.get("/api/learn/lessons/capital-gains").status_code in (403, 404)
-    assert c.get("/api/learn/lessons/no-such-lesson").status_code == 404
+    planned = next(
+        (
+            les["id"]
+            for track in prog["syllabus"]["tracks"]
+            for module in track["modules"]
+            for les in module["lessons"]
+            if les.get("status") == "planned" and module["stage"] == "beginner"
+        ),
+        "not-a-real-lesson",  # every lesson is written now, so fall back to an id that is not on the syllabus
+    )
+    assert c.get(f"/api/learn/lessons/{planned}").status_code == 404
 
 
 def test_example_chart_is_lagged(fresh_db):
@@ -400,6 +408,11 @@ def test_rss_parse_clean_and_categorise():
         ("RBI to conduct a repo auction. Sl. No. 1, notified amount", False),
         ("SEBI recommends a framework for research analysts", False),
         ("Sensex closes 400 points higher as banks rally", False),
+        ("Broker’s call: Ventive Hospitality (Buy)", True),
+        ("Broker's Call: UTI Asset Management Co (Buy)", True),
+        ("Tata Motors (Hold) after the demerger", True),
+        ("Brokers call off strike at the port", False),
+        ("Buy now, pay later lender raises funds", False),
     ],
 )
 def test_tip_style_headlines_are_flagged(title, tip):
@@ -407,10 +420,58 @@ def test_tip_style_headlines_are_flagged(title, tip):
 
 
 def test_news_tags_companies(monkeypatch):
-    monkeypatch.setattr(feeds, "cached", lambda key, ttl, fn: {"RELIANCE": "RELIANCE", "Reliance": "RELIANCE", "TCS": "TCS"})
+    monkeypatch.setattr(
+        feeds, "cached", lambda key, ttl, fn, derived=False: {"RELIANCE": "RELIANCE", "Reliance": "RELIANCE", "TCS": "TCS"}
+    )
     items = feeds.parse(RSS, {"id": "x", "name": "Example"})
     feeds.tag(items)
     assert items[0]["symbols"] == ["RELIANCE"] and items[1]["symbols"] == []
+
+
+@pytest.mark.parametrize(
+    "title,tagged",
+    [
+        ("BSE shares jump 48% in 2026 on record volumes", True),
+        ("HSBC prefers BSE over NSE in its coverage", True),
+        ("Six BSE 100 stocks hit 52-week highs", False),
+        ("Press release filed with BSE and NSE under SEBI rules", False),
+        ("Shares list at a 3% premium on the BSE", False),
+        ("Market cap ranking among BSE-listed companies", False),
+        ("Sensex: the BSE Sensex closed 300 points higher", False),
+    ],
+)
+def test_news_does_not_tag_bse_when_it_means_the_exchange(monkeypatch, title, tagged):
+    monkeypatch.setattr(feeds, "cached", lambda key, ttl, fn, derived=False: {"BSE": "BSE"})
+    story = {"title": title, "summary": ""}
+    feeds.tag([story])
+    assert (story["symbols"] == ["BSE"]) is tagged
+
+
+def test_news_companies_name_each_tagged_stock_without_fetching(monkeypatch, tmp_path):
+    from belfort.data import symbols
+    from belfort.research.analysis import pipeline
+
+    monkeypatch.setattr(symbols.settings, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(symbols, "_closes", None)
+    monkeypatch.setattr(pipeline.nse, "listed", lambda: [("TCS", "Tata Consultancy Services Limited")])
+    symbols.remember_close("TCS", 2640.3, "2026-11-26")
+    out = feeds.companies(["TCS", "NOTLISTED", "TCS"])
+    assert list(out) == ["TCS", "NOTLISTED"]
+    assert (
+        out["TCS"]["last_close"] == 2640.3
+        and out["TCS"]["as_of"] == "2026-11-26"
+        and out["TCS"]["name"] == "Tata Consultancy Services"
+    )
+    assert out["NOTLISTED"] == {"name": "NOTLISTED"}
+
+
+def test_news_route_adds_the_companies_map(monkeypatch):
+    from belfort.news import router as news_router
+
+    data = {"stories": [{"title": "x", "symbols": ["INFY"]}], "generated": "", "sources": [], "categories": [], "note": ""}
+    monkeypatch.setattr(news_router.feeds, "get", lambda refresh=False: data)
+    monkeypatch.setattr(news_router.feeds, "companies", lambda syms: {s: {"name": s} for s in syms})
+    assert TestClient(app).get("/api/news").json()["companies"] == {"INFY": {"name": "INFY"}}
 
 
 # ---------------- assistant ----------------

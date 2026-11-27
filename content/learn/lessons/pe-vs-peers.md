@@ -37,6 +37,9 @@ If the company made a loss, there are no positive earnings to divide by, and the
 [
   {"q": "A share trades at ₹450 and earned ₹18 per share last year. What is its P/E?", "options": ["18", "25", "45"], "answer": 1, "why": "₹450 ÷ ₹18 = 25."},
   {"q": "A company's P/E is 40 and its peers' median is 22. What does the report note?", "options": ["Priced well above peers", "Priced below peers", "Nothing"], "answer": 0, "why": "40 is more than 1.5 times 22 (which is 33), so the report notes it is priced well above peers."},
-  {"q": "Why might a stock have a much lower P/E than its peers?", "options": ["It is always a bargain", "The market may expect a problem, such as falling profits", "Low P/Es are set by SEBI"], "answer": 1, "why": "A low P/E often reflects worries about the business. It is a reason to look closer, not proof of value."}
+  {"q": "Why might a stock have a much lower P/E than its peers?", "options": ["It is always a bargain", "The market may expect a problem, such as falling profits", "Low P/Es are set by SEBI"], "answer": 1, "why": "A low P/E often reflects worries about the business. It is a reason to look closer, not proof of value."},
+  {"type": "number", "q": "A share costs ₹840 and earns ₹28 per share a year. What is its P/E?", "answer": 30, "tolerance": 0, "why": "P/E = share price ÷ earnings per share = 840 ÷ 28 = 30."},
+  {"type": "number", "q": "A company's P/E is 32 and its peer median P/E is 20. The company's P/E is how many times the median?", "answer": 1.6, "tolerance": 0.01, "unit": "times", "why": "32 ÷ 20 = 1.6. That is above 1.5, so the report says 'Priced well above peers'."},
+  {"type": "tf", "q": "A low P/E always means the share is cheap and a good opportunity.", "answer": false, "why": "A low P/E can mean the market expects profits to fall or worries about the accounts or debt. Check the five numbers first."}
 ]
 ```

@@ -48,6 +48,9 @@ In this past chart, look for a close above the highest point of the previous few
 [
   {"q": "A swing-style stock closes above its 20-day high on 0.9 times average volume. What does Belfort's entry-area check say?", "options": ["It passes", "It is not met, because volume is thin", "It places the trade for you"], "answer": 1, "why": "The breakout needs at least 1.5 times average volume. On thin volume the check is not met and the reason is shown."},
   {"q": "Why does a breakout need a close above the level, not just a touch?", "options": ["A touch during the day can reverse before the close", "Closes are cheaper to trade", "Exchanges only report closes"], "answer": 0, "why": "Price can poke above a level intraday and fall back. A close shows the level held through the session."},
-  {"q": "Capital ₹2,00,000, risk 1%, entry ₹820, stop ₹780. How many shares?", "options": ["25", "50", "100"], "answer": 1, "why": "Risk money ₹2,000 ÷ ₹40 per share = 50 shares."}
+  {"q": "Capital ₹2,00,000, risk 1%, entry ₹820, stop ₹780. How many shares?", "options": ["25", "50", "100"], "answer": 1, "why": "Risk money ₹2,000 ÷ ₹40 per share = 50 shares."},
+  {"type": "number", "q": "Capital ₹4,00,000, risk 1%. A breakout closes at ₹1,226 with the stop at ₹1,180. How many shares (rounded down)?", "answer": 86, "tolerance": 0, "unit": "shares", "why": "Risk money is ₹4,000 and the stop distance is ₹46. 4,000 ÷ 46 is about 86.96, rounded down to 86."},
+  {"type": "number", "q": "The 20-day average volume is 10,00,000 shares. What is the least volume a swing breakout day needs to meet Belfort's check?", "answer": 1500000, "tolerance": 0, "unit": "shares", "why": "The check wants at least 1.5 times the 20-day average: 1.5 × 10,00,000 = 15,00,000."},
+  {"type": "tf", "q": "A stock that trades above the 20-day high during the day, but closes back under it, counts as a breakout.", "answer": false, "why": "It must be a close above the level, not just a touch during the day."}
 ]
 ```

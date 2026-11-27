@@ -20,7 +20,7 @@ function candleChart(el, candles, opts) {
   const c = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
     grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" },
     timeScale: { borderColor: "rgba(255,255,255,.08)", visible: !(opts && opts.hideTime) }, crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    handleScroll: !(opts && opts.locked), handleScale: !(opts && opts.locked) });
+    ...(opts && opts.locked ? { handleScroll: false, handleScale: false } : CHART_POINTER) });
   const s = c.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444" });
   s.setData(candles);
   c.timeScale().fitContent();
@@ -68,11 +68,11 @@ function renderPaper() {
   const tr = (cells) => `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
   const rTxt = (r) => (r == null ? T("common.na") : `<span class="${r >= 0 ? "up" : "down"}">${r >= 0 ? "+" : ""}${r}R</span>`);
   $("practice-body").innerHTML = `
-    <div class="cards">${stat(T("pr.account_value"), num(d.equity, 0), T("pr.since_start", { pct: (d.return_pct >= 0 ? "+" : "") + d.return_pct }), true)}
-      ${stat(T("pr.available"), num(d.available, 0), d.reserved ? T("pr.held", { n: num(d.reserved, 0) }) : T("pr.ready"))}
-      ${stat(T("pr.win_rate"), st.win_rate == null ? T("common.na") : pctTxt(st.win_rate), T("pr.closed_trades", { n: st.closed }))}
-      ${stat(T("pr.avg_r"), st.avg_r == null ? T("common.na") : (st.avg_r >= 0 ? "+" : "") + st.avg_r, T("pr.avg_r_sub"))}
-      ${stat(T("pr.open_risk"), d.risk.total_pct == null ? T("common.na") : `<span class="${d.risk.over_limit ? "down" : ""}">${d.risk.total_pct}%</span>`, T("pr.open_risk_sub", { points: num(d.risk.total_points, 0), limit: d.risk.limit_pct }))}</div>
+    <div class="cards">${stat("Account value", num(d.equity, 0), `${d.return_pct >= 0 ? "+" : ""}${d.return_pct}% since start`, true)}
+      ${stat("Available points", num(d.available, 0), d.reserved ? `${num(d.reserved, 0)} held for pending orders` : "ready to use")}
+      ${stat("Win rate", st.win_rate == null ? "n/a" : pctTxt(st.win_rate), `${st.closed} closed trades`)}
+      ${stat("Average R", st.avg_r == null ? "n/a" : (st.avg_r >= 0 ? "+" : "") + st.avg_r, "result per trade, in units of risk")}
+      ${stat("Open risk", d.risk.total_pct == null ? "n/a" : `<span class="${d.risk.over_limit ? "down" : ""}">${d.risk.total_pct}%</span>`, `${num(d.risk.total_points, 0)} points if every stop is hit · limit ${d.risk.limit_pct}%${d.risk.unprotected ? ` · ${d.risk.unprotected} with no stop, counted in full` : ""}`)}</div>
     <div class="layout practice-layout">
       <div class="col-main">
         <div class="panel glass"><h3>${T("pr.open_positions")}</h3>${d.open.length ? `<div class="scroll"><table><thead><tr><th>${T("pr.col_stock")}</th><th class="num">${T("pr.col_qty")}</th><th class="num">${T("pr.col_entry")}</th><th class="num">${T("pr.col_last")}</th><th class="num">${T("pr.col_stop")}</th><th class="num">${T("pr.col_target")}</th><th class="num">${T("pr.col_pnl")}</th><th class="num">${T("pr.col_now")}</th><th></th></tr></thead><tbody>
@@ -80,10 +80,10 @@ function renderPaper() {
             `<span class="${t.pnl >= 0 ? "up" : "down"}">${num(t.pnl, 0)}</span>`, rTxt(t.open_r),
             t.close_requested_on ? `<span class="hint">${T("pr.exit_next_open")}</span>` : `<div class="row-actions"><button type="button" class="btn ghost sm" data-manage="${t.id}">${T("pr.manage")}</button><button type="button" class="btn ghost sm" data-close="${t.id}">${T("pr.exit")}</button></div>`])
             + (t.close_requested_on ? "" : manageRow(t))).join("")}</tbody></table></div>`
-          : `<p class="missing">${T("pr.no_open")}</p>`}</div>
-        ${d.pending.length ? `<div class="panel glass"><h3>${T("pr.waiting")}</h3><div class="scroll"><table><thead><tr><th>${T("pr.col_stock")}</th><th>${T("pr.col_order")}</th><th class="num">${T("pr.col_qty")}</th><th class="num">${T("pr.col_stop")}</th><th>${T("pr.col_placed")}</th><th></th></tr></thead><tbody>
-          ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? T("pr.limit_at", { price: inr(t.limit_price) }) : T("pr.market_next"), num(t.qty, 0), inr(t.stop), esc(t.placed_on),
-            `<button type="button" class="btn ghost sm" data-close="${t.id}">${T("common.cancel")}</button>`])).join("")}</tbody></table></div></div>` : ""}
+          : '<p class="missing">No open positions.</p>'}</div>
+        ${d.pending.length ? `<div class="panel glass"><h3>Waiting to fill</h3><div class="scroll"><table><thead><tr><th>Stock</th><th>Order</th><th class="num">Qty</th><th class="num">Stop</th><th>Placed</th><th></th></tr></thead><tbody>
+          ${d.pending.map((t) => tr([`<b>${esc(t.symbol)}</b>`, t.entry_type === "limit" ? "limit " + inr(t.limit_price) : "market, next open", num(t.qty, 0), t.stop == null ? '<span class="down">none</span>' : inr(t.stop), esc(t.placed_on),
+            `<button type="button" class="btn ghost sm" data-close="${t.id}">Cancel</button>`])).join("")}</tbody></table></div></div>` : ""}
         ${equityPanel()}
         ${journalPanel()}
         <div class="panel glass"><h3>${T("pr.closed_title")}</h3>${d.closed.length ? d.closed.map((t) => `<div class="closed">
@@ -95,19 +95,19 @@ function renderPaper() {
           </div>`).join("") : `<p class="missing">${T("pr.no_closed")}</p>`}</div>
       </div>
       <aside class="col-side">
-        <form class="panel glass glow" id="order-form"><h3>${T("pr.new_trade")}</h3>
-          <p class="hint">${T("pr.new_hint")}</p>
+        <form class="panel glass glow" id="order-form"><h3>New practice trade</h3>
+          <p class="hint">Long only, end-of-day fills. A stop-loss is optional but recommended: without one, the whole position is at risk and the trade has no R.</p>
           <div class="fields">
             <label class="wide">${T("pr.stock")}<input name="symbol" required maxlength="80" placeholder="${T("pr.stock_ph")}" data-stock-picker></label>
             <div class="wide ticket" id="ticket" hidden></div>
-            <label>${T("pr.qty")}<input name="qty" type="number" min="1" step="1" required></label>
-            <label>${T("pr.setup")}<select name="setup"><option value="">${T("pr.not_tagged")}</option>${Object.entries(P.an ? P.an.setups : {}).map(([k, v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join("")}</select></label>
-            <label>${T("pr.order")}<select name="entry_type"><option value="market">${T("pr.order_market")}</option><option value="limit">${T("pr.order_limit")}</option></select></label>
-            <label class="wide limit-only" hidden>${T("pr.limit_price")}<input name="limit_price" type="number" min="0" step="0.05"></label>
-            <label>${T("pr.stop_loss")}<input name="stop" type="number" min="0" step="0.05" required></label>
-            <label>${T("pr.target_opt")}<input name="target" type="number" min="0" step="0.05"></label>
-            <label>${T("pr.risk_pct")}<input id="risk-pct" type="number" min="0.1" max="10" step="0.1" value="1"></label>
-            <div class="size-row"><button type="button" class="btn ghost sm" id="size-it">${T("pr.size_it")}</button></div>
+            <label>Quantity<input name="qty" type="number" min="1" step="1" required></label>
+            <label>Setup<select name="setup"><option value="">Not tagged</option>${Object.entries(P.an ? P.an.setups : {}).map(([k, v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join("")}</select></label>
+            <label>Order<select name="entry_type"><option value="market">Market, next open</option><option value="limit">Limit</option></select></label>
+            <label class="wide limit-only" hidden>Limit price (₹)<input name="limit_price" type="number" min="0" step="0.05"></label>
+            <label>Stop-loss (₹, optional)<input name="stop" type="number" min="0" step="0.05" placeholder="recommended"></label>
+            <label>Target (₹, optional)<input name="target" type="number" min="0" step="0.05"></label>
+            <label>Risk per trade (%)<input id="risk-pct" type="number" min="0.1" max="10" step="0.1" value="1"></label>
+            <div class="size-row"><button type="button" class="btn ghost sm" id="size-it">Size it</button></div>
             <p class="wide hint" id="order-risk"></p>
             <label class="wide">${T("pr.how_sure")} <output id="conf-out">60%</output><input name="confidence" type="range" min="50" max="95" value="60"></label>
             <label class="wide">${T("pr.why_trade")}<textarea name="thesis" rows="3" maxlength="600" required placeholder="${T("pr.thesis_ph")}"></textarea></label>
@@ -146,15 +146,16 @@ function ticketEntry() {
 function updateRisk() {
   const f = $("order-form"), out = $("order-risk"); if (!f || !out) return;
   const entry = ticketEntry(), qty = +f.qty.value, stop = +f.stop.value;
-  if (!entry || !qty || !stop) { out.textContent = ""; return; }
-  if (stop >= entry) { out.innerHTML = `<span class="down">${T("pr.stop_below", { entry: inr(entry) })}</span>`; return; }
-  const risk = qty * (entry - stop), equity = P.pf ? P.pf.equity : 0, share = equity > 0 ? (risk / equity) * 100 : null;
+  if (!entry || !qty) { out.textContent = ""; return; }
+  if (stop && stop >= entry) { out.innerHTML = `<span class="down">The stop must be below the entry (about ${inr(entry)}).</span>`; return; }
+  const risk = stop ? qty * (entry - stop) : qty * entry, equity = P.pf ? P.pf.equity : 0, share = equity > 0 ? (risk / equity) * 100 : null;
   const max = P.pf ? P.pf.risk.trade_limit_pct : 2, limit = P.pf ? P.pf.risk.limit_pct : 6;
   const after = equity > 0 && P.pf ? ((P.pf.risk.total_points + risk) / equity) * 100 : null;
-  out.innerHTML = T("pr.risks_points", { risk: num(risk, 0), used: num(qty * entry, 0), share: share == null ? "" : T("pr.of_account", { cls: share > max ? "down" : "", pct: share.toFixed(2) }) })
-    + (after == null ? "" : T("pr.open_after", { cls: after > limit ? "down" : "", pct: after.toFixed(2), limit }))
-    + (share != null && share > max ? T("pr.over_trade", { max }) : "")
-    + (after != null && after > limit ? T("pr.over_total", { limit }) : "");
+  out.innerHTML = (stop ? "" : `<span class="down">No stop-loss: the whole ${num(risk, 0)} points are at risk, and the trade will have no R.</span> `)
+    + `This order risks <b>${num(risk, 0)} points</b>${share == null ? "" : `, <b class="${share > max ? "down" : ""}">${share.toFixed(2)}%</b> of the account`}, and uses ${num(qty * entry, 0)} points.`
+    + (after == null ? "" : ` Open risk after it: <b class="${after > limit ? "down" : ""}">${after.toFixed(2)}%</b> (limit ${limit}%).`)
+    + (share != null && share > max ? ` <span class="down">That is more than ${max}% on one trade.</span>` : "")
+    + (after != null && after > limit ? ` <span class="down">Together your open trades would risk more than ${limit}% of the account.</span>` : "");
 }
 async function sizeIt() {
   const f = $("order-form"), sym = f.querySelector('input[type="hidden"][name="symbol"]');
@@ -218,18 +219,20 @@ function journalPanel() {
 
 /* ---- managing an open position: raise the stop, trail it, sell part ---- */
 function stopCell(t) {
+  if (t.current_stop == null) return '<span class="down">none</span><div class="src">whole position at risk</div>';
+  if (t.stop == null) return `${inr(t.current_stop)}<div class="src">added after entry</div>`;
   const raised = t.current_stop > t.stop;
   const trail = t.trail_kind ? `<div class="src">${T(t.trail_kind === "pct" ? "pr.trailing_pct" : "pr.trailing_atr", { v: t.trail_value })}</div>` : "";
   return `${inr(t.current_stop)}${raised ? `<div class="src">${T("pr.raised_from", { price: inr(t.stop) })}</div>` : ""}${trail}`;
 }
 function manageRow(t) {
   return `<tr class="manage-row" id="manage-${t.id}" hidden><td colspan="9"><div class="manage">
-    <label>${T("pr.raise_to")}<span class="inline"><input type="number" step="0.05" min="${t.current_stop}" data-raise-input="${t.id}" placeholder="${T("pr.above", { price: num(t.current_stop) })}"><button type="button" class="btn ghost sm" data-raise="${t.id}">${T("pr.raise")}</button></span></label>
-    <label>${T("pr.trailing_stop")}<span class="inline"><select data-trail-kind="${t.id}"><option value="pct" ${t.trail_kind === "pct" ? "selected" : ""}>${T("pr.pct_below")}</option><option value="atr" ${t.trail_kind === "atr" ? "selected" : ""}>${T("pr.atr_below")}</option></select>
-      <input type="number" step="0.1" min="0.5" data-trail-value="${t.id}" value="${t.trail_value || ""}" placeholder="${T("pr.trail_ph")}"><button type="button" class="btn ghost sm" data-trail="${t.id}">${T("pr.set")}</button>
-      ${t.trail_kind ? `<button type="button" class="btn ghost sm" data-trail-off="${t.id}">${T("pr.off")}</button>` : ""}</span></label>
-    <label>${T("pr.sell_part")}<span class="inline"><input type="number" step="1" min="1" max="${t.qty - 1}" data-sell-input="${t.id}" placeholder="${T("pr.range_ph", { n: t.qty - 1 })}"><button type="button" class="btn ghost sm" data-sell="${t.id}">${T("pr.sell_next")}</button></span></label>
-    <p class="hint">${T("pr.manage_hint", { price: inr(t.stop) })}</p>
+    <label>${t.current_stop == null ? "Set a stop at (₹)" : "Raise stop to (₹)"}<span class="inline"><input type="number" step="0.05" min="${t.current_stop || 0}" data-raise-input="${t.id}" placeholder="${t.current_stop == null ? "below the last close" : "above " + num(t.current_stop)}"><button type="button" class="btn ghost sm" data-raise="${t.id}">${t.current_stop == null ? "Set" : "Raise"}</button></span></label>
+    <label>Trailing stop<span class="inline"><select data-trail-kind="${t.id}"><option value="pct" ${t.trail_kind === "pct" ? "selected" : ""}>% below close</option><option value="atr" ${t.trail_kind === "atr" ? "selected" : ""}>x ATR below close</option></select>
+      <input type="number" step="0.1" min="0.5" data-trail-value="${t.id}" value="${t.trail_value || ""}" placeholder="e.g. 8 or 2"><button type="button" class="btn ghost sm" data-trail="${t.id}">Set</button>
+      ${t.trail_kind ? `<button type="button" class="btn ghost sm" data-trail-off="${t.id}">Off</button>` : ""}</span></label>
+    <label>Sell part (shares)<span class="inline"><input type="number" step="1" min="1" max="${t.qty - 1}" data-sell-input="${t.id}" placeholder="1 to ${t.qty - 1}"><button type="button" class="btn ghost sm" data-sell="${t.id}">Sell at next open</button></span></label>
+    <p class="hint">Changes apply from the next session. A stop only moves up; ${t.stop == null ? "this trade was placed without a stop, so it has no R." : `R is still measured against the original stop of ${inr(t.stop)}.`}</p>
   </div></td></tr>`;
 }
 async function manage(path, body) {
@@ -278,7 +281,7 @@ $("practice-body").addEventListener("submit", async (e) => {
   const f = new FormData(e.target), val = (k) => (f.get(k) === "" || f.get(k) == null ? null : f.get(k));
   try {
     if (e.target.id === "order-form") {
-      const r = await post("/api/practice/trades", { symbol: val("symbol"), qty: +val("qty"), stop: +val("stop"), target: val("target") ? +val("target") : null,
+      const r = await post("/api/practice/trades", { symbol: val("symbol"), qty: +val("qty"), stop: val("stop") ? +val("stop") : null, target: val("target") ? +val("target") : null,
         setup: val("setup"), entry_type: val("entry_type"), limit_price: val("limit_price") ? +val("limit_price") : null, confidence: +val("confidence") / 100, thesis: val("thesis") || "" });
       status(r.message); loadPractice();
     } else if (e.target.id === "predict-form") {
@@ -387,7 +390,7 @@ async function replayDecide(decision) {
 }
 
 /* ======================= NEWS ======================= */
-const N = { data: null, cat: "All", tips: false };
+const N = { data: null, cat: "All", tips: false, sym: null };
 const newsCat = (c) => (c === "All" ? T("nw.all") : T("nwcat." + c, null, c));
 onView.news = (opts) => loadNews(opts.refresh);
 async function loadNews(refresh) {
@@ -395,21 +398,39 @@ async function loadNews(refresh) {
   try { N.data = await api("/api/news" + (refresh ? "?refresh=true" : "")); renderNews(); }
   catch (e) { $("news-body").innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
 }
+/* A story card reads top to bottom: which stock, what happened, then the link for the full story. The summary is the
+   publisher's own feed description; Belfort adds the company name and its last close, never its own take. */
+const NEWS_MIN_SUMMARY = 40;
+function stockStrip(syms) {
+  const co = (N.data && N.data.companies) || {};
+  return syms.length ? `<div class="stk-row">${syms.map((x) => { const c = co[x] || { name: x };
+    return `<button type="button" class="stk" data-sym="${esc(x)}" title="Open Belfort's report on ${esc(c.name)}"><b>${esc(x)}</b><span class="nm">${esc(c.name)}</span>
+      ${c.last_close ? `<span class="px">${inr(c.last_close)} <i>close ${esc(c.as_of)}</i></span>` : ""}<span class="go">Report →</span></button>`; }).join("")}</div>` : "";
+}
 function storyCard(s, big) {
   const img = s.image ? `<div class="ni"><img src="${esc(safeUrl(s.image))}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></div>` : "";
+  const what = s.summary && s.summary.length >= NEWS_MIN_SUMMARY;
   return `<article class="story ${big ? "lead" : ""} ${s.image ? "" : "noimg"}" data-id="${esc(s.id)}">${img}
-    <div class="sb"><div class="meta"><span class="chip c-plain">${esc(s.category)}</span>${s.tip ? `<span class="chip c-medium">${T("nw.tip_label")}</span>` : ""}<span>${esc(s.source)}</span><span>${esc(ago(s.published))}</span></div>
-      <h3 class="st"><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a></h3>
-      ${s.summary ? `<p class="ss">${esc(s.summary)}</p>` : ""}
-      <div class="sf">${(s.symbols || []).map((x) => `<button type="button" class="tkr" data-sym="${esc(x)}">${esc(x)}</button>`).join("")}
-        <span class="sp"></span><button type="button" class="linkish" data-explain="${esc(s.id)}">${T("nw.explain")}</button>
-        <a class="linkish" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${T("nw.read_source")}</a></div></div></article>`;
+    <div class="sb"><div class="meta"><span class="chip c-plain">${esc(s.category)}</span>${s.tip ? '<span class="chip c-medium">publisher\'s stock call</span>' : ""}<span>${esc(s.source)}</span><span>${esc(ago(s.published))}</span></div>
+      ${stockStrip(s.symbols || [])}
+      <h3 class="st">${esc(s.title)}</h3>
+      ${what ? `<div class="what"><span class="eyebrow">What happened</span><p>${esc(s.summary)}</p></div>` : ""}
+      <div class="sf"><button type="button" class="linkish" data-explain="${esc(s.id)}">Explain in plain words</button><span class="sp"></span>
+        <a class="more" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">Read the full story on ${esc(s.source)} ↗</a></div></div></article>`;
+}
+function stocksInNews(stories) {
+  const count = {};
+  stories.forEach((s) => (s.symbols || []).forEach((x) => { count[x] = (count[x] || 0) + 1; }));
+  const co = N.data.companies || {}, top = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  return top.length ? `<div class="panel glass"><h3>Stocks in the news</h3><p class="hint">Companies named in today's stories. Pick one to see only its stories.</p>
+    ${top.map(([x, n]) => `<button type="button" class="in-news ${N.sym === x ? "on" : ""}" data-filter="${esc(x)}"><b>${esc(x)}</b><span>${esc((co[x] || {}).name || x)}</span><i>${n} stor${n > 1 ? "ies" : "y"}</i></button>`).join("")}</div>` : "";
 }
 function renderNews() {
   const d = N.data, cats = ["All"].concat(d.categories.filter((c) => d.stories.some((s) => s.category === c)));
   if (!cats.includes(N.cat)) N.cat = "All";
   $("news-cats").innerHTML = cats.map((c) => `<button type="button" data-cat="${esc(c)}" class="${c === N.cat ? "on" : ""}">${esc(newsCat(c))}</button>`).join("");
-  const inCat = d.stories.filter((s) => N.cat === "All" || s.category === N.cat);
+  if (N.sym && !d.stories.some((s) => (s.symbols || []).includes(N.sym))) N.sym = null;
+  const inCat = d.stories.filter((s) => (N.cat === "All" || s.category === N.cat) && (!N.sym || (s.symbols || []).includes(N.sym)));
   const hiddenTips = inCat.filter((s) => s.tip).length;
   const xs = inCat.filter((s) => N.tips || !s.tip);
   const official = xs.filter((s) => s.kind === "official"), pub = xs.filter((s) => s.kind !== "official");
@@ -418,8 +439,8 @@ function renderNews() {
     const lead = pub.find((s) => s.image) || pub[0];
     const rest = pub.filter((s) => s !== lead);
     $("news-body").innerHTML = `<div class="news-grid">
-      <div class="news-main">${lead ? storyCard(lead, true) : ""}<div class="stories">${rest.slice(0, 40).map((s) => storyCard(s)).join("")}</div></div>
-      <aside class="news-side"><div class="panel glass"><h3>${T("nw.official")}</h3>${official.length ? official.slice(0, 12).map((s) => `<div class="brief">
+      <div class="news-main">${N.sym ? `<div class="filter-note">Showing stories about <b>${esc(N.sym)}</b> · <button type="button" class="linkish" data-filter="">Show all stories</button></div>` : ""}${lead ? storyCard(lead, true) : ""}<div class="stories">${rest.slice(0, 40).map((s) => storyCard(s)).join("")}</div></div>
+      <aside class="news-side">${stocksInNews(d.stories.filter((s) => N.tips || !s.tip))}<div class="panel glass"><h3>From the regulator and the RBI</h3>${official.length ? official.slice(0, 12).map((s) => `<div class="brief">
           <span class="hint">${esc(s.source)} · ${esc(ago(s.published))}</span><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a>
           <button type="button" class="linkish" data-explain="${esc(s.id)}">${T("nw.explain")}</button></div>`).join("") : `<p class="missing">${T("nw.no_official")}</p>`}</div>
         ${hiddenTips ? `<div class="panel glass"><h3>${T("nw.tips_hidden")}</h3><p class="hint">${T("nw.tips_text", { n: hiddenTips })}</p>
@@ -435,6 +456,7 @@ $("news-cats").addEventListener("click", (e) => { const b = e.target.closest("bu
 $("news-refresh").addEventListener("click", () => loadNews(true));
 $("news-body").addEventListener("click", (e) => {
   if (e.target.closest("#tips-toggle")) { N.tips = !N.tips; return renderNews(); }
+  const f = e.target.closest("[data-filter]"); if (f) { N.sym = f.dataset.filter || null; renderNews(); return window.scrollTo({ top: 0, behavior: "smooth" }); }
   const t = e.target.closest("button[data-sym]"); if (t) return load(t.dataset.sym);
   const x = e.target.closest("button[data-explain]");
   if (x) {
