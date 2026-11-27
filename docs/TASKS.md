@@ -53,7 +53,7 @@
 | T39 | Release workflow | 5 Ship | P0 | M | Blocked on T38 |
 | T40 | Ship Belfort 1.0 for Windows | 5 Ship | P0 | L | Blocked on all P0 and P1 tasks |
 | T41 | Apply the brand decision | 5 Ship | P1 | S | Blocked on D2 |
-| T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | Done ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)) |
+| T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | Done ([#37](https://github.com/sarthakviche/belfort/pull/37)) |
 | T43 | Accounts and sync across devices | 6 Belfort 2 | P0 | L | In progress |
 | T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress |
 | T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | In progress |
@@ -256,7 +256,7 @@ Shared contracts every Phase 6 task uses:
 - **New UI** goes in its own file under `belfort/static/` (for example `learn-game.js`, `auth.js`, `tipcheck.js`), with only a script tag and a nav hook added to `index.html` and `app.js`, so parallel branches do not collide.
 
 ### T42 · Gamified Learn: stages, locks, XP, streaks, hearts
-- **P0 · L · Owner:** Sarthak (agent) · **Status:** Done ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)) · **Area:** learn, ui · Supersedes T24.
+- **P0 · L · Owner:** Sarthak (agent) · **Status:** Done ([#37](https://github.com/sarthakviche/belfort/pull/37)) · **Area:** learn, ui · Supersedes T24.
 - **Path:** a vertical map per stage: one node per lesson, a checkpoint node at the end of each module and a stage test at the end of the stage. Next node pulses; done nodes show a crown when the quiz was perfect.
 - **Locks:** a new user sees Beginner only. Intermediate and Advanced lessons show their title and a lock; their content and quiz are refused by the API (not only hidden in the page). A stage unlocks when its previous stage test is passed at 80% or more, or by passing the placement test (a 12-question mix from Beginner) on first open.
 - **Lesson flow:** the lesson is split into cards at each `## ` heading, one card per screen, with an exercise after the cards. Wrong answers cost a heart (5 per day); hearts refill each day or by finishing a Weak spots review (questions the user got wrong before).
@@ -311,7 +311,7 @@ Shared contracts every Phase 6 task uses:
 
 ## Done
 
-- T42 Gamified Learn: stage path, locks, cards, four exercise types, XP, streaks, hearts ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)).
+- T42 Gamified Learn: stage path, locks, cards, four exercise types, XP, streaks, hearts ([#37](https://github.com/sarthakviche/belfort/pull/37)).
 - v0.1 foundation (see README "What is built").
 - Production engineering setup: lint, format, coverage, pinned dependencies, CI on Windows and Linux, commit policy, conventions (PR #1).
 - T01 Onboarding steps checked on a clean clone and fixed ([#7](https://github.com/sarthakviche/belfort/pull/7)).
