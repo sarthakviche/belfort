@@ -112,7 +112,7 @@ def portfolio() -> dict:
     trades = _trades(acc["id"])
     marks = _last_closes({t["symbol"] for t in trades if t["status"] in ("open", "pending")})
     cash, reserved, invested, market_value = acc["start_points"], 0.0, 0.0, 0.0
-    open_risk, pending_risk = 0.0, 0.0
+    open_risk, pending_risk, unprotected = 0.0, 0.0, 0
     open_rows, pending_rows, closed_rows = [], [], []
     for t in trades:
         if t["status"] in ("open", "closed"):
@@ -134,7 +134,12 @@ def portfolio() -> dict:
             last, as_of = marks.get(t["symbol"], (t["entry_price"], t["entry_date"]))
             invested += buy
             market_value += last * t["qty"]
-            open_risk += max(0.0, last - current_stop(t)) * t["qty"]
+            stop_now = current_stop(t)
+            if stop_now is None:
+                open_risk += last * t["qty"]
+                unprotected += 1
+            else:
+                open_risk += max(0.0, last - stop_now) * t["qty"]
             open_rows.append(
                 {
                     **t,
@@ -148,7 +153,11 @@ def portfolio() -> dict:
         elif t["status"] == "pending":
             est = (t["limit_price"] or marks.get(t["symbol"], (0, None))[0]) * t["qty"]
             reserved += est + _cost(est)
-            pending_risk += max(0.0, est / t["qty"] - t["stop"]) * t["qty"] if t["qty"] else 0.0
+            if t["stop"] is None:
+                pending_risk += est
+                unprotected += 1
+            elif t["qty"]:
+                pending_risk += max(0.0, est / t["qty"] - t["stop"]) * t["qty"]
             pending_rows.append(t)
     wins = [t for t in closed_rows if t["pnl"] > 0]
     rs = [t["r"] for t in closed_rows if t["r"] is not None]
@@ -163,7 +172,7 @@ def portfolio() -> dict:
         "market_value": round(market_value, 2),
         "equity": round(equity, 2),
         "return_pct": round((equity / acc["start_points"] - 1) * 100, 2),
-        "risk": risk_summary(open_risk, pending_risk, equity),
+        "risk": risk_summary(open_risk, pending_risk, equity, unprotected),
         "open": open_rows,
         "pending": pending_rows,
         "closed": closed_rows[:50],
@@ -278,8 +287,9 @@ def equity_curve() -> dict:
     }
 
 
-def risk_summary(open_risk: float, pending_risk: float, equity: float) -> dict:
-    """Points that would be lost if every open position and waiting order hit its stop, and their share of the account."""
+def risk_summary(open_risk: float, pending_risk: float, equity: float, unprotected: int = 0) -> dict:
+    """Points that would be lost if every open position and waiting order hit its stop, and their share of the account.
+    A position without a stop counts with its whole value, since nothing limits the loss."""
     total = open_risk + pending_risk
     pct = round(total / equity * 100, 2) if equity > 0 else None
     return {
@@ -290,8 +300,10 @@ def risk_summary(open_risk: float, pending_risk: float, equity: float) -> dict:
         "limit_pct": PAPER_MAX_OPEN_RISK_PCT,
         "trade_limit_pct": PAPER_MAX_RISK_PCT,
         "over_limit": pct is not None and pct > PAPER_MAX_OPEN_RISK_PCT,
+        "unprotected": unprotected,
         "note": "Open risk is the distance from the last close to the stop, times the shares, for every open position, plus "
-        "the same for orders still waiting to fill. It is what you would lose if every stop were hit.",
+        "the same for orders still waiting to fill. It is what you would lose if every stop were hit. A position with no "
+        "stop counts with its whole value, because nothing limits its loss.",
     }
 
 
@@ -317,7 +329,7 @@ def risk_warnings(order_risk: float, risk: dict, equity: float) -> list[str]:
 def place_trade(
     symbol: str,
     qty: int,
-    stop: float,
+    stop: float | None,
     target: float | None,
     thesis: str,
     confidence: float | None,
@@ -345,7 +357,7 @@ def place_trade(
         raise PracticeError(str(e)) from e
     last = float(df["close"].iloc[-1])
     ref = float(limit_price) if entry_type == "limit" else last
-    if stop >= ref:
+    if stop is not None and stop >= ref:
         raise PracticeError(f"The stop must be below the entry price (about ₹{ref:.2f}). Practice is long only for now.")
     if target is not None and target <= ref:
         raise PracticeError("The target must be above the entry price.")
@@ -363,7 +375,7 @@ def place_trade(
                 int(qty),
                 entry_type,
                 limit_price,
-                float(stop),
+                float(stop) if stop is not None else None,
                 target,
                 thesis.strip(),
                 confidence,
@@ -373,7 +385,14 @@ def place_trade(
         )
         tid = cur.lastrowid
     db.touch_activity("practice")
-    warnings = risk_warnings((ref - float(stop)) * qty, pf["risk"], pf["equity"])
+    order_risk = (ref - float(stop)) * qty if stop is not None else ref * qty
+    warnings = risk_warnings(order_risk, pf["risk"], pf["equity"])
+    if stop is None:
+        warnings.insert(
+            0,
+            "No stop-loss: nothing limits the loss on this trade, so its whole value counts as risk, and it has no R "
+            "in your journal. You can add a stop once it is open.",
+        )
     return {
         "id": tid,
         "symbol": symbol,
@@ -409,10 +428,14 @@ def _open_trade(con, trade_id: int):
     return dict(t)
 
 
-def current_stop(t: dict) -> float:
-    """The stop that applies now: the latest raise, or what the last settlement trailed it to."""
+def current_stop(t: dict) -> float | None:
+    """The stop that applies now: the latest raise, or what the last settlement trailed it to. None when the trade has
+    never had a stop."""
     moves = engine.stop_moves(t)
-    return max([float(t["stop"]), t.get("current_stop") or 0.0] + [float(m["stop"]) for m in moves])
+    known = [float(t["stop"])] if t.get("stop") is not None else []
+    known += [float(t["current_stop"])] if t.get("current_stop") else []
+    known += [float(m["stop"]) for m in moves]
+    return max(known) if known else None
 
 
 def raise_stop(trade_id: int, new_stop: float) -> dict:
@@ -420,7 +443,7 @@ def raise_stop(trade_id: int, new_stop: float) -> dict:
     with db.connect() as con:
         t = _open_trade(con, trade_id)
     now = current_stop(t)
-    if new_stop <= now:
+    if now is not None and new_stop <= now:
         raise PracticeError(f"A stop only moves up. The stop is ₹{now:.2f}; set a higher one, or leave it.")
     last = _last_closes({t["symbol"]}).get(t["symbol"], (None, None))[0]
     if last is not None and new_stop >= last:
@@ -428,7 +451,8 @@ def raise_stop(trade_id: int, new_stop: float) -> dict:
     moves = engine.stop_moves(t) + [{"on": _today(), "stop": round(float(new_stop), 2)}]
     with db.connect() as con:
         con.execute("UPDATE trades SET stop_moves=?, current_stop=? WHERE id=?", (json.dumps(moves), new_stop, trade_id))
-    return {"message": f"Stop raised to ₹{new_stop:.2f}. It applies from the next session."}
+    verb = "set" if now is None else "raised"
+    return {"message": f"Stop {verb} at ₹{new_stop:.2f}. It applies from the next session."}
 
 
 def set_trail(trade_id: int, kind: str, value: float | None) -> dict:

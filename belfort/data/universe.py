@@ -4,7 +4,7 @@ UNIVERSE = {
     "IT services": ["TCS", "INFY", "HCLTECH", "WIPRO", "TECHM"],
     "Banks": ["HDFCBANK", "ICICIBANK", "SBIN", "KOTAKBANK", "AXISBANK", "INDUSINDBK"],
     "Non-bank lenders": ["BAJFINANCE", "BAJAJFINSV", "SHRIRAMFIN"],
-    "Automobiles": ["MARUTI", "M&M", "BAJAJ-AUTO", "EICHERMOT", "HEROMOTOCO", "TVSMOTOR"],
+    "Automobiles": ["MARUTI", "M&M", "BAJAJ-AUTO", "EICHERMOT", "HEROMOTOCO", "TVSMOTOR", "TMPV"],
     "Consumer staples": ["HINDUNILVR", "ITC", "NESTLEIND", "BRITANNIA", "TATACONSUM"],
     "Pharma": ["SUNPHARMA", "DRREDDY", "CIPLA", "DIVISLAB"],
     "Oil and gas": ["RELIANCE", "ONGC", "BPCL", "IOC"],
@@ -13,6 +13,7 @@ UNIVERSE = {
     "Cement and infrastructure": ["ULTRACEMCO", "GRASIM", "LT", "ADANIPORTS"],
     "Consumer discretionary": ["TITAN", "ASIANPAINT"],
     "Telecom": ["BHARTIARTL"],
+    "Hospitals": ["APOLLOHOSP", "MAXHEALTH"],
 }
 
 SECTOR_OF = {sym: sector for sector, syms in UNIVERSE.items() for sym in syms}

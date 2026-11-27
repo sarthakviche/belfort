@@ -50,8 +50,36 @@ STYLES = {
 }
 
 MIN_REWARD_TO_RISK = 1.5
+# Support and resistance: swing points within this many ATRs of a zone's lowest point form one level; levels come from
+# this many recent daily bars (about one year for swing, two for positional); 3 or more swing points make a strong level.
+LEVEL_ZONE_ATR = 0.75
+LEVEL_LOOKBACK_BARS = {"swing": 260, "positional": 500}
+
+
+def level_span(style_key: str) -> str:
+    """The level lookback in words, for sentences such as "in the last year of swings"."""
+    years = round(LEVEL_LOOKBACK_BARS[style_key] / 250)
+    return "the last year" if years <= 1 else f"the last {years} years"
+
+
+LEVEL_STRONG_TOUCHES = 3
 BREAKOUT_VOLUME = 1.5  # times the 20-day average
 TICK = 0.05
+# Context for the checks (research/analysis/context.py). A run is a rise of at least RUN_MIN_PCT from the lowest low of
+# the last RUN_LOOKBACK_BARS sessions; a sideways range (base) is at least BASE_MIN_BARS sessions whose high-to-low
+# range stays within BASE_MAX_RANGE_PCT, searched back up to BASE_MAX_BARS sessions.
+# Weekly chart: averages in weeks (10 and 40 weeks are about the 50 and 200-day averages).
+WEEKLY_FAST = 10
+WEEKLY_SLOW = 40
+# Bars of RSI, MACD and ATR history sent for the momentum charts in the Levels section (about a year).
+MOMENTUM_CHART_BARS = 250
+RUN_LOOKBACK_BARS = 40
+RUN_MIN_PCT = 8.0
+BASE_MIN_BARS = 20
+BASE_MAX_BARS = 400
+BASE_MAX_RANGE_PCT = 15.0
+PROFILE_MAX_CHARS = 420  # the company description at the top of a report, cut at a sentence
+QUARTER_STALE_DAYS = 200  # a newest quarter older than this means the fundamentals source is behind
 
 # Labels describe whether a fixed rule's conditions hold. They are not buy or sell words.
 LABEL_VALID = "Conditions met"
@@ -90,6 +118,7 @@ TRAIL_ATR_RANGE = (
 )  # allowed trailing distance in ATR multiples  # about three months of sessions on the order ticket's mini chart
 # ---------------- Stock search (the picker) ----------------
 SEARCH_LIMIT = 8  # rows in the picker dropdown
+NIFTY_MIN_MEMBERS = 45  # an official Nifty 50 file with fewer symbols than this is treated as broken
 SEARCH_MIN_INITIALS = 2  # "hul" matches Hindustan Unilever from two letters up
 SEARCH_MIN_SUBSTRING = 3  # shorter queries only match prefixes, to keep the list relevant
 SEARCH_MIN_FUZZY = 4  # typo tolerance starts at four characters

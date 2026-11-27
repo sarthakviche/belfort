@@ -176,7 +176,7 @@ EXCHANGE_MENTION = re.compile(
 
 
 def tag(stories: list[dict]) -> None:
-    al = cached("news-aliases:v1", 7 * 86400, _aliases)
+    al = cached("news-aliases", 7 * 86400, _aliases, derived=True)
     pats = [
         (re.compile(r"(?<![A-Za-z])" + re.escape(k) + r"(?![A-Za-z])", 0 if k.isupper() else re.I), v)
         for k, v in sorted(al.items(), key=lambda kv: -len(kv[0]))
@@ -246,4 +246,4 @@ def get(refresh: bool = False) -> dict:
     key = "news:v2:" + datetime.now().strftime("%Y-%m-%d %H") + f":{datetime.now().minute // 15:02d}"
     if refresh:
         key += ":r" + datetime.now().strftime("%M%S")
-    return cached(key, 15 * 60, build)
+    return cached(key, 15 * 60, build, derived=True)
