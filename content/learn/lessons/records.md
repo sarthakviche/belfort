@@ -41,7 +41,7 @@ Buying and selling the same share on the same day, without taking delivery, is g
 
 The tax department can look back at a return for a limited number of years, and the limit was changed by the Finance (No. 2) Act, 2024, so check the current rule. Separately, an unused capital loss can be carried forward for 8 years, and you may need the papers behind it when you finally use it. A safe habit: keep everything for at least 8 years after the year of any loss you are carrying forward, and for the other years keep it as long as you can store it cheaply. Scans in a labelled folder are enough.
 
-Sources: Income Tax Department, set-off and carry-forward of losses and reassessment provisions (section 149, as substituted by the Finance (No. 2) Act, 2024); trader tax guides from brokers and tax portals for the form and business-income categories. Checked November 2026. The Income Tax Department site is the authority; confirm before you file.
+Sources: Income Tax Department, set-off and carry-forward of losses and reassessment provisions (section 149 of the Income-tax Act, 1961, as substituted by the Finance (No. 2) Act, 2024; the Income-tax Act, 2025, in force from 1 April 2026, carries these rules under new section numbers); trader tax guides from brokers and tax portals for the form and business-income categories. Checked November 2026. The Income Tax Department site is the authority; confirm before you file.
 
 ```quiz
 [

@@ -53,7 +53,7 @@ Some investors sell a losing share to book the loss and offset gains, then buy b
 
 ## What this lesson leaves out
 
-Shares bought before 1 February 2018 have special cost rules. Intraday trades and futures and options are taxed as business income, not capital gains (the next lesson mentions this). If you are unsure which applies to you, ask a tax professional.
+The Income-tax Act, 2025 replaced the 1961 Act from 1 April 2026. It keeps these rates and the ₹1.25 lakh limit, but calls the year a "tax year" and gives the rules new section numbers, so guides written earlier may cite different sections. Shares bought before 1 February 2018 have special cost rules. Intraday trades and futures and options are taxed as business income, not capital gains (the next lesson mentions this). If you are unsure which applies to you, ask a tax professional.
 
 ::try paper
 
