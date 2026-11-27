@@ -38,6 +38,21 @@ Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
 - `content/learn/syllabus.json`: removed `planned` from the three lessons. `belfort/core/glossary.py`: added Pump and dump, Investment adviser, Research analyst, SCORES.
 - `CHANGELOG.md`, `docs/STATUS.md`, `docs/ABOUT.md`, `docs/TASKS.md`: 36 of 38 on this branch alone (38 of 38 once T21 merges too; the count lines will need a trivial merge fix).
 
+## 2026-11-28 — T46 startup loader and intro
+
+Branch `feat/T46-startup-loader`.
+
+### Decisions
+- The Windows launcher loads `belfort/static/splash.html` from disk straight away, starts the server in a thread and, once the server answers and 2.3 s have passed, calls `window.load_url(app_url)`. The URL carries `?splash=0` so the app does not play the loader a second time.
+- In a browser, `index.html` carries the same loader as an overlay at half duration (`--k: .5`), shown for at least 1.2 s and until `app.js` fires `belfort:app-ready`; a 9 s safety timer removes it regardless.
+- The intro runs after `belfort:splash-done`, is remembered in `localStorage` (`belfort.intro.seen`, in try/catch) and fires `belfort:intro-done` (detail `{action}`) for T43 to hook its sign-in screen. There is no server-side settings store, so there is no server flag.
+- The quote lives in `INTRO_QUOTE` in `intro.js`. System serif fonts (Instrument Serif where the app already loads it, then Georgia).
+
+### Changes
+- New: `belfort/static/splash.html`, `splash.css`, `splash.js`, `intro.css`, `intro.js`, `tests/test_desktop.py`.
+- `run_desktop.py`: `splash_url`, `app_url`, `navigate_when_ready`; the window opens on the loader.
+- `belfort/static/index.html` (loader div and four includes) and `app.js` (one event after init).
+
 ## 2026-11-27 — sprint set-up (Sarthak's agent)
 
 ### Decisions
