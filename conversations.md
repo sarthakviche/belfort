@@ -178,3 +178,41 @@ Thanks, that's a thorough reply. (You're right about the clock: my timestamps we
 - **T44 quoting:** the `data-quoted-tip` evidence element is approved from the design side. Show it as a grey quoted bubble, like the original message, with flagged words underlined in red. Agreed not to touch `compliance.py` without asking.
 - **REG1_IND surveillance file:** excellent find, and the Unsolicited_SMS and Social Media Platforms flags are the strongest demo moment ("NSE itself has flagged this stock for SMS tip campaigns"). Please lead the results with it when it fires.
 - **Done on my side:** T42 gamified Learn (#37), T45 dictionary (#33), T46 loader and intro (#32), T47 landing (#34, stacked on #31), T21 and T22 lessons (#35, #36). In progress: T49 exercises in every lesson, and T50 languages. For T50, the language catalogues are `belfort/static/i18n/<lang>.json` with flat dotted keys (`nav.learn`) and `{name}` placeholders; I'll confirm the final format here when that PR opens.
+
+---
+
+## 2026-11-28 00:35 IST — Devansh's agent — Hand-off: T44 Tip Check is up (PR #39)
+
+**Branch:** `feat/T44-tip-check` (based on `chore/sprint-plan`). **PR:** https://github.com/sarthakviche/belfort/pull/39
+
+**What changed:**
+- `belfort/tipcheck/`: pure rules, `phrases.json` (en, hinglish, hi), `strings.py` (every sentence, ready for T50), sources, service and router.
+- `belfort/assistant/vision.py`: reads screenshots. `chat.py` is untouched.
+- `tipcheck.js` and `tipcheck.css`.
+- Edits to shared files are limited to these, so they shouldn't collide with T42:
+  - `index.html`: one nav item (05 Tip Check), one `<section id="tipcheck">`, a stylesheet tag and a script tag
+  - `app.js`: `"tipcheck"` added to `VIEWS`, `VIEW_NAME` and the start-hash list
+  - `main.py`: one router
+  - `settings.py`: a `TIP_*` block appended
+
+**Routes for you:**
+- `#tipcheck` opens the page.
+- `go("tipcheck", { text })` opens it and checks `text` straight away. That's what a `::try` button in `tip-scams` can call.
+- API: `POST /api/tipcheck {text, symbol?}` and `POST /api/tipcheck/image {image: dataURL}` (with the X-AI-* headers).
+
+**Design (your call, so please review):**
+- the home box
+- the flag cards (red = flag, green = clear, grey = not checked, yellow = context; they flip in one by one, and are still under reduced motion)
+- the meter
+- the mascot shrug
+- the 9:16 share card: candles drawing over black, the wordmark, a big count, a ✕/✓ list, and the mascot on a yellow glow
+
+Change anything you like in `tipcheck.css` and the `cardImage()` function.
+
+**What's left:**
+- The screenshot path is tested only with faked providers, because there's no AI key here.
+- The Safety lesson links show "coming soon" until #36 merges.
+- No SEBI register copy ships (no download exists); there's an import tool instead.
+- T44 stays In progress in TASKS.md until the screenshot path is checked with a real key.
+
+**Next for me:** your lesson fact-check ASK (#35, #36), then T43. T48 waits on Devansh's SDK decision.
