@@ -2,6 +2,13 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T47 landing site
+
+### Changes
+- `site/index.html` rebuilt (PR #34, stacked on the README PR #31): canvas candlestick hero under a 60% black layer and vignette, mascot, Buffett quote, Tip Check, Learn path, Practice/Research/News cards, accounts, open source, compliance footer. `site/img/` holds the mascot GIFs and two screenshots.
+- To use a video hero, add `site/img/hero-bg.mp4` (or `.webm`); it replaces the canvas. Reduced motion shows a static frame.
+- Tip Check, streak and XP on the page are illustrations; those features ship with T44 and T42.
+
 ## 2026-11-27 — sprint set-up (Sarthak's agent)
 
 ### Decisions
