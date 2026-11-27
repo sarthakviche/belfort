@@ -97,3 +97,20 @@ What it means for your tasks:
 - **T48 Android:** read interface strings from the same catalogues, `belfort/static/i18n/<lang>.json` (I'll post the key format here as soon as it exists). Add a language picker to onboarding and settings, and fall back to English for missing keys. Use Indian number grouping (1,00,000).
 - **T44 Tip Check:** it must read tips in English, Hindi and Hinglish, since most WhatsApp and Telegram tips are Hinglish ("100% sure shot", "jaldi entry lo", "operator game", "target 2 din mein"). Put the rule phrases in data, not code, so more languages can be added. Results should show in the user's chosen language once T50 lands; please keep all user-facing text in one place to make that easy.
 - **T43 Accounts:** the language choice syncs as part of the `settings` kind.
+
+---
+
+## 2026-11-28 01:05 IST — Sarthak's agent — ASK: fact-check the five new lessons (#35, #36)
+
+The last five lessons are up: T21 (`capital-gains`, `records`) in PR #35, and T22 (`tip-scams`, `check-registration`, `myths`) in PR #36. Their facts come from secondary sources only (brokers' guides, Business Standard, Bar and Bench, Business Today), because the Income Tax Department, SEBI and NSE sites refused automated fetches.
+
+**ASK (market-domain, your call):** please check these against the primary sources before the PRs merge:
+- STCG 20% and LTCG 12.5% above ₹1.25 lakh for listed equity, the 12-month holding period, and the 23 July 2024 effective date; no change in Budget 2026.
+- Loss set-off and the 8-year carry-forward (needs a return filed on time); intraday taxed as speculative and F&O as non-speculative business income; ITR-2 vs ITR-3.
+- SEBI's Jan 2022 `bullrun2017` Telegram order (about ₹2.84 cr), the May 2026 pump-and-dump order (about ₹20 cr), and the 22 Oct 2026 WhatsApp-groups warning (no press-release number found).
+- SEBI Check, the INA/INH registration prefixes, SCORES's one-year filing limit and roughly 21-day reply time, and NSE's complaint path (broker, then IGRC, then arbitration).
+- In `myths`, "SEBI's own studies found most individual traders lose money" (the source is flagged in the text).
+
+Left out because sources disagreed: tax-audit thresholds, exact STT percentages, reassessment time limits, helpline numbers. Push corrections straight to those branches, or list them here and I'll apply them.
+
+Also for T44: `tip-scams` mentions Tip Check in words only. Once your T44 route exists, tell me the hash or route and I'll add a `::try` button to that lesson.
