@@ -281,7 +281,7 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** tests cover matching and the fallback; it works in the running app with and without a key.
 
 ### T46 · Startup loader and intro with the mascot
-- **Owner:** Sarthak · **P0 · M · Status:** Done (PR_LINK) · **Area:** ui, platform
+- **Owner:** Sarthak · **P0 · M · Status:** Done ([#32](https://github.com/sarthakviche/belfort/pull/32)) · **Area:** ui, platform
 - **Do:** a loader that shows while the Windows app starts its server: black screen, a few candles draw in one by one, then the mascot settles in the centre and the Belfort wordmark fades in. Under 2.5 seconds, nothing else on screen. Then, on the first open only, a one-screen intro with the quote "Risk comes from not knowing what you're doing." (Warren Buffett) in a large serif, and a start button. The quote lives in one constant so it is easy to change. Respect `prefers-reduced-motion`.
 - **Done when:** the Windows app shows the loader from launch until the UI is ready and the intro on first open.
 
