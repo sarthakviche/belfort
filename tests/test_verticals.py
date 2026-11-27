@@ -417,7 +417,9 @@ def test_tip_style_headlines_are_flagged(title, tip):
 
 
 def test_news_tags_companies(monkeypatch):
-    monkeypatch.setattr(feeds, "cached", lambda key, ttl, fn: {"RELIANCE": "RELIANCE", "Reliance": "RELIANCE", "TCS": "TCS"})
+    monkeypatch.setattr(
+        feeds, "cached", lambda key, ttl, fn, derived=False: {"RELIANCE": "RELIANCE", "Reliance": "RELIANCE", "TCS": "TCS"}
+    )
     items = feeds.parse(RSS, {"id": "x", "name": "Example"})
     feeds.tag(items)
     assert items[0]["symbols"] == ["RELIANCE"] and items[1]["symbols"] == []
@@ -436,7 +438,7 @@ def test_news_tags_companies(monkeypatch):
     ],
 )
 def test_news_does_not_tag_bse_when_it_means_the_exchange(monkeypatch, title, tagged):
-    monkeypatch.setattr(feeds, "cached", lambda key, ttl, fn: {"BSE": "BSE"})
+    monkeypatch.setattr(feeds, "cached", lambda key, ttl, fn, derived=False: {"BSE": "BSE"})
     story = {"title": title, "summary": ""}
     feeds.tag([story])
     assert (story["symbols"] == ["BSE"]) is tagged

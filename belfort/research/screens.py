@@ -347,14 +347,9 @@ def _safe_info(sym: str) -> dict | None:
         return None
 
 
-# Part of the cache key for the built lists. The cache is on disk and outlives a restart, so raise this whenever build()
-# changes what it returns (lists, titles, wording); otherwise people see the old lists for up to six hours.
-SCREENS_CACHE_VERSION = 5
-
-
 def _run():
     try:
-        data = cached(f"screens:v{SCREENS_CACHE_VERSION}:" + datetime.now().strftime("%Y-%m-%d"), 6 * 3600, build)
+        data = cached("screens:" + datetime.now().strftime("%Y-%m-%d"), 6 * 3600, build, derived=True)
         _state.update(data=data, error=None)
     except Exception as e:  # network trouble: report it, allow a retry
         _state.update(error=f"The lists could not be built ({type(e).__name__}). Reload to try again.")

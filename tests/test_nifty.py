@@ -65,9 +65,8 @@ def test_builtin_nifty_list_has_fifty_unique_symbols():
     assert len(screens.NIFTY) == len(set(screens.NIFTY)) == 50
 
 
-def test_screens_cache_key_carries_the_format_version(monkeypatch):
-    keys = []
-    monkeypatch.setattr(screens, "cached", lambda key, ttl, fn: keys.append(key) or {"lists": {}})
+def test_screens_cache_is_rebuilt_after_a_code_change(monkeypatch):
+    calls = []
+    monkeypatch.setattr(screens, "cached", lambda key, ttl, fn, derived=False: calls.append(derived) or {"lists": {}})
     screens._run()
-    assert keys and keys[0].startswith(f"screens:v{screens.SCREENS_CACHE_VERSION}:")
-    assert screens.SCREENS_CACHE_VERSION >= 5  # v4 lists were built before the official Nifty 50 list was read
+    assert calls == [True]

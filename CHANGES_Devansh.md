@@ -346,6 +346,34 @@ Rows the source does not have are left out. For example, banks have no operating
 
 **Checked:** the server now returns 50 companies, "The companies in the Nifty 50 index", read from NSE Indices' current list.
 
+## 14. Results built by Belfort refresh after every update ✅
+
+**Your question:** wouldn't restarting the whole front end and back end be better?
+
+**Answer:** a restart would not have fixed the last two problems.
+- The 48-company list lived in the on-disk cache, which survives restarts.
+- The empty company box was an old script cached in your browser.
+
+Wiping the whole cache on every start would also throw away 5 years of prices for every stock, company figures and news. The first load would be slow, and refetching everything risks Yahoo or NSE blocking us.
+
+**What changed instead (`belfort/data/cache.py`):**
+- **Raw downloads** (prices, company figures, results dates, NSE files) stay cached and expire by time only, as before. Their content doesn't depend on our code.
+- **Results Belfort builds from them** are now cached with `derived=True`. Their key includes a fingerprint, a 12-character hash of every `.py` file in `belfort/`, so any code change makes them rebuild on first use. That covers:
+  - the home lists (`screens.py`);
+  - the tagged news feed (`news/feeds.py`);
+  - the news company-name aliases.
+- **Packaged `Belfort.exe`:** it has no `.py` files on disk, so it uses the version number (`v0.1.0`) instead.
+- **No manual version numbers:** this replaces the `SCREENS_CACHE_VERSION` number from section 13, so nobody has to remember to raise it.
+- **Not affected:** research reports aren't cached, so they always run the current code.
+
+**Tests:** `tests/test_cache.py` covers:
+- raw entries are reused;
+- derived entries rebuild when the fingerprint changes, and raw ones don't;
+- the fingerprint is stable;
+- the version fallback works.
+
+**Note on a flaky test:** `test_search_is_fast_on_a_full_size_listing` sometimes fails during the full run with coverage on this PC (139 ms per search against a 100 ms limit). It passes every time on its own. Search code isn't touched by this change. It's a timing test that is sensitive to how busy the machine is.
+
 ---
 
 ## Open items for you
