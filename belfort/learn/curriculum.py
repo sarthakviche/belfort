@@ -3,6 +3,8 @@
 Content lives in content/learn so contributors can add lessons without touching Python:
   syllabus.json          tracks -> modules -> lessons (id, title, minutes, status)
   lessons/<id>.md        front matter, Markdown body, optional ```quiz``` block (JSON list)
+  lessons/<lang>/<id>.md the same lesson translated (same structure and quiz answers); used when the learner's
+                         language is <lang>, else the English file (T50)
 
 Directives inside a lesson body:
   ::chart SYMBOL BARS    a real chart of SYMBOL, ending at least EDU_LAG_DAYS ago (SEBI education norms)
@@ -15,7 +17,7 @@ import random
 import re
 from datetime import date, timedelta
 
-from ..core import db
+from ..core import db, i18n
 from ..settings import CONTENT_DIR, EDU_LAG_DAYS, STAGES
 
 LEARN = CONTENT_DIR / "learn"
@@ -24,7 +26,12 @@ QUESTION_TYPES = ("mc", "tf", "order", "number")
 
 
 class LearnError(Exception):
-    pass
+    """A Learn problem. `key` and `vars` let the router say it in the learner's language (server.* catalogue keys)."""
+
+    def __init__(self, message: str, key: str | None = None, **vars):
+        super().__init__(message)
+        self.key = key
+        self.vars = vars
 
 
 def syllabus() -> dict:
@@ -104,7 +111,9 @@ def render_markdown(md: str) -> str:
             )
         elif m := re.match(r"^::try\s+(replay|paper|predict|research)", line):
             flush()
-            out.append(f'<button type="button" class="try" data-try="{m.group(1)}">Try it in Belfort →</button>')
+            out.append(
+                f'<button type="button" class="try" data-try="{m.group(1)}">{html.escape(i18n.tr(i18n.current(), "lesson.try"))}</button>'
+            )
         elif line.startswith("> "):
             flush()
             out.append(f'<div class="note plain">{_inline(line[2:])}</div>')
@@ -244,6 +253,29 @@ def parse_lesson(text: str) -> dict:
     return {"meta": meta, "html": render_markdown(body.strip()), "quiz": quiz, "text": body.strip(), "body": body.strip()}
 
 
+def lesson_file(lesson_id: str, lang: str | None = None):
+    """The file to serve: the translation for `lang` (default: this request's language) if there is one, else English."""
+    lang = i18n.normalize(lang or i18n.current())
+    if lang != i18n.DEFAULT:
+        f = LEARN / "lessons" / lang / f"{lesson_id}.md"
+        if f.exists():
+            return f
+    return LEARN / "lessons" / f"{lesson_id}.md"
+
+
+def translated_title(lesson_id: str, lang: str | None = None) -> str | None:
+    """The lesson's title in the requested language, or None when there is no translation."""
+    f = lesson_file(lesson_id, lang)
+    if f.parent.name == "lessons":
+        return None
+    return parse_lesson(f.read_text(encoding="utf-8"))["meta"].get("title")
+
+
+def available_languages(lesson_id: str) -> list[str]:
+    """Languages other than English that have a translated file for this lesson."""
+    return [c for c in i18n.LANGUAGES if c != i18n.DEFAULT and (LEARN / "lessons" / c / f"{lesson_id}.md").exists()]
+
+
 def is_written(lesson_id: str) -> bool:
     """Whether the lesson file exists (a lesson can be on the syllabus before it is written)."""
     return bool(ID_RE.match(lesson_id or "")) and (LEARN / "lessons" / f"{lesson_id}.md").exists()
@@ -253,15 +285,15 @@ def lesson_info(lesson_id: str) -> dict:
     """Syllabus facts about a lesson (track, module, stage) without reading the file."""
     info = _lesson_index().get(lesson_id) if ID_RE.match(lesson_id or "") else None
     if not info:
-        raise LearnError("No such lesson.")
+        raise LearnError("No such lesson.", "server.no_lesson")
     return info
 
 
 def questions(lesson_id: str) -> list[dict]:
     """The normalized exercises of a written lesson, answers included. Server side only."""
     if not is_written(lesson_id):
-        raise LearnError("No such lesson.")
-    return parse_lesson((LEARN / "lessons" / f"{lesson_id}.md").read_text(encoding="utf-8"))["quiz"]
+        raise LearnError("No such lesson.", "server.no_lesson")
+    return parse_lesson(lesson_file(lesson_id).read_text(encoding="utf-8"))["quiz"]
 
 
 def stage_modules() -> list[dict]:
@@ -276,7 +308,10 @@ def stage_modules() -> list[dict]:
                     "why": m.get("why", ""),
                     "stage": m.get("stage", "beginner"),
                     "track": t["id"],
-                    "lessons": [{**x, "written": is_written(x["id"])} for x in m["lessons"]],
+                    "lessons": [
+                        {**x, "title": translated_title(x["id"]) or x["title"], "written": is_written(x["id"])}
+                        for x in m["lessons"]
+                    ],
                 }
             )
     mods.sort(key=lambda m: STAGES.index(m["stage"]))  # stable: syllabus order is kept inside a stage
@@ -285,12 +320,16 @@ def stage_modules() -> list[dict]:
 
 def lesson(lesson_id: str) -> dict:
     if not ID_RE.match(lesson_id or ""):
-        raise LearnError("No such lesson.")
+        raise LearnError("No such lesson.", "server.no_lesson")
     idx = _lesson_index()
     info = idx.get(lesson_id)
     f = LEARN / "lessons" / f"{lesson_id}.md"
     if not info or not f.exists():
-        raise LearnError("This lesson has not been written yet. It is on the syllabus; contributions are welcome.")
+        raise LearnError(
+            "This lesson has not been written yet. It is on the syllabus; contributions are welcome.", "server.not_written"
+        )
+    f = lesson_file(lesson_id)
+    translated = f.parent.name != "lessons"
     data = parse_lesson(f.read_text(encoding="utf-8"))
     order = [k for k, v in idx.items() if (LEARN / "lessons" / f"{k}.md").exists()]
     i = order.index(lesson_id)
@@ -298,6 +337,11 @@ def lesson(lesson_id: str) -> dict:
     return {
         "id": lesson_id,
         **info,
+        "title": data["meta"].get("title") or info["title"],
+        "lang": i18n.current() if translated else i18n.DEFAULT,
+        "translated": translated,
+        "translation_status": data["meta"].get("translation") if translated else None,
+        "translations": available_languages(lesson_id),
         "objectives": data["meta"]["objectives"],
         "html": data["html"],
         "cards": split_cards(data["body"], info["title"]),

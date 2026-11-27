@@ -2,6 +2,20 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T50 languages
+
+Branch `feat/T50-languages`, built on `feat/T42-gamified-learn` with T22 (safety lessons), T46 (loader and intro) and T45 (dictionary search) merged in.
+
+### Decisions
+- **Catalogues:** flat JSON per language in `belfort/static/i18n/`, English as source and fallback, `{name}` placeholders, `_one` plural keys, `@key` placeholder values. About 630 keys. Written for the web and reusable by Android.
+- **Code uses `T()`** as well as `t()`: several files have local variables named `t`, so `T` is the same function under a name that cannot be shadowed. Static markup uses `data-i18n*`.
+- **No reload:** `setLanguage` re-applies markup and fires `belfort:language`; app.js redraws the current view. A Learn run in progress is restarted on a language change, because the exercise text and the server grading must be in the same language (ordering exercises compare the translated items).
+- **Server messages** that carry a catalogue key (locked stage, no hearts) are translated from the same files and send `X-Error-Key`, so the page stops matching English words.
+- **Lessons:** `lessons/<lang>/<id>.md`, same structure and quiz answers; the English file is the fallback. Hindi for all 16 Beginner lessons. The old Learn code in `verticals.js` (replaced by T42) was deleted instead of translated.
+- **Compliance:** the Hindi banned list is data in `content/compliance/banned.hi.json`; `core/compliance.py` is untouched. The `disclaimer` catalogue key must equal `DISCLAIMER` in English (tested), and its translations need a fluent reader and Sarthak's review.
+- **Not translated:** strings the Python engines write (verdicts, rule explanations, glossary meanings, news, practice notes).
+- **Tests:** `tests/test_i18n.py`. One existing test no longer looks for a planned Beginner lesson (none are left after T22).
+
 ## 2026-11-28 — T46 startup loader and intro
 
 Branch `feat/T46-startup-loader`.

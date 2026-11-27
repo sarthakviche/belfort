@@ -24,7 +24,7 @@
     el.classList.add("splash");
     el.setAttribute("role", "status");
     el.setAttribute("aria-busy", "true");
-    el.setAttribute("aria-label", "Loading Belfort");
+    el.setAttribute("aria-label", typeof T === "function" ? T("splash.loading", null, "Loading Belfort") : "Loading Belfort");
     el.innerHTML = markup(mascotSrc || "img/mascot/mascot-suit.gif");
     return el;
   }

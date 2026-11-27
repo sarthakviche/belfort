@@ -123,6 +123,13 @@ MIGRATIONS = [
         refs TEXT NOT NULL, created TEXT NOT NULL DEFAULT (datetime('now'))
     );
     """,
+    # 8: small per-user, non-secret settings such as the interface language (T50)
+    """
+    CREATE TABLE IF NOT EXISTS settings (
+        user_id TEXT NOT NULL DEFAULT 'local', key TEXT NOT NULL, value TEXT NOT NULL,
+        PRIMARY KEY (user_id, key)
+    );
+    """,
 ]
 
 _lock = threading.Lock()

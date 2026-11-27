@@ -61,7 +61,7 @@
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
-| T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Ready (Sarthak, starts after T42) |
+| T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Done ([#41](https://github.com/sarthakviche/belfort/pull/41)) |
 
 ---
 
@@ -294,21 +294,14 @@ Shared contracts every Phase 6 task uses:
 - **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** mobile · Built on Devansh's machine (Android SDK).
 - **Do:** a native Android app named Belfort with every part of the desktop app in a mobile-first interface, the same mascot, loader and animations, the same account (T43). Coordinated in `conversations.md` on the `collab` branch.
 
-### T50 · Belfort in Indian languages
-- **Owner:** Sarthak · **P0 · L · Status:** Ready (starts after T42 merges, to avoid touching every screen twice) · **Area:** ui, learn, assistant
-- **Why:** Belfort is for India, and most Indians are more at home in a language other than English.
-- **Do:** English stays the default and the first choice. A language picker on the intro, in settings and on Android: English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી, ಕನ್ನಡ.
-  - Every interface string comes from a catalogue (`belfort/static/i18n/<lang>.json`, also used by Android), with English as the fallback for any missing key.
-  - Lessons can have translated files (`content/learn/lessons/<lang>/<id>.md`); the Beginner stage ships in Hindi first. Where a translation is missing, the English lesson shows with an "Explain in <language>" button.
-  - Ask Belfort, Tip Check and the dictionary answer in the chosen language.
-  - Numbers use Indian grouping (1,00,000) in every language.
-- **Compliance:** translated lessons and catalogues are machine-drafted and must be read by a fluent speaker before release; the banned-wording check must run on every language (add translated banned phrases to the content checker, T12).
-- **Done when:** switching language changes the whole interface without a reload, the choice syncs with the account (T43), Hindi Beginner lessons pass the content checker, and tests cover fallback and number formatting.
-
 ### T49 · New exercise types in every lesson
 - **P1 · M · Owner:** Sarthak (agent) · **Status:** Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) · **Area:** learn
 - **Do:** add at least two exercises of the new types (tf, order, number) to every lesson, keeping the existing questions. Facts must match the lesson text.
 - **Result:** 97 new items across all 38 lessons: 45 number, 41 true/false, 11 order. Every lesson has at least two items of at least two types. `tests/test_learn_exercises.py` keeps it that way.
+
+### T50 · Belfort in Indian languages
+- **P0 · L · Owner:** Sarthak (agent) · **Status:** Done ([#41](https://github.com/sarthakviche/belfort/pull/41)) · **Area:** ui, learn, assistant
+- English stays the default. Language picker on the intro, in Settings and in the header: English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી, ಕನ್ನಡ. Catalogues in `belfort/static/i18n/<lang>.json` (shared with Android), English as the fallback; Beginner lessons in Hindi; Ask Belfort and the dictionary answer in the chosen language; Indian number grouping everywhere. Machine drafts: a fluent speaker must read them before release. See `docs/ARCHITECTURE.md` ("Languages").
 
 ## Decisions (maintainers, not code)
 
