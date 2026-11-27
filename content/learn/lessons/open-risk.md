@@ -47,6 +47,9 @@ Raising a stop shrinks the distance to it, so the trade's open risk falls. Once 
 [
   {"q": "You hold 100 shares at ₹410 with a stop at ₹395, and 40 shares at ₹980 with a stop at ₹955. What is the total open risk?", "options": ["₹1,500", "₹2,500", "₹3,000"], "answer": 1, "why": "100 × ₹15 = ₹1,500 and 40 × ₹25 = ₹1,000, so ₹2,500 in total."},
   {"q": "What does Belfort's Practice account do when total open risk would pass 6%?", "options": ["Blocks the order", "Warns you before you place it", "Nothing"], "answer": 1, "why": "It warns so you decide on purpose. The order is not blocked."},
-  {"q": "Why can three trades in one sector be riskier than three in different sectors?", "options": ["They tend to fall together", "Sectors have no link to prices", "Exchanges charge more"], "answer": 0, "why": "Shared drivers make their stops more likely to be hit at the same time, like one larger trade."}
+  {"q": "Why can three trades in one sector be riskier than three in different sectors?", "options": ["They tend to fall together", "Sectors have no link to prices", "Exchanges charge more"], "answer": 0, "why": "Shared drivers make their stops more likely to be hit at the same time, like one larger trade."},
+  {"type": "number", "q": "A trade has 80 shares, a last close of ₹250 and a stop at ₹235. How much open risk does it add?", "answer": 1200, "tolerance": 0, "unit": "₹", "why": "(250 − 235) × 80 = ₹15 × 80 = ₹1,200."},
+  {"type": "number", "q": "Your trades have a total open risk of ₹9,000 on capital of ₹3,00,000. What is the open risk as a percentage of the account?", "answer": 3, "tolerance": 0, "unit": "%", "why": "9,000 ÷ 3,00,000 = 3%, under Belfort's 6% warning for all open trades together."},
+  {"type": "tf", "q": "Three bank stocks at 1% risk each are three separate 1% bets.", "answer": false, "why": "They tend to move together, so they are closer to one 3% bet on banks. Their stops can go together."}
 ]
 ```

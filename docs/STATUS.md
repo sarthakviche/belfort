@@ -21,7 +21,7 @@
 | Area | Limitation | Task |
 |---|---|---|
 | Practice | Long only, one account, end-of-day fills | |
-| Learn | 33 of 38 lessons written. Existing lessons only have multiple-choice exercises; the true or false, order and number types work but wait for content | T21 to T22, T49 |
+| Learn | 38 of 38 lessons written, each with multiple-choice plus true or false, order and number exercises | |
 | Learn | Stage progress is per local user; XP, hearts and streaks use the device's date. Moving between devices waits for accounts | T43 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
 | Research | Rule thresholds can be changed only in code | T25 |

@@ -2,6 +2,19 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T49 exercise types
+
+Branch `content/T49-exercise-types`, built on `feat/T42-gamified-learn` (#37) with `content/T21-taxes-records` (#35) and `content/T22-safety` (#36) merged in. PR #38.
+
+### What changed
+- **Content:** 97 new exercises in all 38 lessons: 45 `number`, 41 `tf`, 11 `order`. Existing multiple-choice items are untouched. Every lesson has at least two new items of at least two types, each with a `why`. Numbers come from the lesson's own figures (position sizing, R multiples, expectancy, ATR stops, P/E, LTCG, Brier points).
+- **Merge:** lesson counts now read "38 of 38"; both T21 and T22 are Done in `docs/TASKS.md`. A missing `),` and `(` between two glossary entries from the merge was fixed in `belfort/core/glossary.py`.
+- **Tests:** new `tests/test_learn_exercises.py`. `test_quiz_grading_and_progress` falls back to an unknown id, because no planned lesson is left.
+
+### Decisions
+- Lessons with no calculation (biases, flows-and-events, myths, tip-scams, trend) use tf and order only.
+- Wording avoids the banned phrases the content tests reject, for example "cannot lose" and "guarantee" were rephrased.
+
 ## 2026-11-28 — T42 gamified Learn
 
 Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
@@ -27,6 +40,22 @@ Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
 - **Order exercises** use tap-to-order (no drag), which also works on touch screens.
 - **Hooks into other files:** the old Learn loader in `verticals.js` is left in place; `learn-game.js` loads after it, replaces `onView.learn` and makes `renderSyllabus` a no-op.
 - **Tests:** an existing test now looks for a planned lesson in the Beginner stage, because planned lessons in locked stages answer 403 before 404.
+## 2026-11-28 — T21 taxes and records lessons (Sarthak's agent)
+
+### Changes
+- `content/learn/lessons/capital-gains.md` and `records.md`: the two Taxes and records lessons, each with a quiz and a Sources line. Facts checked: STCG 20%, LTCG 12.5% above 1.25 lakh and the 12-month rule (Budget 2024, effective 23 July 2024, unchanged in Budget 2026 reporting), STT on delivery trades, loss set-off and 8-year carry-forward (Income Tax Department), intraday as speculative and F&O as non-speculative business income, ITR-2 against ITR-3.
+- Left out because sources disagreed or could not be verified: tax audit turnover thresholds, exact reassessment time limits (the lesson says to check the current rule), exact STT percentages (the lesson points to the official sites).
+- `content/learn/syllabus.json`: removed `planned` from both lessons. `belfort/core/glossary.py`: added STCG, LTCG, ITR.
+- `CHANGELOG.md`, `docs/STATUS.md`, `docs/ABOUT.md`, `docs/TASKS.md`: 35 of 38 lessons written; T21 Done.
+## 2026-11-28 — T22 scams, tips and your rights lessons (Sarthak's agent)
+
+### Changes
+- `content/learn/lessons/tip-scams.md`, `check-registration.md`, `myths.md`: the three Safety lessons, each with a quiz and a Sources line. They describe SEBI's January 2022 interim order on a Telegram tip channel, the May 2026 interim order on social-media pump-and-dump, and SEBI's October 2026 warning on invitation-only WhatsApp groups; how to search SEBI's registered intermediaries, SEBI Check, SCORES and NSE complaints; and six myths mapped to earlier lessons.
+- Wording avoids the banned promise phrases, which the content test scans for, so "promised returns" and "buy at once" stand in for the usual scam phrases.
+- Left out because unverified: a "Know your broker" NSE page (not found), helpline numbers, the exact SCORES stage-by-stage flow, the August 2024 SEBI circular text. The SCORES one-year limit and 21-day reply time come from secondary summaries and are hedged in the lesson. The statement that SEBI studies found most individual traders lose money is from memory and is flagged in the lesson's Sources line.
+- Tip Check (T44) is referred to in words only; it may not have shipped when this merges.
+- `content/learn/syllabus.json`: removed `planned` from the three lessons. `belfort/core/glossary.py`: added Pump and dump, Investment adviser, Research analyst, SCORES.
+- `CHANGELOG.md`, `docs/STATUS.md`, `docs/ABOUT.md`, `docs/TASKS.md`: 36 of 38 on this branch alone (38 of 38 once T21 merges too; the count lines will need a trivial merge fix).
 ## 2026-11-28 — T44 Tip Check (Devansh's agent, branch `feat/T44-tip-check`)
 
 ### Decisions

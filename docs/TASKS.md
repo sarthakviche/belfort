@@ -32,8 +32,8 @@
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) |
 | T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) |
-| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | In progress (Sarthak) |
-| T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | In progress (Sarthak) |
+| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) |
+| T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | Done ([#36](https://github.com/sarthakviche/belfort/pull/36)) |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
 | T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Superseded by T42 |
 | T25 | Editable rule profiles | 3 Research and News | P1 | L | Blocked on D1 |
@@ -60,7 +60,7 @@
 | T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | In progress |
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
-| T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Blocked on T42 |
+| T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
 | T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Ready (Sarthak, starts after T42) |
 
 ---
@@ -166,10 +166,10 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) · `open-risk`, `drawdown-rules`, `biases`, `rules`.
 
 ### T21 · Lessons: Taxes and records module
-- **P1 · M · Status:** Ready · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
+- **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
 
 ### T22 · Lessons: Safety module
-- **P1 · M · Status:** Ready · `tip-scams`, `check-registration` (how to verify a SEBI registration and file a complaint, with official links), `myths`.
+- **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#36](https://github.com/sarthakviche/belfort/pull/36)) · `tip-scams`, `check-registration` (how to verify a SEBI registration and file a complaint, with official links), `myths`.
 
 ### T23 · Replay drills inside lessons
 - **P1 · M · Status:** Ready · **Area:** learn, practice
@@ -306,8 +306,9 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** switching language changes the whole interface without a reload, the choice syncs with the account (T43), Hindi Beginner lessons pass the content checker, and tests cover fallback and number formatting.
 
 ### T49 · New exercise types in every lesson
-- **Owner:** Sarthak · **P1 · M · Status:** Blocked on T42 · **Area:** learn
+- **P1 · M · Owner:** Sarthak (agent) · **Status:** Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) · **Area:** learn
 - **Do:** add at least two exercises of the new types (tf, order, number) to every lesson, keeping the existing questions. Facts must match the lesson text.
+- **Result:** 97 new items across all 38 lessons: 45 number, 41 true/false, 11 order. Every lesson has at least two items of at least two types. `tests/test_learn_exercises.py` keeps it that way.
 
 ## Decisions (maintainers, not code)
 
@@ -344,3 +345,5 @@ Shared contracts every Phase 6 task uses:
 - T18 Lessons: Journal module, trade journal, expectancy and calibration ([#25](https://github.com/sarthakviche/belfort/pull/25)).
 - T19 Lessons: Market context module, index trend and breadth, sectors, flows and events ([#26](https://github.com/sarthakviche/belfort/pull/26)).
 - T20 Lessons: Portfolio and Psychology modules, open risk, drawdown rules, biases and rules ([#27](https://github.com/sarthakviche/belfort/pull/27)).
+- T21 Lessons: Taxes and records module, capital gains on shares, records and filing ([#35](https://github.com/sarthakviche/belfort/pull/35)).
+- T22 Lessons: Safety module, tip scams, checking registration, myths ([#36](https://github.com/sarthakviche/belfort/pull/36)).
