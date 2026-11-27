@@ -2,6 +2,19 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T49 exercise types
+
+Branch `content/T49-exercise-types`, built on `feat/T42-gamified-learn` (#37) with `content/T21-taxes-records` (#35) and `content/T22-safety` (#36) merged in. PR #38.
+
+### What changed
+- **Content:** 97 new exercises in all 38 lessons: 45 `number`, 41 `tf`, 11 `order`. Existing multiple-choice items are untouched. Every lesson has at least two new items of at least two types, each with a `why`. Numbers come from the lesson's own figures (position sizing, R multiples, expectancy, ATR stops, P/E, LTCG, Brier points).
+- **Merge:** lesson counts now read "38 of 38"; both T21 and T22 are Done in `docs/TASKS.md`. A missing `),` and `(` between two glossary entries from the merge was fixed in `belfort/core/glossary.py`.
+- **Tests:** new `tests/test_learn_exercises.py`. `test_quiz_grading_and_progress` falls back to an unknown id, because no planned lesson is left.
+
+### Decisions
+- Lessons with no calculation (biases, flows-and-events, myths, tip-scams, trend) use tf and order only.
+- Wording avoids the banned phrases the content tests reject, for example "cannot lose" and "guarantee" were rephrased.
+
 ## 2026-11-28 — T42 gamified Learn
 
 Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.

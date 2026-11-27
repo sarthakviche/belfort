@@ -60,7 +60,7 @@
 | T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | In progress |
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | In progress |
 | T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
-| T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Blocked on T42 |
+| T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
 
 ---
 
@@ -294,8 +294,9 @@ Shared contracts every Phase 6 task uses:
 - **Do:** a native Android app named Belfort with every part of the desktop app in a mobile-first interface, the same mascot, loader and animations, the same account (T43). Coordinated in `conversations.md` on the `collab` branch.
 
 ### T49 · New exercise types in every lesson
-- **Owner:** Sarthak · **P1 · M · Status:** Blocked on T42 · **Area:** learn
+- **P1 · M · Owner:** Sarthak (agent) · **Status:** Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) · **Area:** learn
 - **Do:** add at least two exercises of the new types (tf, order, number) to every lesson, keeping the existing questions. Facts must match the lesson text.
+- **Result:** 97 new items across all 38 lessons: 45 number, 41 true/false, 11 order. Every lesson has at least two items of at least two types. `tests/test_learn_exercises.py` keeps it that way.
 
 ## Decisions (maintainers, not code)
 
