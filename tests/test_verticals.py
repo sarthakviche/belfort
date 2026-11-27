@@ -363,7 +363,7 @@ def test_quiz_grading_and_progress(fresh_db):
         for track in prog["syllabus"]["tracks"]
         for module in track["modules"]
         for les in module["lessons"]
-        if les.get("status") == "planned"
+        if les.get("status") == "planned" and module["stage"] == "beginner"
     )
     assert c.get(f"/api/learn/lessons/{planned}").status_code == 404  # on the syllabus, not written yet
 

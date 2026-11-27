@@ -2,6 +2,31 @@
 
 A running log of every change made in the Belfort 2 sprint, newest first. `CHANGELOG.md` stays the user-facing release notes; this file records what was done, by whom, on which branch, and why.
 
+## 2026-11-28 — T42 gamified Learn
+
+Branch `feat/T42-gamified-learn`, built on the sprint plan in #30.
+
+### What changed
+- **Engine (pure, no I/O):** `belfort/learn/engine.py` holds XP, the daily goal and streak with freezes, hearts, stage unlock rules, test sampling and the path builder. Dates are passed in. `belfort/learn/game.py` is the thin SQLite layer around it; `belfort/learn/router.py` gains `/path`, `/lessons/{id}/check`, `/tests/{kind}/{key}`, `/sessions/{id}/grade`, `/weak-spots`, `/goal` and `/placement/dismiss`. Thresholds are named constants in `belfort/settings.py`.
+- **Exercise types:** `curriculum.py` validates and grades `mc`, `tf`, `order` and `number`. The public quiz payload has no answers; `order` items are shuffled on the server; grading is server side.
+- **Locks:** the API returns 403 with a friendly sentence for the content, check and quiz of a lesson in a locked stage, and for starting a checkpoint or stage test there. Beginner is always open.
+- **Database:** migration 8 (renumbered at merge; 7 is the optional stop-loss from #40) adds `learn_profile`, `learn_xp_days`, `learn_lessons`, `learn_tests`, `learn_weak` and `learn_sessions`, each with `user_id` (default `local`).
+- **UI:** new `belfort/static/learn-game.js` and `learn-game.css` (path, lesson cards, exercises, results, confetti) and two still mascot PNGs for reduced motion. Only `index.html` changed (a link and a script tag).
+
+### Decisions
+- **Stage order:** stage comes from each module's `stage`; inside a stage, syllabus order. Safety is in the file under the Advanced track but is shown in Beginner.
+- **Planned lessons** show as "coming soon" nodes and are not counted toward stage progress or the stage test, so unwritten Safety and Taxes lessons do not block anyone.
+- **Stage test and checkpoints** open once every written lesson in the module or stage is done. Checkpoint: up to 8 questions from the module. Stage test: up to 12 from the stage. Both sample evenly across lessons. Pass mark 80%; 20 XP only on the first pass.
+- **Placement test** is 12 questions from Beginner, offered on first open, and unlocks Intermediate only. Advanced always needs the Intermediate stage test.
+- **Lessons in an unlocked stage are all open** (order is not forced); the first not-done node is highlighted as next. Once a stage test is passed, leftover checkpoints in that stage are not highlighted.
+- **A lesson completes at 60%** (as before). Tests are graded all at once with no hearts lost; hearts are lost only on instant-feedback answers inside lessons. If hearts reach zero mid-lesson the run ends without XP.
+- **XP:** 10 for a first completion, +5 for no mistakes, 5 for replaying a done lesson, 5 for a Weak spots review. Streak counts days the daily goal was met; a missed day spends a freeze if one is held; one freeze is earned at each multiple of 7 days, up to two.
+- **Hearts:** 5 a day, refilled lazily when the date changes. With none left a new lesson cannot be started; a Weak spots review (up to 8 questions you missed) refills them when finished, whatever the score.
+- **Test sessions:** a checkpoint, stage test, placement test or review is a server-side session of question references, graded once, so a page cannot grade a hand-picked easy subset.
+- **Old progress counts:** rows in `lesson_progress` are treated as done for the local user, and finished lessons are still written there for the local user.
+- **Order exercises** use tap-to-order (no drag), which also works on touch screens.
+- **Hooks into other files:** the old Learn loader in `verticals.js` is left in place; `learn-game.js` loads after it, replaces `onView.learn` and makes `renderSyllabus` a no-op.
+- **Tests:** an existing test now looks for a planned lesson in the Beginner stage, because planned lessons in locked stages answer 403 before 404.
 ## 2026-11-28 — T44 Tip Check (Devansh's agent, branch `feat/T44-tip-check`)
 
 ### Decisions

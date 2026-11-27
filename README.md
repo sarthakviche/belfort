@@ -18,7 +18,7 @@
 
 |  |  |
 |---|---|
-| **Learn** | A short, practical course for swing and positional trading, with quizzes. |
+| **Learn** | A short, practical course for swing and positional trading, as a path of three stages with exercises, XP, a daily streak and hearts. |
 | **Practice** | Paper trading with virtual points, a prediction journal, and a chart-replay trainer. |
 | **Research** | One clear report per NSE stock: the rule's checklist, the risk, and a position size. |
 | **News** | Market headlines in plain language, with every term explained on hover. |
