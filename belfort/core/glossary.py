@@ -548,6 +548,28 @@ G = [
         "Market",
         "Income tax return: the yearly form you file with the Income Tax Department. Which form you use (ITR-2, ITR-3) depends on your kinds of income.",
         ["itr-2", "itr-3", "itr"],
+        "Pump and dump",
+        "Market",
+        "A scheme where organisers buy a thinly traded share, push it through tips, then sell to the followers who bought. It is market manipulation, and SEBI acts against it.",
+        ["pump and dump", "pump-and-dump"],
+    ),
+    (
+        "Investment adviser",
+        "Market",
+        "A person or firm that gives investment advice for a fee and must be registered with SEBI (registration numbers start with INA).",
+        ["investment adviser", "investment advisers", "investment advisor"],
+    ),
+    (
+        "Research analyst",
+        "Market",
+        "A person or firm that publishes research or recommendations on securities and must be registered with SEBI (registration numbers start with INH).",
+        ["research analyst", "research analysts"],
+    ),
+    (
+        "SCORES",
+        "Market",
+        "SEBI's online system for investor complaints against listed companies and registered intermediaries. Filing is free.",
+        ["scores"],
     ),
 ]
 
