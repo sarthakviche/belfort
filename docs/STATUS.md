@@ -1,11 +1,12 @@
 # Status and known limitations
 
-> What works today and what does not. Last updated 22 November 2026. Update it in any PR that changes what is true here.
+> What works today and what does not. Last updated 28 November 2026. Update it in any PR that changes what is true here.
 
 ## Verified
 
-- 81 automated tests pass offline, with 74% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
+- 191 automated tests pass offline, with 83% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
 - The contributor setup was followed on a clean clone on Windows 11 with Python 3.12.4 on 22 November 2026: setup, hooks, tests and the app all worked.
+- The gamified Learn path (T42) was clicked through in the built-in browser on 28 November 2026: the path, a lesson as cards with every exercise type, a wrong answer losing a heart, a locked lesson refused with 403, the placement test unlocking Intermediate, a checkpoint with its review screen, and the out-of-hearts screen. Reduced-motion behaviour was reviewed in code only; it was not tried with the system setting on.
 - Each section was clicked through in a browser against live data on 21 November 2026: a research report, a lesson with its example chart and quiz, a paper order, a chart replay, the news page with tip filtering.
 
 ## Not verified yet
@@ -20,9 +21,11 @@
 | Area | Limitation | Task |
 |---|---|---|
 | Practice | Long only, one account, end-of-day fills | |
-| Learn | 35 of 38 lessons written | T22 |
+| Learn | 38 of 38 lessons written, each with multiple-choice plus true or false, order and number exercises | |
+| Learn | Stage progress is per local user; XP, hearts and streaks use the device's date. Moving between devices waits for accounts | T43 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
 | Research | Rule thresholds can be changed only in code | T25 |
+| Tip Check | Phrase rules miss wording they do not list; SEBI registration numbers are checked against a copy the user must import from SEBI's site (shape only until then); company size comes from Yahoo and may be missing | T44 |
 | Front end | No browser tests; JavaScript is checked only by syntax check and clicking through | T31 |
 | Packaging | `Belfort.exe` builds and runs (single file, unsigned, no installer or uninstaller yet); fonts still load from Google Fonts | T36, T38, T39, D7 |
 | Data | Yahoo Finance and NSE archive files are unofficial and can change or block access | D4 |

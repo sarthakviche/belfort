@@ -24,6 +24,8 @@ from .analysis.structure import trend_state
 
 warnings.filterwarnings("ignore")
 
+# Fallback when NSE's official list cannot be fetched: the Nifty 50 as published by NSE Indices on 2026-11-26.
+NIFTY_AS_OF = "2026-11-26"
 NIFTY = [
     "ADANIENT",
     "ADANIPORTS",
@@ -31,23 +33,24 @@ NIFTY = [
     "ASIANPAINT",
     "AXISBANK",
     "BAJAJ-AUTO",
-    "BAJFINANCE",
     "BAJAJFINSV",
+    "BAJFINANCE",
     "BEL",
     "BHARTIARTL",
+    "BSE",
     "CIPLA",
     "COALINDIA",
     "DRREDDY",
     "EICHERMOT",
+    "ETERNAL",
     "GRASIM",
     "HCLTECH",
     "HDFCBANK",
     "HDFCLIFE",
-    "HEROMOTOCO",
     "HINDALCO",
     "HINDUNILVR",
     "ICICIBANK",
-    "INDUSINDBK",
+    "INDIGO",
     "INFY",
     "ITC",
     "JIOFIN",
@@ -56,6 +59,7 @@ NIFTY = [
     "LT",
     "M&M",
     "MARUTI",
+    "MAXHEALTH",
     "NESTLEIND",
     "NTPC",
     "ONGC",
@@ -70,9 +74,9 @@ NIFTY = [
     "TCS",
     "TECHM",
     "TITAN",
+    "TMPV",
     "TRENT",
     "ULTRACEMCO",
-    "WIPRO",
 ]
 
 BROADER = [
@@ -224,8 +228,22 @@ def _row(sym: str, df: pd.DataFrame, info: dict | None) -> dict:
     }
 
 
+def nifty_members() -> tuple[list[str], str]:
+    """Today's Nifty 50 from NSE Indices, or the built-in copy (with its date) when that cannot be fetched."""
+    from ..research.analysis.pipeline import nse
+
+    try:
+        live = nse.nifty50()
+    except Exception:
+        live = None
+    if live:
+        return live, "NSE Indices' current Nifty 50 list"
+    return list(NIFTY), f"Belfort's built-in copy of the Nifty 50 list from {NIFTY_AS_OF} (NSE's list could not be fetched)"
+
+
 def build() -> dict:
-    symbols = sorted(set(NIFTY + BROADER))
+    members, members_source = nifty_members()
+    symbols = sorted(set(members + BROADER))
     frames = _download(symbols)
     with ThreadPoolExecutor(max_workers=6) as ex:
         infos = dict(zip(frames, ex.map(lambda s: _safe_info(s), frames), strict=False))
@@ -233,7 +251,8 @@ def build() -> dict:
     with_info = [r for r in rows.values() if r["mcap_cr"]]
 
     order = {"up": 0, "sideways": 1, "down": 2}
-    nifty = sorted([rows[s] for s in NIFTY if s in rows], key=lambda r: (order[r["trend"]], -r["chg_1m"]))
+    nifty = sorted([rows[s] for s in members if s in rows], key=lambda r: (order[r["trend"]], -r["chg_1m"]))
+    missing = sorted(set(members) - set(rows))
     for r in nifty:
         r["why"] = f"Trend {r['trend']}{' (recent)' if r['phase'] == 'early' else ''}; {r['from_high']}% from its 1-year high."
 
@@ -294,9 +313,11 @@ def build() -> dict:
         "lists": {
             "large": {
                 "title": "Large caps",
-                "subtitle": "Companies from the built-in Nifty 50 list",
-                "criteria": "All built-in Nifty 50 stocks, uptrends first. Large caps are usually steadier than smaller companies and "
-                "have recovered from past falls more often, but they still fall. Index membership changes; this built-in list can be out of date.",
+                "subtitle": "The companies in the Nifty 50 index",
+                "criteria": f"All {len(members)} Nifty 50 companies from {members_source}, uptrends first."
+                + (f" No price data for: {', '.join(missing)}." if missing else "")
+                + " Large caps are usually steadier than smaller companies and "
+                "have recovered from past falls more often, but they still fall. Index membership changes; the list is checked against NSE once a week.",
                 "rows": nifty,
             },
             "growth": {
@@ -328,7 +349,7 @@ def _safe_info(sym: str) -> dict | None:
 
 def _run():
     try:
-        data = cached("screens:v4:" + datetime.now().strftime("%Y-%m-%d"), 6 * 3600, build)
+        data = cached("screens:" + datetime.now().strftime("%Y-%m-%d"), 6 * 3600, build, derived=True)
         _state.update(data=data, error=None)
     except Exception as e:  # network trouble: report it, allow a retry
         _state.update(error=f"The lists could not be built ({type(e).__name__}). Reload to try again.")

@@ -35,6 +35,8 @@ Here is a real chart from at least 30 days ago. Find one day where price fell du
 [
   {"q": "Which price does the thick body of a candle span?", "options": ["High to low", "Open to close", "Yesterday's close to today's close"], "answer": 1, "why": "The body runs from the open to the close. Wicks show the high and low."},
   {"q": "A candle has a long lower wick and closes near its high. What happened?", "options": ["Price rose all day", "Price fell during the session, then buyers pushed it back up", "Nothing traded"], "answer": 1, "why": "The lower wick shows prices that traded but did not hold; the close near the high shows buyers took over."},
-  {"q": "How much should you rely on a single candle pattern?", "options": ["Fully: named patterns are reliable", "Little on its own; it matters in the context of trend and levels", "Never look at candles"], "answer": 1, "why": "On liquid stocks, single candles predict little alone. Context gives them meaning."}
+  {"q": "How much should you rely on a single candle pattern?", "options": ["Fully: named patterns are reliable", "Little on its own; it matters in the context of trend and levels", "Never look at candles"], "answer": 1, "why": "On liquid stocks, single candles predict little alone. Context gives them meaning."},
+  {"type": "number", "q": "A day opens at ₹100, reaches a high of ₹108 and a low of ₹98, and closes at ₹105. How many rupees tall is the body?", "answer": 5, "tolerance": 0, "unit": "₹", "why": "The body runs from open to close: 105 − 100 = ₹5. The high and low are the wicks."},
+  {"type": "tf", "q": "A single candle pattern on its own reliably predicts the next day's move.", "answer": false, "why": "One candle is one day of noise. Candles matter in context, such as a strong close at support in an uptrend."}
 ]
 ```

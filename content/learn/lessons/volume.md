@@ -31,6 +31,8 @@ Volume is a clue about participation, not a signal on its own. Use it to check w
 [
   {"q": "What does a day's volume measure?", "options": ["How many shares changed hands", "Whether buyers beat sellers", "The company's profit"], "answer": 0, "why": "Volume counts shares traded. Each trade has a buyer and a seller, so it does not show who won."},
   {"q": "A stock usually trades 2 lakh shares a day. Today it trades 5 lakh while closing above resistance. How would Belfort read the volume?", "options": ["Quiet", "Heavy: 2.5 times the average", "Normal"], "answer": 1, "why": "5 lakh is 2.5 times the 2 lakh average, above the 1.5 times Belfort uses for a convincing breakout."},
-  {"q": "Why compare volume with the stock's own average rather than with other stocks?", "options": ["Every stock has a different normal level of trading", "Other stocks' volume is secret", "Volume never changes"], "answer": 0, "why": "A busy day for a small company can be a quiet one for a large bank, so each stock is compared with itself."}
+  {"q": "Why compare volume with the stock's own average rather than with other stocks?", "options": ["Every stock has a different normal level of trading", "Other stocks' volume is secret", "Volume never changes"], "answer": 0, "why": "A busy day for a small company can be a quiet one for a large bank, so each stock is compared with itself."},
+  {"type": "number", "q": "A stock's 20-day average volume is 8,00,000 shares and today's volume is 12,80,000. Today's volume is how many times the average?", "answer": 1.6, "tolerance": 0.01, "unit": "times", "why": "12,80,000 ÷ 8,00,000 = 1.6, above the 1.5 times that the lesson calls heavy."},
+  {"type": "tf", "q": "High volume tells you that buyers won against sellers that day.", "answer": false, "why": "Every share bought was sold by someone else, so volume does not say who won. It says how many people took part."}
 ]
 ```

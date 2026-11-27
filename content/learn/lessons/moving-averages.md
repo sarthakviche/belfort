@@ -35,6 +35,8 @@ In this past chart, estimate where the 50-day average would run. Is price mostly
 [
   {"q": "The last five closes are 100, 102, 101, 104 and 103. What is the 5-day simple moving average?", "options": ["102", "103", "104"], "answer": 0, "why": "100 + 102 + 101 + 104 + 103 = 510, and 510 divided by 5 is 102."},
   {"q": "Why does a moving average lag behind price?", "options": ["It is calculated from past closes only", "Exchanges delay it", "It uses tomorrow's price"], "answer": 0, "why": "Each value is an average of earlier closes, so it changes direction after price does."},
-  {"q": "Price is above a rising 50-day average and makes higher highs and higher lows. How does Belfort describe this?", "options": ["A downtrend", "An established uptrend", "A sure sign it will keep rising"], "answer": 1, "why": "Those conditions describe an established uptrend. They describe the past, not a promise about the future."}
+  {"q": "Price is above a rising 50-day average and makes higher highs and higher lows. How does Belfort describe this?", "options": ["A downtrend", "An established uptrend", "A sure sign it will keep rising"], "answer": 1, "why": "Those conditions describe an established uptrend. They describe the past, not a promise about the future."},
+  {"type": "number", "q": "The last 20 closes of a stock add up to ₹10,400. What is the 20-day moving average?", "answer": 520, "tolerance": 0, "unit": "₹", "why": "The average is the sum of the closes divided by 20: 10,400 ÷ 20 = ₹520."},
+  {"type": "tf", "q": "A crossover of two moving averages is a forecast of where price goes next.", "answer": false, "why": "Averages use only past closes, so a crossover summarises what already happened."}
 ]
 ```

@@ -35,6 +35,9 @@ Sources: NSE market timings (updated 11 November 2026), NSE circuit breakers and
 [
   {"q": "When does NSE's normal equity market session run?", "options": ["9:00 to 15:00", "9:15 to 15:30", "10:00 to 16:00"], "answer": 1, "why": "Normal market hours are 9:15 to 15:30 IST, after the pre-open session."},
   {"q": "A stock with a 10% price band rises 10% by noon. What happens?", "options": ["Trading stops for the whole market", "It can only trade inside the band for the rest of the day", "The band doubles"], "answer": 1, "why": "A price band caps the day's move for that stock; it does not halt the market."},
-  {"q": "Your stop is at 95. The stock closes at 97, then opens at 90 after bad news. Where does a stop order exit?", "options": ["At 95", "Near the open of 90", "It does not exit"], "answer": 1, "why": "Price never traded between 97 and 90, so the first available price is the open. That is a gap."}
+  {"q": "Your stop is at 95. The stock closes at 97, then opens at 90 after bad news. Where does a stop order exit?", "options": ["At 95", "Near the open of 90", "It does not exit"], "answer": 1, "why": "Price never traded between 97 and 90, so the first available price is the open. That is a gap."},
+  {"type": "order", "q": "Put the NSE sessions in the order they happen in the day.", "items": ["Pre-open order entry", "Normal market", "Closing session"], "why": "Pre-open runs 9:00 to 9:08, the normal market 9:15 to 15:30 and the closing session 15:40 to 16:00."},
+  {"type": "number", "q": "How many minutes does the normal market session last (9:15 to 15:30)?", "answer": 375, "tolerance": 0, "unit": "minutes", "why": "9:15 to 15:30 is 6 hours 15 minutes, which is 375 minutes."},
+  {"type": "tf", "q": "Every stock has a fixed daily price band, including stocks that have futures and options.", "answer": false, "why": "Stocks that have futures and options have no fixed band."}
 ]
 ```

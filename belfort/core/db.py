@@ -10,6 +10,13 @@ from pathlib import Path
 
 from .. import settings
 
+# Every column of the trades table after migration 6, in order; used when migration 7 rebuilds the table.
+_TRADE_COLUMNS = (
+    "id, account_id, symbol, qty, entry_type, limit_price, stop, target, thesis, confidence, placed_on, status, "
+    "entry_price, entry_date, exit_price, exit_date, exit_reason, close_requested_on, review, created, stop_moves, "
+    "current_stop, trail_kind, trail_value, trail_from, parent_id, setup, mistakes"
+)
+
 MIGRATIONS = [
     # 1: practice and learning
     """
@@ -68,6 +75,52 @@ MIGRATIONS = [
     """
     CREATE TABLE IF NOT EXISTS equity_snapshots (
         account_id INTEGER NOT NULL, day TEXT NOT NULL, equity REAL NOT NULL, PRIMARY KEY (account_id, day)
+    );
+    """,
+    # 7: the stop-loss is optional. SQLite cannot drop NOT NULL from a column, so the trades table is rebuilt with the
+    # same columns and every row copied across.
+    f"""
+    CREATE TABLE trades_new (
+        id INTEGER PRIMARY KEY, account_id INTEGER NOT NULL REFERENCES accounts(id),
+        symbol TEXT NOT NULL, qty INTEGER NOT NULL, entry_type TEXT NOT NULL, limit_price REAL,
+        stop REAL, target REAL, thesis TEXT NOT NULL DEFAULT '', confidence REAL,
+        placed_on TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending',
+        entry_price REAL, entry_date TEXT, exit_price REAL, exit_date TEXT, exit_reason TEXT,
+        close_requested_on TEXT, review TEXT NOT NULL DEFAULT '', created TEXT NOT NULL DEFAULT (datetime('now')),
+        stop_moves TEXT NOT NULL DEFAULT '[]', current_stop REAL, trail_kind TEXT, trail_value REAL, trail_from TEXT,
+        parent_id INTEGER, setup TEXT, mistakes TEXT NOT NULL DEFAULT '[]'
+    );
+    INSERT INTO trades_new ({_TRADE_COLUMNS}) SELECT {_TRADE_COLUMNS} FROM trades;
+    DROP TABLE trades;
+    ALTER TABLE trades_new RENAME TO trades;
+    """,
+    # 8: the Learn game: profile (XP, hearts, streak), daily XP, lessons, tests, weak spots, test sessions (T42)
+    """
+    CREATE TABLE IF NOT EXISTS learn_profile (
+        user_id TEXT NOT NULL DEFAULT 'local' PRIMARY KEY, xp_total INTEGER NOT NULL DEFAULT 0,
+        goal INTEGER NOT NULL DEFAULT 20, hearts INTEGER NOT NULL DEFAULT 5, hearts_day TEXT,
+        streak INTEGER NOT NULL DEFAULT 0, last_goal_day TEXT, freezes INTEGER NOT NULL DEFAULT 0,
+        placement_seen INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS learn_xp_days (
+        user_id TEXT NOT NULL DEFAULT 'local', day TEXT NOT NULL, xp INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, day)
+    );
+    CREATE TABLE IF NOT EXISTS learn_lessons (
+        user_id TEXT NOT NULL DEFAULT 'local', lesson_id TEXT NOT NULL, completed_on TEXT NOT NULL,
+        best_score REAL NOT NULL, PRIMARY KEY (user_id, lesson_id)
+    );
+    CREATE TABLE IF NOT EXISTS learn_tests (
+        user_id TEXT NOT NULL DEFAULT 'local', kind TEXT NOT NULL, key TEXT NOT NULL, best_score REAL NOT NULL,
+        passed INTEGER NOT NULL, xp_awarded INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (user_id, kind, key)
+    );
+    CREATE TABLE IF NOT EXISTS learn_weak (
+        user_id TEXT NOT NULL DEFAULT 'local', lesson_id TEXT NOT NULL, q_index INTEGER NOT NULL,
+        wrong_count INTEGER NOT NULL DEFAULT 1, last_wrong TEXT NOT NULL, PRIMARY KEY (user_id, lesson_id, q_index)
+    );
+    CREATE TABLE IF NOT EXISTS learn_sessions (
+        id TEXT PRIMARY KEY, user_id TEXT NOT NULL DEFAULT 'local', kind TEXT NOT NULL, key TEXT NOT NULL,
+        refs TEXT NOT NULL, created TEXT NOT NULL DEFAULT (datetime('now'))
     );
     """,
 ]

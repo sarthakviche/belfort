@@ -37,6 +37,9 @@ That is why Belfort's Practice account and journal show results in R. A positive
 [
   {"q": "You risk ₹1,500 on a trade and close it with a ₹4,500 profit. What is the result in R?", "options": ["+1.5R", "+3R", "+4.5R"], "answer": 1, "why": "₹4,500 ÷ ₹1,500 = 3, so the trade made +3R."},
   {"q": "Your stop was ₹480 but the stock opened at ₹470 and you sold there. Entry was ₹500. What happened in R?", "options": ["Exactly −1R", "A loss larger than −1R", "A gain"], "answer": 1, "why": "The planned loss per share was ₹20; the real loss was ₹30, so the result is −1.5R. Gaps make losses bigger than planned."},
-  {"q": "A trader wins 40% of trades. Winners average +2.5R and losers −1R. What is the average result per trade?", "options": ["−0.2R", "+0.4R", "+1.5R"], "answer": 1, "why": "Per ten trades: 4 × 2.5 = +10R and 6 × −1 = −6R, so +4R in total, or +0.4R per trade."}
+  {"q": "A trader wins 40% of trades. Winners average +2.5R and losers −1R. What is the average result per trade?", "options": ["−0.2R", "+0.4R", "+1.5R"], "answer": 1, "why": "Per ten trades: 4 × 2.5 = +10R and 6 × −1 = −6R, so +4R in total, or +0.4R per trade."},
+  {"type": "number", "q": "Entry ₹250, stop ₹240, 100 shares. You exit at ₹275. What is the result in R?", "answer": 2.5, "tolerance": 0.01, "unit": "R", "why": "Planned risk is ₹10 × 100 = ₹1,000. Profit is ₹25 × 100 = ₹2,500, so +2.5R."},
+  {"type": "number", "q": "Ten trades: 5 winners at +2R each and 5 losers at −1R each. What is the Average R?", "answer": 0.5, "tolerance": 0.01, "unit": "R", "why": "5 × 2 − 5 × 1 = +5R over 10 trades, an average of +0.5R."},
+  {"type": "tf", "q": "A positive Average R over a handful of trades proves your plan works.", "answer": false, "why": "A few trades say very little either way. Average R matters over many trades."}
 ]
 ```

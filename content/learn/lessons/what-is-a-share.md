@@ -29,6 +29,9 @@ Belfort teaches a process: read the trend, find a sensible entry, decide where y
 [
   {"q": "In the short term (days to weeks), what mostly moves a share price?", "options": ["Only the company's yearly profit", "The balance of buyers and sellers, driven by news, results and market mood", "A price set by SEBI each morning"], "answer": 1, "why": "Over days and weeks, price is the last agreed trade between buyers and sellers. Profit matters most over years."},
   {"q": "Where are your shares held after you buy them?", "options": ["In your broker's own account", "In a demat account in your name at NSDL or CDSL", "At the company's head office"], "answer": 1, "why": "Shares sit in your own demat account with a depository, not with the broker."},
-  {"q": "A company you admire is a good trade at any price.", "options": ["True", "False"], "answer": 1, "why": "The price you pay and the size of your trade matter as much as the quality of the company."}
+  {"q": "A company you admire is a good trade at any price.", "options": ["True", "False"], "answer": 1, "why": "The price you pay and the size of your trade matter as much as the quality of the company."},
+  {"type": "order", "q": "Put the journey of a share purchase in order.", "items": ["You place the order with your broker", "The broker sends it to the exchange", "The trade happens", "The shares arrive in your demat account one working day later"], "why": "The broker sends your order to the exchange, and under T+1 settlement the shares move one working day after the trade."},
+  {"type": "tf", "q": "The shares you buy are held in your broker's name.", "answer": false, "why": "Your shares sit in a demat account with a depository (NSDL or CDSL), in your name, not the broker's."},
+  {"type": "number", "q": "Under T+1 settlement, how many working days after the trade day do shares and money change hands?", "answer": 1, "tolerance": 0, "unit": "day", "why": "T+1 means one working day after the trade day. Buy on Monday and the shares arrive on Tuesday."}
 ]
 ```

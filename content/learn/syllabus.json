@@ -140,9 +140,9 @@
           "id": "safety", "title": "Scams, tips and your rights", "stage": "beginner",
           "why": "The fastest way to lose money is to follow someone else's 'sure shot'.",
           "lessons": [
-            {"id": "tip-scams", "title": "Tip groups, fake apps and guaranteed returns", "minutes": 6, "status": "planned"},
-            {"id": "check-registration", "title": "Checking SEBI registration and filing a complaint", "minutes": 5, "status": "planned"},
-            {"id": "myths", "title": "Myths: secret indicators and 'operator' stocks", "minutes": 5, "status": "planned"}
+            {"id": "tip-scams", "title": "Tip groups, fake apps and guaranteed returns", "minutes": 6},
+            {"id": "check-registration", "title": "Checking SEBI registration and filing a complaint", "minutes": 5},
+            {"id": "myths", "title": "Myths: secret indicators and 'operator' stocks", "minutes": 5}
           ]
         }
       ]
