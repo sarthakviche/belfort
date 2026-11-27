@@ -7,7 +7,7 @@ Markets are full of stories that sound true. Each myth below has a cost, and eac
 
 ## 1. "You can get rich quick"
 
-Social media shows the winners and hides the rest. SEBI's own studies of individual traders have found that most of them lose money; the survivors are the ones who keep the risk per trade small and stay in the game. Slow compounding with controlled losses is the plan that survives.
+Social media shows the winners and hides the rest. SEBI's own studies found that about 9 in 10 individual traders in futures and options lost money in each year from 2021-22 to 2023-24, and that about 7 in 10 individual intraday traders in shares lost money in 2022-23. The survivors are the ones who keep the risk per trade small and stay in the game. Slow compounding with controlled losses is the plan that survives.
 *Test it:* the lessons on position sizing, R multiples and risk of ruin show how quickly big bets wipe out an account.
 
 ## 2. "Indicators predict the next move"
@@ -43,7 +43,7 @@ Before acting on any claim, ask three questions:
 2. What would prove it wrong, and what is my stop?
 3. Who gains if I believe it?
 
-Sources: SEBI studies of individual trader outcomes (stated from memory of the published studies; check them on sebi.gov.in); Belfort's own pattern backtest and lessons referred to above; SEBI's October 2026 warning on invitation-only groups and its registration rules, as described in the previous lessons.
+Sources: SEBI's studies of individual traders' results in equity futures and options (January 2023 and September 2024) and in intraday cash trading (July 2023), published on sebi.gov.in; Belfort's own pattern backtest and lessons referred to above; SEBI's October 2026 warning on invitation-only groups and its registration rules, as described in the previous lessons.
 
 ::try replay
 
