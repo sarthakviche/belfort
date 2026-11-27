@@ -1,4 +1,4 @@
-﻿# Tasks: from v0.1 to Belfort 1.0 for Windows
+# Tasks: from v0.1 to Belfort 1.0 for Windows
 
 > The public task board. Anyone can pick a `Ready` task: comment on its issue (or open one titled with the task id) to claim it, then follow [CONTRIBUTING.md](../CONTRIBUTING.md). When you start, set Owner and Status in your first commit; when it merges, set Status to Done with the PR link.
 >
