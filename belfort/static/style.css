@@ -59,7 +59,7 @@ kbd { font: 500 11px var(--font); padding: 1px 7px; border-radius: 6px; backgrou
 .ix.on .no { color: var(--y); }
 .ix.on::after { content: ""; position: absolute; right: 6px; top: 50%; width: 7px; height: 7px; margin-top: -3px; border-radius: 50%; background: var(--y); box-shadow: 0 0 12px var(--y); }
 
-/* open files: a filing drawer of recently opened stocks */
+/* recent stocks: the stocks opened most recently */
 .drawer-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--dim); margin-bottom: -10px; padding: 0 6px; }
 .linkish { background: none; border: 0; padding: 0; color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; cursor: pointer; }
 .linkish:hover { color: var(--y); }
@@ -187,9 +187,9 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 11px; color:
 .kv .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; } .kv .n { font-size: 11.5px; color: var(--muted); }
 .kv .big { grid-column: 1 / -1; background: linear-gradient(120deg, var(--y-a14), rgba(0,0,0,.35)); border-color: var(--y-a30); } .kv .big .v { font-size: 30px; color: var(--y); }
 ul.plain { margin: 8px 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
-ul.plain li { display: flex; gap: 11px; color: var(--ink2); }
-ul.plain li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; margin-top: 8px; background: var(--y); }
-ul.plain li > * { min-width: 0; } ul.plain b { color: var(--ink); }
+ul.plain li { position: relative; padding-left: 18px; color: var(--ink2); }
+ul.plain li::before { content: ""; position: absolute; left: 0; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--y); }
+ul.plain b { color: var(--ink); }
 .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 
 /* dossier: glass folders */
@@ -340,6 +340,17 @@ ul.plain, ol.plain { margin: 6px 0; padding-left: 20px; color: var(--ink2); } ul
 .story .st { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 21px; line-height: 1.18; letter-spacing: 0; text-transform: none; color: var(--ink); }
 .story .st a { color: inherit; text-decoration: none; } .story .st a:hover { color: var(--y); }
 .story .ss { margin: 0; color: var(--muted); font-size: 13.5px; }
+.story .ni { aspect-ratio: 21 / 9; } .story.lead .ni { aspect-ratio: auto; max-height: 240px; }
+.stk-row { display: flex; flex-direction: column; gap: 6px; }
+.stk { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; text-align: left; padding: 8px 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--s2); color: var(--ink2); font: inherit; font-size: 13px; cursor: pointer; transition: border-color .2s; }
+.stk:hover { border-color: var(--y); } .stk b { color: var(--y); letter-spacing: .02em; } .stk .nm { color: var(--ink); }
+.stk .px { color: var(--ink2); font-variant-numeric: tabular-nums; } .stk .px i { color: var(--dim); font-style: normal; font-size: 11.5px; }
+.stk .go { margin-left: auto; color: var(--y); font-size: 12px; }
+.story .what { border-left: 2px solid var(--y); padding: 2px 0 2px 11px; } .story .what p { margin: 4px 0 0; color: var(--ink2); font-size: 14px; line-height: 1.5; }
+.story .more { color: var(--y); font-size: 13px; font-weight: 600; text-decoration: none; } .story .more:hover { text-decoration: underline; }
+.in-news { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: baseline; width: 100%; text-align: left; padding: 7px 4px; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink2); font: inherit; font-size: 13px; cursor: pointer; }
+.in-news b { color: var(--y); } .in-news i { color: var(--dim); font-style: normal; font-size: 12px; } .in-news:hover span, .in-news.on span { color: var(--ink); }
+.filter-note { margin-bottom: 12px; color: var(--ink2); font-size: 14px; }
 .story .sf { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: auto; padding-top: 6px; }
 .story .sf .sp { flex: 1; } .story .sf .linkish { font-size: 12px; text-decoration: none; }
 .story.lead { display: grid; grid-template-columns: 1.25fr 1fr; background: linear-gradient(160deg, rgba(250,204,21,.10), var(--s1) 60%); border-color: var(--y-a30); }

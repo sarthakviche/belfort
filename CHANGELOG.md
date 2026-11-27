@@ -25,12 +25,15 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Production engineering setup: Ruff lint and format, coverage threshold, pinned dependencies, dependency audit, Windows and Linux CI, commit and PR policy checks, pre-commit hooks, Dependabot, code owners, conventions guide.
 
 ### Changed
+- Sidebar: "Open files" is now "Recent stocks", the stocks you opened most recently.
+- News: each story now leads with the stocks it names (full name, last close when Belfort has it, and a link to Belfort's report), then the publisher's own summary under "What happened", then a link to read the full story at the source. A new "Stocks in the news" panel lists the companies in today's stories and filters to one. Broker "(Buy)" calls are hidden with the other stock tips, and "BSE" is no longer tagged as the company when a story means the exchange or its indices.
 - README shortened to the essentials; project details moved to `docs/ABOUT.md`.
 - Practice: the portfolio opens much faster on repeat visits. Daily prices are kept until the next end-of-day release, and the paper account settles once per trading day instead of on every view.
 - Ask Belfort: errors now say what to do (wrong key, unknown model, rate limit, provider outage, slow answer, local model not running) and never show your key back to you.
 - Renamed single-letter and uppercase local variables in the research engine to descriptive names; no behaviour change.
 
 ### Fixed
+- Research report: the Business strengths and weaknesses lists no longer break into narrow columns where a term is underlined; chart patterns are named once each (bullish below the bars, bearish above) instead of piling up point labels; scrolling with the mouse over a chart scrolls the page instead of zooming the chart (drag to pan, pinch or drag an axis to zoom).
 - Chart replay: the company and the future bars stay inside Belfort until you decide, and the reveal shows the correct end date instead of "[object Object]".
 
 ## [0.1.0] - 2026-11-21

@@ -20,7 +20,7 @@ function candleChart(el, candles, opts) {
   const c = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
     grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" },
     timeScale: { borderColor: "rgba(255,255,255,.08)", visible: !(opts && opts.hideTime) }, crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    handleScroll: !(opts && opts.locked), handleScale: !(opts && opts.locked) });
+    ...(opts && opts.locked ? { handleScroll: false, handleScale: false } : CHART_POINTER) });
   const s = c.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444" });
   s.setData(candles);
   c.timeScale().fitContent();
@@ -469,28 +469,46 @@ async function replayDecide(decision) {
 }
 
 /* ======================= NEWS ======================= */
-const N = { data: null, cat: "All", tips: false };
+const N = { data: null, cat: "All", tips: false, sym: null };
 onView.news = (opts) => loadNews(opts.refresh);
 async function loadNews(refresh) {
   $("news-body").innerHTML = '<p class="hint">Gathering headlines…</p>';
   try { N.data = await api("/api/news" + (refresh ? "?refresh=true" : "")); renderNews(); }
   catch (e) { $("news-body").innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
 }
+/* A story card reads top to bottom: which stock, what happened, then the link for the full story. The summary is the
+   publisher's own feed description; Belfort adds the company name and its last close, never its own take. */
+const NEWS_MIN_SUMMARY = 40;
+function stockStrip(syms) {
+  const co = (N.data && N.data.companies) || {};
+  return syms.length ? `<div class="stk-row">${syms.map((x) => { const c = co[x] || { name: x };
+    return `<button type="button" class="stk" data-sym="${esc(x)}" title="Open Belfort's report on ${esc(c.name)}"><b>${esc(x)}</b><span class="nm">${esc(c.name)}</span>
+      ${c.last_close ? `<span class="px">${inr(c.last_close)} <i>close ${esc(c.as_of)}</i></span>` : ""}<span class="go">Report →</span></button>`; }).join("")}</div>` : "";
+}
 function storyCard(s, big) {
   const img = s.image ? `<div class="ni"><img src="${esc(safeUrl(s.image))}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></div>` : "";
+  const what = s.summary && s.summary.length >= NEWS_MIN_SUMMARY;
   return `<article class="story ${big ? "lead" : ""} ${s.image ? "" : "noimg"}" data-id="${esc(s.id)}">${img}
     <div class="sb"><div class="meta"><span class="chip c-plain">${esc(s.category)}</span>${s.tip ? '<span class="chip c-medium">publisher\'s stock call</span>' : ""}<span>${esc(s.source)}</span><span>${esc(ago(s.published))}</span></div>
-      <h3 class="st"><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a></h3>
-      ${s.summary ? `<p class="ss">${esc(s.summary)}</p>` : ""}
-      <div class="sf">${(s.symbols || []).map((x) => `<button type="button" class="tkr" data-sym="${esc(x)}">${esc(x)}</button>`).join("")}
-        <span class="sp"></span><button type="button" class="linkish" data-explain="${esc(s.id)}">Explain this</button>
-        <a class="linkish" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">Read at source ↗</a></div></div></article>`;
+      ${stockStrip(s.symbols || [])}
+      <h3 class="st">${esc(s.title)}</h3>
+      ${what ? `<div class="what"><span class="eyebrow">What happened</span><p>${esc(s.summary)}</p></div>` : ""}
+      <div class="sf"><button type="button" class="linkish" data-explain="${esc(s.id)}">Explain in plain words</button><span class="sp"></span>
+        <a class="more" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">Read the full story on ${esc(s.source)} ↗</a></div></div></article>`;
+}
+function stocksInNews(stories) {
+  const count = {};
+  stories.forEach((s) => (s.symbols || []).forEach((x) => { count[x] = (count[x] || 0) + 1; }));
+  const co = N.data.companies || {}, top = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  return top.length ? `<div class="panel glass"><h3>Stocks in the news</h3><p class="hint">Companies named in today's stories. Pick one to see only its stories.</p>
+    ${top.map(([x, n]) => `<button type="button" class="in-news ${N.sym === x ? "on" : ""}" data-filter="${esc(x)}"><b>${esc(x)}</b><span>${esc((co[x] || {}).name || x)}</span><i>${n} stor${n > 1 ? "ies" : "y"}</i></button>`).join("")}</div>` : "";
 }
 function renderNews() {
   const d = N.data, cats = ["All"].concat(d.categories.filter((c) => d.stories.some((s) => s.category === c)));
   if (!cats.includes(N.cat)) N.cat = "All";
   $("news-cats").innerHTML = cats.map((c) => `<button type="button" data-cat="${esc(c)}" class="${c === N.cat ? "on" : ""}">${esc(c)}</button>`).join("");
-  const inCat = d.stories.filter((s) => N.cat === "All" || s.category === N.cat);
+  if (N.sym && !d.stories.some((s) => (s.symbols || []).includes(N.sym))) N.sym = null;
+  const inCat = d.stories.filter((s) => (N.cat === "All" || s.category === N.cat) && (!N.sym || (s.symbols || []).includes(N.sym)));
   const hiddenTips = inCat.filter((s) => s.tip).length;
   const xs = inCat.filter((s) => N.tips || !s.tip);
   const official = xs.filter((s) => s.kind === "official"), pub = xs.filter((s) => s.kind !== "official");
@@ -499,8 +517,8 @@ function renderNews() {
     const lead = pub.find((s) => s.image) || pub[0];
     const rest = pub.filter((s) => s !== lead);
     $("news-body").innerHTML = `<div class="news-grid">
-      <div class="news-main">${lead ? storyCard(lead, true) : ""}<div class="stories">${rest.slice(0, 40).map((s) => storyCard(s)).join("")}</div></div>
-      <aside class="news-side"><div class="panel glass"><h3>From the regulator and the RBI</h3>${official.length ? official.slice(0, 12).map((s) => `<div class="brief">
+      <div class="news-main">${N.sym ? `<div class="filter-note">Showing stories about <b>${esc(N.sym)}</b> · <button type="button" class="linkish" data-filter="">Show all stories</button></div>` : ""}${lead ? storyCard(lead, true) : ""}<div class="stories">${rest.slice(0, 40).map((s) => storyCard(s)).join("")}</div></div>
+      <aside class="news-side">${stocksInNews(d.stories.filter((s) => N.tips || !s.tip))}<div class="panel glass"><h3>From the regulator and the RBI</h3>${official.length ? official.slice(0, 12).map((s) => `<div class="brief">
           <span class="hint">${esc(s.source)} · ${esc(ago(s.published))}</span><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a>
           <button type="button" class="linkish" data-explain="${esc(s.id)}">Explain this</button></div>`).join("") : '<p class="missing">No official releases in this section.</p>'}</div>
         ${hiddenTips ? `<div class="panel glass"><h3>Stock tips hidden</h3><p class="hint">${hiddenTips} headline${hiddenTips > 1 ? "s" : ""} in this section pass on a buy or sell call or a price target from a publisher or brokerage. Belfort hides them by default: they are someone else's opinion, not news, and not Belfort's view.</p>
@@ -516,6 +534,7 @@ $("news-cats").addEventListener("click", (e) => { const b = e.target.closest("bu
 $("news-refresh").addEventListener("click", () => loadNews(true));
 $("news-body").addEventListener("click", (e) => {
   if (e.target.closest("#tips-toggle")) { N.tips = !N.tips; return renderNews(); }
+  const f = e.target.closest("[data-filter]"); if (f) { N.sym = f.dataset.filter || null; renderNews(); return window.scrollTo({ top: 0, behavior: "smooth" }); }
   const t = e.target.closest("button[data-sym]"); if (t) return load(t.dataset.sym);
   const x = e.target.closest("button[data-explain]");
   if (x) {

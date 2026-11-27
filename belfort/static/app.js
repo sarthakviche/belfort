@@ -1,5 +1,10 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
+/* Charts never take the mouse wheel, so scrolling over one scrolls the page. Drag to pan; pinch or drag an axis to zoom. */
+const CHART_POINTER = {
+  handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+  handleScale: { mouseWheel: false, pinch: true, axisPressedMouseMove: true, axisDoubleClickReset: true },
+};
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const inr = (x, d = 2) => (x == null ? "n/a" : "₹" + Number(x).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d }));
 const num = (x, d = 2) => (x == null ? "n/a" : Number(x).toLocaleString("en-IN", { maximumFractionDigits: d }));
@@ -13,7 +18,7 @@ const compact = (x) => (x == null ? "n/a" : x >= 1e7 ? (x / 1e7).toFixed(2) + " 
 const S = { report: null, symbol: null, style: localStorage.getItem("style") || "swing", tab: null, list: "large", screens: null,
   chat: [], cfg: null, view: "home", chatCtx: null };
 
-/* ---------- sidebar: index, open files, breadcrumb ---------- */
+/* ---------- sidebar: index, recent stocks, breadcrumb ---------- */
 const FILES_KEY = "belfortFiles";
 const readFiles = () => { try { return JSON.parse(localStorage.getItem(FILES_KEY)) || []; } catch (e) { return []; } };
 function rememberFile(d) {
@@ -28,7 +33,7 @@ function renderFiles() {
   box.innerHTML = f.length ? f.map((x) => `<button type="button" class="file ${x.symbol === S.symbol && !$("report").hidden ? "on" : ""}" data-sym="${esc(x.symbol)}">
       <div><b>${esc(x.symbol)}</b><span>${esc(x.name)}</span></div>
       <div class="px">${inr(x.close)}<i class="${x.chg >= 0 ? "up" : "down"}">${x.chg >= 0 ? "▲" : "▼"} ${Math.abs(x.chg)}%</i></div></button>`).join("")
-    : '<div class="files-empty">No files open. Search a company to start its dossier.</div>';
+    : '<div class="files-empty">No stocks yet. Search a company to see its report here.</div>';
 }
 /* ---------- views: research (home, report), learn, practice, news ---------- */
 const VIEWS = ["home", "report", "learn", "practice", "news"];
@@ -403,7 +408,7 @@ function drawChart(d) {
   el.innerHTML = "";
   chart = LightweightCharts.createChart(el, { autoSize: true, layout: { background: { color: "transparent" }, textColor: "#8b8b90", fontFamily: "Inter, sans-serif" },
     grid: { vertLines: { color: "rgba(255,255,255,.04)" }, horzLines: { color: "rgba(255,255,255,.05)" } }, rightPriceScale: { borderColor: "rgba(255,255,255,.08)" }, timeScale: { borderColor: "rgba(255,255,255,.08)" },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal } });
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal }, ...CHART_POINTER });
   const candles = chart.addCandlestickSeries({ upColor: "#16c47f", downColor: "#ef4444", borderVisible: false, wickUpColor: "#16c47f", wickDownColor: "#ef4444" });
   candles.setData(d.chart.candles);
   const vol = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "vol", lastValueVisible: false, priceLineVisible: false });
@@ -415,14 +420,27 @@ function drawChart(d) {
   t.levels.supports.slice(0, 2).forEach((l) => line(l.price, "#16c47f", "support", 2));
   t.levels.resistances.slice(0, 2).forEach((l) => line(l.price, "#ef4444", "resistance", 2));
   line(d.sizing.stop, "#8b8b90", "stop", 0);
-  const first = d.chart.first_date, marks = [];
-  t.patterns.filter((p) => !p.name.includes("trend line")).forEach((p) => p.points.forEach((q) => {
-    if (q.date >= first) marks.push({ time: q.date, position: "aboveBar", color: p.direction === "bearish" ? "#ef4444" : p.direction === "bullish" ? "#16c47f" : "#facc15", shape: "circle", text: q.role });
-  }));
-  marks.sort((a, b) => (a.time < b.time ? -1 : a.time > b.time ? 1 : 0));
-  candles.setMarkers(marks);
+  candles.setMarkers(patternMarkers(t.patterns, d.chart.candles, d.chart.first_date));
   const n = d.chart.candles.length, show = d.style.key === "swing" ? 130 : 260;
-  chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + 5 });
+  chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + 14 });
+}
+
+/* Pattern markers: one name per pattern at its last point, other points as plain dots. Bullish patterns sit below the
+   bars and the rest above, and a name is dropped when another one on the same side is within LABEL_GAP bars, so labels
+   never pile up. Each point's role (first peak, neckline...) stays in the Levels and patterns section. */
+const LABEL_GAP = 12;
+function patternMarkers(patterns, candles, first) {
+  const index = new Map(candles.map((c, i) => [c.time, i])), marks = [], labelled = { aboveBar: [], belowBar: [] };
+  const shown = patterns.filter((p) => !p.name.includes("trend line")).map((p) => ({ p, pts: p.points.filter((q) => q.date >= first && index.has(q.date)) }))
+    .filter((x) => x.pts.length).sort((a, b) => index.get(b.pts[b.pts.length - 1].date) - index.get(a.pts[a.pts.length - 1].date));
+  shown.forEach(({ p, pts }) => {
+    const position = p.direction === "bullish" ? "belowBar" : "aboveBar";
+    const color = p.direction === "bearish" ? "#ef4444" : p.direction === "bullish" ? "#16c47f" : "#facc15";
+    const at = index.get(pts[pts.length - 1].date), free = labelled[position].every((i) => Math.abs(i - at) >= LABEL_GAP);
+    if (free) labelled[position].push(at);
+    pts.forEach((q, i) => marks.push({ time: q.date, position, color, shape: "circle", size: 0.6, text: free && i === pts.length - 1 ? p.name : "" }));
+  });
+  return marks.sort((a, b) => index.get(a.time) - index.get(b.time));
 }
 
 /* ---------- chat ---------- */
