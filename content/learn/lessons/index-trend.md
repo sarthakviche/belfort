@@ -46,6 +46,8 @@ Write your choice into your rules before the market forces it on you.
 [
   {"q": "The Nifty 50 rises 2% in a month, but only 30% of its stocks are above their 50-day average. What does that suggest?", "options": ["Broad strength across the market", "A narrow rise carried by a few large stocks", "A certain fall next month"], "answer": 1, "why": "Low breadth means few stocks are taking part. The rise is narrow; it says nothing certain about what comes next."},
   {"q": "Why check the index before a stock's chart?", "options": ["Most stocks move with the market, so it puts the setup in context", "The index decides Belfort's label", "Index charts never change"], "answer": 0, "why": "Setups fail more often when the whole market is falling. The index is a backdrop for every trade."},
-  {"q": "What is a sensible response to a falling index with poor breadth?", "options": ["Take more trades to catch the bottom", "Take fewer new trades or smaller risk", "Remove all stops"], "answer": 1, "why": "Reducing the number and size of new trades limits damage when most stocks are under pressure."}
+  {"q": "What is a sensible response to a falling index with poor breadth?", "options": ["Take more trades to catch the bottom", "Take fewer new trades or smaller risk", "Remove all stops"], "answer": 1, "why": "Reducing the number and size of new trades limits damage when most stocks are under pressure."},
+  {"type": "number", "q": "Of the 50 stocks in the Nifty 50 list, 20 trade above their own 50-day average. What percentage is that?", "answer": 40, "tolerance": 0, "unit": "%", "why": "20 ÷ 50 = 40%. The lesson reads below about 40% as broad weakness and above about 60% as broad strength."},
+  {"type": "tf", "q": "If the Nifty 50 makes a new high, most stocks must be rising too.", "answer": false, "why": "The index can rise while most stocks fall if a few heavyweights carry it. That is why breadth matters."}
 ]
 ```

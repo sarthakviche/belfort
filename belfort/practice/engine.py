@@ -97,7 +97,9 @@ def settle_trade(t: dict, df: pd.DataFrame) -> Fill:
             else:
                 return f
 
-    initial = float(t["stop"])
+    # With no stop (it is optional), nothing closes the trade on the way down until the user adds one, raises it from
+    # nothing with a stop move, or turns on a trailing stop.
+    initial = float(t["stop"]) if t.get("stop") is not None else None
     stop, target = initial, t.get("target")
     target = float(target) if target else None
     close_req = t.get("close_requested_on")
@@ -111,18 +113,18 @@ def settle_trade(t: dict, df: pd.DataFrame) -> Fill:
         first = day == f.entry_date
         for m in moves:
             if m["on"] < day:
-                stop = max(stop, float(m["stop"]))
+                stop = float(m["stop"]) if stop is None else max(stop, float(m["stop"]))
         if trailed is not None:
-            stop = max(stop, trailed)
+            stop = trailed if stop is None else max(stop, trailed)
         f.stop = stop
-        raised = stop > initial
+        raised = stop is not None and initial is not None and stop > initial
         if close_req and day > close_req:
             return _exit(f, o, day, "closed by you")
-        if not first and o <= stop:
+        if stop is not None and not first and o <= stop:
             return _exit(f, o, day, "gapped below the raised stop" if raised else "gapped below the stop")
         if not first and target and o >= target:
             return _exit(f, o, day, "gapped above the target")
-        if lo <= stop:
+        if stop is not None and lo <= stop:
             return _exit(f, stop, day, f"raised stop hit at ₹{stop:.2f}" if raised else "stop-loss hit")
         if target and h >= target:
             return _exit(f, target, day, "target reached")
@@ -130,7 +132,9 @@ def settle_trade(t: dict, df: pd.DataFrame) -> Fill:
             candidate = trail_candidate(kind, value, c, float(ranges.loc[ts]) if ranges is not None else None)
             if candidate is not None and candidate < c:
                 trailed = candidate if trailed is None else max(trailed, candidate)
-    f.stop = max(stop, trailed) if trailed is not None else stop
+    if trailed is not None:
+        stop = trailed if stop is None else max(stop, trailed)
+    f.stop = stop
     return f
 
 
@@ -139,7 +143,10 @@ def _exit(f: Fill, price: float, day: str, reason: str) -> Fill:
     return f
 
 
-def r_multiple(entry: float, stop: float, exit_price: float) -> float | None:
+def r_multiple(entry: float, stop: float | None, exit_price: float) -> float | None:
+    """Result as a multiple of the planned risk (entry minus the original stop). None without a stop: no plan, no R."""
+    if stop is None:
+        return None
     risk = entry - stop
     return None if risk <= 0 else round((exit_price - entry) / risk, 2)
 

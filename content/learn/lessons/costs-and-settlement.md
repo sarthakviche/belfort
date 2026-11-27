@@ -36,6 +36,8 @@ Indian equities settle **T+1**: shares and money move one working day after the 
 [
   {"q": "Which cost is charged on both the buy and the sell of a delivery trade?", "options": ["Stamp duty", "Securities Transaction Tax (STT)", "Depository charge"], "answer": 1, "why": "STT is charged on both sides of a delivery trade. Stamp duty is on the buy, the depository charge on the sell."},
   {"q": "Why are many very small trades expensive?", "options": ["Brokers do not allow them", "Flat fees are a large share of a small trade", "SEBI adds a penalty"], "answer": 1, "why": "Flat charges stay the same size, so they take a bigger share of a small trade."},
-  {"q": "You buy shares on Monday. Under T+1, when do they reach your demat account?", "options": ["Monday", "Tuesday", "Friday"], "answer": 1, "why": "T+1 means one working day after the trade day."}
+  {"q": "You buy shares on Monday. Under T+1, when do they reach your demat account?", "options": ["Monday", "Tuesday", "Friday"], "answer": 1, "why": "T+1 means one working day after the trade day."},
+  {"type": "number", "q": "A flat ₹15 depository charge is taken on a ₹2,000 sale. What percentage of the sale is that?", "answer": 0.75, "tolerance": 0.01, "unit": "%", "why": "15 ÷ 2,000 = 0.0075, which is 0.75%. Flat fees weigh more on small trades."},
+  {"type": "tf", "q": "On a delivery trade, STT is charged only when you sell.", "answer": false, "why": "STT is charged on both the buy and the sell."}
 ]
 ```

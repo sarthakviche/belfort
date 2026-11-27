@@ -1,0 +1,27 @@
+/* Dictionary view (T45). Uses the tokens from style.css. */
+.dx-search { margin-bottom: 14px; }
+.dx-search input { width: 100%; padding: 13px 16px; font-size: 16px; border-radius: 14px; background: var(--s2); border: 1px solid var(--line2); color: var(--ink); }
+.dx-search input:focus { outline: none; border-color: var(--y); box-shadow: 0 0 0 3px var(--y-a14); }
+.dx-cats { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 16px; max-width: 100%; }
+.dx-count { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+.dx-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.dx-card { background: var(--glass); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; transition: border-color .15s, background .15s; }
+.dx-card:hover { border-color: var(--y-a30); background: var(--glass-hi); }
+.dx-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.dx-card h3 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 21px; }
+.dx-card p { margin: 8px 0 0; color: var(--ink2); font-size: 14px; line-height: 1.55; }
+.dx-chip { background: var(--y-a14); color: var(--y); }
+.dx-empty { text-align: center; max-width: 560px; margin: 24px auto; padding: 8px; }
+.dx-empty img { max-width: 140px; height: auto; }
+.dx-empty h3 { font-family: var(--serif); font-weight: 400; font-size: 26px; margin: 8px 0; overflow-wrap: anywhere; text-transform: none; letter-spacing: 0; }
+.dx-empty p { color: var(--muted); margin: 0 0 16px; }
+.dx-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.dx-ai { margin-top: 18px; text-align: left; }
+.dx-note { background: var(--glass); border: 1px solid var(--line2); border-radius: 12px; padding: 12px 14px; color: var(--ink2); font-size: 14px; line-height: 1.55; }
+.dx-note.err { border-color: rgba(248,113,113,.4); }
+.dx-answer { background: var(--glass); border: 1px solid var(--y-a30); border-radius: 14px; padding: 14px 16px; }
+.dx-answer p { margin: 10px 0; color: var(--ink); line-height: 1.6; }
+.dx-fade { animation: dx-in .28s ease-out both; }
+@keyframes dx-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dx-fade { animation: none; } .dx-card { transition: none; } }
+@media (max-width: 640px) { .dx-cats { display: flex; overflow-x: auto; flex-wrap: nowrap; } .dx-cats button { white-space: nowrap; } }

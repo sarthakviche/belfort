@@ -54,7 +54,7 @@ const StockPicker = (() => {
 
     function render() {
       if (!rows.length) { box.hidden = true; input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); return; }
-      box.innerHTML = (showingRecent ? '<p class="suggest-head">Recent</p>' : "") + rows.map((r, i) => rowHtml(r, i, active, id)).join("");
+      box.innerHTML = (showingRecent ? `<p class="suggest-head">${T("picker.recent")}</p>` : "") + rows.map((r, i) => rowHtml(r, i, active, id)).join("");
       box.hidden = false; input.setAttribute("aria-expanded", "true");
       if (active >= 0) input.setAttribute("aria-activedescendant", `${id}-${active}`); else input.removeAttribute("aria-activedescendant");
     }

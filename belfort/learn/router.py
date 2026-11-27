@@ -1,19 +1,46 @@
 """Learn vertical API: syllabus, lessons, quizzes, progress and lagged example charts."""
 
-from fastapi import APIRouter, HTTPException, Query
+from typing import Any
+
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
+from ..core import i18n
+from ..core.users import current_user_id
 from ..data import market
 from ..data.providers import DataError, clean_symbol
 from ..settings import EDU_LAG_DAYS
-from . import curriculum
+from . import curriculum, game
 from .curriculum import LearnError
 
 router = APIRouter(prefix="/api/learn", tags=["learn"])
 
 
 class QuizIn(BaseModel):
-    answers: list[int] = Field(max_length=50)
+    answers: list[Any] = Field(max_length=50)
+
+
+class CheckIn(BaseModel):
+    index: int = Field(ge=0, le=200)
+    answer: Any = None
+
+
+class GoalIn(BaseModel):
+    goal: int
+
+
+def _fail(e: LearnError) -> HTTPException:
+    """Locked or out of hearts: 403. Not ready yet: 409. Anything else about a missing thing: 404.
+
+    The message is said in the learner's language when the error has a catalogue key; X-Error-Key tells the page which."""
+    key = getattr(e, "key", None)
+    detail = i18n.tr(i18n.current(), key, **e.vars) if key else str(e)
+    headers = {"X-Error-Key": key} if key else None
+    if isinstance(e, game.LockedError | game.NoHeartsError):
+        return HTTPException(status_code=403, detail=detail, headers=headers)
+    if isinstance(e, game.NotReadyError):
+        return HTTPException(status_code=409, detail=detail, headers=headers)
+    return HTTPException(status_code=404, detail=detail, headers=headers)
 
 
 @router.get("/syllabus")
@@ -21,20 +48,76 @@ def syllabus():
     return curriculum.progress()
 
 
+@router.get("/path")
+def path(request: Request):
+    """The stages, nodes and the learner's XP, hearts and streak."""
+    return game.path(current_user_id(request))
+
+
 @router.get("/lessons/{lesson_id}")
-def lesson(lesson_id: str):
+def lesson(lesson_id: str, request: Request):
+    user = current_user_id(request)
     try:
-        return curriculum.lesson(lesson_id)
+        curriculum.lesson_info(lesson_id)
+        game.ensure_open(user, lesson_id)
+        data = curriculum.lesson(lesson_id)
+        game.ensure_can_start(user, lesson_id)
+        return data
     except LearnError as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
+        raise _fail(e) from e
+
+
+@router.post("/lessons/{lesson_id}/check")
+def check(lesson_id: str, body: CheckIn, request: Request):
+    """Grade one exercise now (a wrong answer costs a heart)."""
+    try:
+        return game.check_question(current_user_id(request), lesson_id, body.index, body.answer)
+    except LearnError as e:
+        raise _fail(e) from e
 
 
 @router.post("/lessons/{lesson_id}/quiz")
-def quiz(lesson_id: str, body: QuizIn):
+def quiz(lesson_id: str, body: QuizIn, request: Request):
     try:
-        return curriculum.grade(lesson_id, body.answers)
+        return game.complete_lesson(current_user_id(request), lesson_id, body.answers)
     except LearnError as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
+        raise _fail(e) from e
+
+
+@router.get("/tests/{kind}/{key}")
+def start_test(kind: str, key: str, request: Request):
+    """Start a checkpoint (module id), a stage test (stage) or the placement test (beginner)."""
+    try:
+        return game.start_test(current_user_id(request), kind, key)
+    except LearnError as e:
+        raise _fail(e) from e
+
+
+@router.post("/sessions/{session_id}/grade")
+def grade_session(session_id: str, body: QuizIn, request: Request):
+    try:
+        return game.grade_session(current_user_id(request), session_id, body.answers)
+    except LearnError as e:
+        raise _fail(e) from e
+
+
+@router.get("/weak-spots")
+def weak_spots(request: Request):
+    return game.weak_spots(current_user_id(request))
+
+
+@router.put("/goal")
+def set_goal(body: GoalIn, request: Request):
+    try:
+        return game.set_goal(current_user_id(request), body.goal)
+    except LearnError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@router.post("/placement/dismiss")
+def dismiss_placement(request: Request):
+    game.dismiss_placement(current_user_id(request))
+    return {"ok": True}
 
 
 @router.get("/example")

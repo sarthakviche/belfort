@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from ...settings import BREAKOUT_VOLUME, Style
+from ...settings import BREAKOUT_VOLUME, LEVEL_STRONG_TOUCHES, LEVEL_ZONE_ATR, Style
 from .indicators import sma
 from .pivots import Pivot
 
@@ -69,13 +69,23 @@ def trend_state(df: pd.DataFrame, pivots: list[Pivot], st: Style) -> dict:
     }
 
 
+def level_strength(touches: int) -> str:
+    """How much a level has been tested: 3 or more swing points is strong, 2 is moderate, 1 is a single swing."""
+    return "strong" if touches >= LEVEL_STRONG_TOUCHES else "moderate" if touches >= 2 else "single"
+
+
 def find_levels(pivots: list[Pivot], close: float, atr: float, n_bars: int, lookback: int = 260) -> dict:
-    """Cluster pivot prices that sit within 0.75 ATR of each other."""
+    """Group swing highs and lows into price zones no wider than LEVEL_ZONE_ATR.
+
+    Pivots are sorted by price and a zone is closed as soon as the next pivot is more than LEVEL_ZONE_ATR above the
+    zone's lowest pivot. (Comparing with the zone's running average let a zone creep upward and merge levels more
+    than one ATR apart.) A level's price is the average of its pivots; low and high give the zone around it.
+    """
     recent = sorted([p for p in pivots if p.idx >= n_bars - lookback], key=lambda p: p.price)
-    tol = 0.75 * atr
+    tol = LEVEL_ZONE_ATR * atr
     clusters: list[list[Pivot]] = []
     for p in recent:
-        if clusters and p.price - np.mean([q.price for q in clusters[-1]]) <= tol:
+        if clusters and p.price - clusters[-1][0].price <= tol:
             clusters[-1].append(p)
         else:
             clusters.append([p])
@@ -85,7 +95,10 @@ def find_levels(pivots: list[Pivot], close: float, atr: float, n_bars: int, look
         levels.append(
             {
                 "price": round(price, 2),
+                "low": round(min(p.price for p in c), 2),
+                "high": round(max(p.price for p in c), 2),
                 "touches": len(c),
+                "strength": level_strength(len(c)),
                 "last_touch_idx": max(p.idx for p in c),
                 "bars": [p.idx for p in c],
                 "distance_pct": round((price - close) / close * 100, 2),

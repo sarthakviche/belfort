@@ -39,6 +39,8 @@ Run your rules in Belfort's paper account for a few months before risking real m
 [
   {"q": "Which of these is a checkable rule?", "options": ["Be patient with entries", "Enter within 1 ATR of the planned level", "Only take good trades"], "answer": 1, "why": "It can be answered yes or no for every trade. The others are wishes."},
   {"q": "When is the right time to change a rule?", "options": ["Straight after a loss", "On a set review date, based on many trades", "During an open trade"], "answer": 1, "why": "Changes made on a schedule and with evidence avoid reacting to one result."},
-  {"q": "Why run new rules on paper first?", "options": ["To see whether you can actually follow them", "Paper trades are more profitable", "Rules only work on paper"], "answer": 0, "why": "Following rules is the hard part. Paper trading shows whether you can, before real money is at stake."}
+  {"q": "Why run new rules on paper first?", "options": ["To see whether you can actually follow them", "Paper trades are more profitable", "Rules only work on paper"], "answer": 0, "why": "Following rules is the hard part. Paper trading shows whether you can, before real money is at stake."},
+  {"type": "number", "q": "With 1% risk per trade and a 6% limit on total open risk, what is the most trades you can hold open at full 1% risk?", "answer": 6, "tolerance": 0, "unit": "trades", "why": "6% ÷ 1% = 6 trades. The example rules also cap trades per sector at two."},
+  {"type": "tf", "q": "The best time to change a rule is straight after a loss, while the lesson is fresh.", "answer": false, "why": "Never change a rule during a trade or straight after a loss. Change one thing at a time, on a set review date."}
 ]
 ```

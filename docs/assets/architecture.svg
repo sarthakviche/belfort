@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640" role="img" aria-labelledby="t d">
+  <title id="t">Belfort architecture</title>
+  <desc id="d">A front end talks JSON to a local FastAPI server with five modules, a core and a data layer. The data layer and assistant reach outside services fetched by the user's own machine.</desc>
+  <defs>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1a1d"/><stop offset="1" stop-color="#0f0f11"/></linearGradient>
+    <linearGradient id="hi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2208"/><stop offset="1" stop-color="#0f0f11"/></linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0" r="0.8"><stop offset="0" stop-color="#facc15" stop-opacity="0.16"/><stop offset="1" stop-color="#facc15" stop-opacity="0"/></radialGradient>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#facc15"/></marker>
+    <style>
+      .serif{font-family:"Instrument Serif",Georgia,"Times New Roman",serif}
+      .sans{font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif}
+      .w{fill:#f4f4f2}.g{fill:#c9c9c6}.m{fill:#8b8b90}.y{fill:#facc15}
+      .eb{font-size:11px;font-weight:600;letter-spacing:.16em}
+      .tt{font-size:15px;font-weight:600}
+      .sm{font-size:12px}
+    </style>
+  </defs>
+
+  <rect width="1200" height="640" rx="22" fill="#08080a"/>
+  <rect width="1200" height="640" rx="22" fill="url(#glow)"/>
+  <rect x=".5" y=".5" width="1199" height="639" rx="22" fill="none" stroke="#2a2a2e"/>
+
+  <text x="36" y="52" class="serif w" font-size="30">Belfort, <tspan class="y" font-style="italic">how it fits together</tspan></text>
+  <text x="36" y="74" class="sans m sm">Everything runs on your own computer. Nothing about you is sent to a Belfort server, because there is no Belfort server.</text>
+
+  <!-- Your computer -->
+  <rect x="30" y="96" width="800" height="510" rx="22" fill="none" stroke="#facc15" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <rect x="52" y="84" width="170" height="24" rx="12" fill="#08080a" stroke="#facc15"/>
+  <text x="137" y="100" text-anchor="middle" class="sans y eb" font-size="10.5">YOUR COMPUTER</text>
+
+  <!-- Front end -->
+  <rect x="54" y="132" width="210" height="450" rx="18" fill="url(#card)" stroke="#3a3a3e"/>
+  <text x="74" y="162" class="sans y eb">FRONT END</text>
+  <text x="74" y="192" class="serif w" font-size="24">Desktop window</text>
+  <text x="74" y="214" class="sans m sm">or any browser · no build step</text>
+  <g class="sans">
+    <rect x="74" y="236" width="170" height="38" rx="10" fill="#141416" stroke="#3a3a3e"/><text x="90" y="260" class="w tt" font-size="14">Research</text>
+    <rect x="74" y="284" width="170" height="38" rx="10" fill="#141416" stroke="#3a3a3e"/><text x="90" y="308" class="w tt" font-size="14">Learn</text>
+    <rect x="74" y="332" width="170" height="38" rx="10" fill="#141416" stroke="#3a3a3e"/><text x="90" y="356" class="w tt" font-size="14">Practice</text>
+    <rect x="74" y="380" width="170" height="38" rx="10" fill="#141416" stroke="#3a3a3e"/><text x="90" y="404" class="w tt" font-size="14">News</text>
+  </g>
+  <text x="74" y="448" class="sans g sm">Dictionary on hover</text>
+  <text x="74" y="468" class="sans g sm">Ask Belfort (key stays in</text>
+  <text x="74" y="486" class="sans g sm">your browser)</text>
+  <text x="74" y="516" class="sans g sm">Candles by Lightweight</text>
+  <text x="74" y="534" class="sans g sm">Charts (Apache-2.0)</text>
+  <text x="74" y="562" class="sans m" font-size="11">pywebview + WebView2</text>
+
+  <!-- JSON arrow -->
+  <line x1="266" y1="300" x2="318" y2="300" stroke="#facc15" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="318" y1="324" x2="268" y2="324" stroke="#facc15" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="292" y="288" text-anchor="middle" class="sans y" font-size="11" font-weight="700">JSON</text>
+
+  <!-- FastAPI -->
+  <rect x="322" y="132" width="484" height="270" rx="18" fill="url(#hi)" stroke="#facc15" stroke-opacity=".5"/>
+  <text x="342" y="162" class="sans y eb">LOCAL FASTAPI SERVER · 127.0.0.1</text>
+  <text x="342" y="190" class="serif w" font-size="22">Five modules, deterministic first</text>
+  <g class="sans">
+    <rect x="342" y="206" width="140" height="82" rx="12" fill="#141416" stroke="#3a3a3e"/>
+    <text x="356" y="230" class="w tt">research</text><text x="356" y="250" class="g" font-size="11.5">pivots · levels</text><text x="356" y="266" class="g" font-size="11.5">patterns · sizing</text>
+    <rect x="494" y="206" width="140" height="82" rx="12" fill="#141416" stroke="#3a3a3e"/>
+    <text x="508" y="230" class="w tt">learn</text><text x="508" y="250" class="g" font-size="11.5">Markdown lessons</text><text x="508" y="266" class="g" font-size="11.5">quiz grading</text>
+    <rect x="646" y="206" width="140" height="82" rx="12" fill="#141416" stroke="#3a3a3e"/>
+    <text x="660" y="230" class="w tt">practice</text><text x="660" y="250" class="g" font-size="11.5">paper fills · journal</text><text x="660" y="266" class="g" font-size="11.5">Brier scoring</text>
+    <rect x="342" y="300" width="212" height="84" rx="12" fill="#141416" stroke="#3a3a3e"/>
+    <text x="356" y="324" class="w tt">news</text><text x="356" y="344" class="g" font-size="11.5">RSS reader · de-duplication</text><text x="356" y="360" class="g" font-size="11.5">tagging · tip-style filter</text>
+    <rect x="566" y="300" width="220" height="84" rx="12" fill="#141416" stroke="#facc15" stroke-opacity=".45"/>
+    <text x="580" y="324" class="w tt">assistant</text><text x="580" y="344" class="g" font-size="11.5">explains what is on screen</text><text x="580" y="360" class="g" font-size="11.5">your key · wording filter</text>
+  </g>
+
+  <!-- Core -->
+  <rect x="322" y="420" width="232" height="162" rx="18" fill="url(#card)" stroke="#3a3a3e"/>
+  <text x="342" y="450" class="sans y eb">CORE</text>
+  <text x="342" y="478" class="serif w" font-size="22">Shared guardrails</text>
+  <g class="sans g" font-size="12">
+    <text x="342" y="506">compliance wording filter</text>
+    <text x="342" y="526">plain-English glossary</text>
+    <text x="342" y="546">SQLite store with migrations</text>
+    <text x="342" y="566" class="m">practice records stay local</text>
+  </g>
+
+  <!-- Data -->
+  <rect x="574" y="420" width="232" height="162" rx="18" fill="url(#card)" stroke="#3a3a3e"/>
+  <text x="594" y="450" class="sans y eb">DATA LAYER</text>
+  <text x="594" y="478" class="serif w" font-size="20">Source and date, always</text>
+  <g class="sans g" font-size="12">
+    <text x="594" y="506">provider classes, swappable</text>
+    <text x="594" y="526">time-to-live disk cache</text>
+    <text x="594" y="546">30-day lag for lesson charts</text>
+    <text x="594" y="566" class="m">missing shown as missing</text>
+  </g>
+
+  <!-- links inside -->
+  <line x1="438" y1="388" x2="438" y2="416" stroke="#8b8b90" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <line x1="690" y1="388" x2="690" y2="416" stroke="#facc15" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- outside arrows -->
+  <path d="M806 500 H846 V185" fill="none" stroke="#facc15" stroke-width="2"/>
+  <path d="M846 185 H888" fill="none" stroke="#facc15" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M846 305 H888" fill="none" stroke="#facc15" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M846 425 H888" fill="none" stroke="#facc15" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M786 342 H826 V538 H888" fill="none" stroke="#facc15" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+
+  <!-- Outside -->
+  <rect x="866" y="96" width="304" height="510" rx="22" fill="none" stroke="#3a3a3e" stroke-width="1.5"/>
+  <rect x="888" y="84" width="236" height="24" rx="12" fill="#08080a" stroke="#5f5f65"/>
+  <text x="1006" y="100" text-anchor="middle" class="sans m eb" font-size="10.5">OUTSIDE · FETCHED BY YOU</text>
+  <g class="sans">
+    <rect x="890" y="132" width="256" height="106" rx="16" fill="url(#card)" stroke="#3a3a3e"/>
+    <text x="910" y="162" class="w tt" font-size="16">Yahoo Finance</text><text x="910" y="184" class="g sm">daily prices, statements,</text><text x="910" y="202" class="g sm">peers, via yfinance</text><text x="910" y="224" class="m" font-size="11">unofficial source</text>
+    <rect x="890" y="252" width="256" height="106" rx="16" fill="url(#card)" stroke="#3a3a3e"/>
+    <text x="910" y="282" class="w tt" font-size="16">NSE archives</text><text x="910" y="304" class="g sm">end-of-day files, delivery,</text><text x="910" y="322" class="g sm">bulk deals, listings</text><text x="910" y="344" class="m" font-size="11">public files, best effort</text>
+    <rect x="890" y="372" width="256" height="106" rx="16" fill="url(#card)" stroke="#3a3a3e"/>
+    <text x="910" y="402" class="w tt" font-size="16">Publisher and RBI feeds</text><text x="910" y="424" class="g sm">headlines and descriptions</text><text x="910" y="442" class="g sm">only, linked to the source</text><text x="910" y="464" class="m" font-size="11">six public RSS sources</text>
+    <rect x="890" y="492" width="256" height="92" rx="16" fill="url(#hi)" stroke="#facc15" stroke-opacity=".5"/>
+    <text x="910" y="522" class="w tt" font-size="16">Your AI provider</text><text x="910" y="544" class="g sm">Gemini, OpenAI-compatible,</text><text x="910" y="562" class="g sm">or local Ollama. Optional.</text>
+  </g>
+
+  <!-- legend -->
+  <text x="36" y="628" class="sans m" font-size="11">Solid arrow: data fetched. Dashed: optional, only when you add your own key.  ·  MIT licence  ·  No account, no server, no telemetry</text>
+</svg>

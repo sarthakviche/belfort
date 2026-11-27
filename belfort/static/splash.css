@@ -1,0 +1,36 @@
+/* Startup loader (T46): neon candles draw on black, then the mascot and the wordmark.
+   --k scales every duration: 1 for the desktop splash page (about 2.3 s), .5 for the in-app overlay. */
+html.splash-page, html.splash-page body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+.splash { --k: 1; --green: #22c55e; --red: #ef4444; --yellow: #facc15;
+  position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; align-content: center; gap: 18px;
+  background: #000; color: #f5f5f4; opacity: 1; transition: opacity calc(380ms * var(--k)) ease; }
+.splash.quick { --k: .5; }
+.splash.fade { opacity: 0; pointer-events: none; }
+.splash.gone { display: none; }
+.sp-stage { position: relative; width: min(280px, 62vw); aspect-ratio: 2 / 1.5; }
+.sp-stage > * { position: absolute; inset: 0; margin: auto; }
+.sp-candles { width: 100%; height: 100%; overflow: visible; animation: sp-candles-out calc(260ms * var(--k)) ease calc(1300ms * var(--k)) forwards; }
+.sp-candles .body, .sp-candles .wick { filter: drop-shadow(0 0 4px currentColor); }
+.sp-candles .up { color: var(--green); } .sp-candles .down { color: var(--red); }
+.sp-candles .body { fill: currentColor; transform-box: fill-box; transform: scaleY(0);
+  animation: sp-grow calc(120ms * var(--k)) ease-out forwards; animation-delay: calc((var(--i) * 105ms + 80ms) * var(--k)); }
+.sp-candles .up .body { transform-origin: 50% 100%; } .sp-candles .down .body { transform-origin: 50% 0; }
+.sp-candles .wick { stroke: currentColor; stroke-width: 1.4; opacity: 0;
+  animation: sp-fade calc(160ms * var(--k)) ease forwards; animation-delay: calc((var(--i) * 105ms + 120ms) * var(--k)); }
+.sp-candles .level { stroke: var(--yellow); stroke-width: 1.2; stroke-dasharray: 5 5; opacity: .9; transform-box: fill-box; transform-origin: 0 50%;
+  transform: scaleX(0); animation: sp-slide calc(420ms * var(--k)) ease-out calc(760ms * var(--k)) forwards; filter: drop-shadow(0 0 3px rgba(250,204,21,.6)); }
+.sp-mascot { height: 100%; width: auto; max-width: 100%; object-fit: contain; opacity: 0; transform: scale(.92);
+  animation: sp-settle calc(420ms * var(--k)) ease-out calc(1500ms * var(--k)) forwards; }
+.sp-word { font: 400 clamp(26px, 5vw, 34px)/1 "Instrument Serif", Georgia, "Times New Roman", serif; letter-spacing: .02em; opacity: 0;
+  animation: sp-fade calc(380ms * var(--k)) ease calc(1850ms * var(--k)) forwards; }
+@keyframes sp-grow { to { transform: scaleY(1); } }
+@keyframes sp-fade { to { opacity: 1; } }
+@keyframes sp-slide { to { transform: scaleX(1); } }
+@keyframes sp-candles-out { to { opacity: 0; } }
+@keyframes sp-settle { to { opacity: 1; transform: scale(1); } }
+/* Reduced motion: the mascot and the wordmark, standing still. */
+@media (prefers-reduced-motion: reduce) {
+  .sp-candles { display: none; }
+  .sp-mascot, .sp-word { animation: none; opacity: 1; transform: none; }
+  .splash { transition: none; }
+}
