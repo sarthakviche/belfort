@@ -55,11 +55,11 @@
 | T41 | Apply the brand decision | 5 Ship | P1 | S | Blocked on D2 |
 | T42 | Gamified Learn: stages, locks, XP, streaks, hearts | 6 Belfort 2 | P0 | L | Done ([#37](https://github.com/sarthakviche/belfort/pull/37)) |
 | T43 | Accounts and sync across devices | 6 Belfort 2 | P0 | L | In progress (Devansh) |
-| T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | In progress (Devansh) |
+| T44 | Tip Check: is this stock tip a trap? | 6 Belfort 2 | P0 | L | Done ([#39](https://github.com/sarthakviche/belfort/pull/39)) |
 | T45 | Dictionary search with an Ask and web fallback | 6 Belfort 2 | P1 | S | Done ([#33](https://github.com/sarthakviche/belfort/pull/33)) |
 | T46 | Startup loader and intro with the mascot | 6 Belfort 2 | P0 | M | Done ([#32](https://github.com/sarthakviche/belfort/pull/32)) |
 | T47 | Landing site rebuild | 6 Belfort 2 | P1 | M | Done ([#34](https://github.com/sarthakviche/belfort/pull/34)) |
-| T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh) |
+| T48 | Belfort for Android | 6 Belfort 2 | P0 | L | In progress (Devansh; first version [#43](https://github.com/sarthakviche/belfort/pull/43)) |
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
 | T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Done ([#41](https://github.com/sarthakviche/belfort/pull/41)) |
 
@@ -271,7 +271,7 @@ Shared contracts every Phase 6 task uses:
 - **Done when:** tests (with the Supabase HTTP calls faked) cover sign-in, token refresh, scoping and both sync directions; a user who signs in on a second machine sees the same paper account.
 
 ### T44 · Tip Check: is this stock tip a trap?
-- **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** research, assistant · The hackathon hook.
+- **Owner:** Devansh · **P0 · L · Status:** Done ([#39](https://github.com/sarthakviche/belfort/pull/39)) · **Area:** research, assistant · The hackathon hook.
 - **What:** paste or screenshot a stock tip from WhatsApp, Telegram or Instagram, in English, Hindi or Hinglish (most tips arrive in Hinglish). Belfort reads it and shows, in about ten seconds, the red flags it found: is the sender a SEBI-registered adviser or research analyst; does the tip promise returns or a target in days (SEBI forbids guaranteed returns); urgency and secrecy language; is the stock in NSE's ASM or GSM surveillance lists; does its recent price and volume look like a pump (volume many times its 50-day average, a sharp run-up, a small company); what happened to the stock the last time it looked like this. It ends with what to do (check the registration yourself on SEBI's site, report on SEBI SCORES) and links to the Safety lessons.
 - **Compliance:** it never says a stock is good, safe, a buy or a sell. It reports red flags found and not found, and says Belfort cannot tell whether a trade will work.
 - **Done when:** text works offline with rules; a screenshot works with the user's own assistant key (vision); every check is a pure tested function with fixtures for the SEBI registers and the surveillance lists; it works in the running app.
@@ -291,7 +291,7 @@ Shared contracts every Phase 6 task uses:
 - **Do:** rebuild `site/index.html` on top of the current landing page: a moving candlestick background (canvas, replaceable by a video file) under a black layer at about 60% opacity, the mascot, the quote, Tip Check as the lead feature, the gamified path, download and Android sections.
 
 ### T48 · Belfort for Android
-- **Owner:** Devansh · **P0 · L · Status:** In progress · **Area:** mobile · Built on Devansh's machine (Android SDK).
+- **Owner:** Devansh · **P0 · L · Status:** In progress (first version [#43](https://github.com/sarthakviche/belfort/pull/43) runs Belfort from your computer over Wi-Fi; not yet tried on a phone) · **Area:** mobile · Built on Devansh's machine (Android SDK).
 - **Do:** a native Android app named Belfort with every part of the desktop app in a mobile-first interface, the same mascot, loader and animations, the same account (T43). Coordinated in `conversations.md` on the `collab` branch.
 
 ### T49 · New exercise types in every lesson

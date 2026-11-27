@@ -69,7 +69,10 @@ belfort/
                           (import SEBI's lists), service.py, router.py
   static/                 index.html, app.js (shell + research), verticals.js (practice, news, settings),
                           learn-game.js and learn-game.css (the Learn path, lesson player and rewards),
-                          stock-picker.js (reusable company picker), tipcheck.js and tipcheck.css (Tip Check), style.css
+                          stock-picker.js (reusable company picker), tipcheck.js and tipcheck.css (Tip Check), mobile.js and
+                          mobile.css (phone layout and the Android bridge), style.css
+android/                 Belfort for Android (T48): Java shell (MainActivity, Bridge, ShareProvider, ReminderReceiver),
+                          start screen and offline Tip Check in assets/, build_apk.py (no Gradle); see android/README.md
 content/
   learn/syllabus.json     tracks -> modules -> lessons
   learn/lessons/*.md      one lesson per file, with a quiz block

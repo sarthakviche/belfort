@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The splash mark: three candles (green, green, red) inside the 240dp splash circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp" android:height="240dp" android:viewportWidth="240" android:viewportHeight="240">
+    <path android:strokeColor="#22C55E" android:strokeWidth="4" android:pathData="M92,78 L92,152" />
+    <path android:fillColor="#22C55E" android:pathData="M84,92 h16 v46 h-16 z" />
+    <path android:strokeColor="#22C55E" android:strokeWidth="4" android:pathData="M120,66 L120,136" />
+    <path android:fillColor="#22C55E" android:pathData="M112,76 h16 v48 h-16 z" />
+    <path android:strokeColor="#EF4444" android:strokeWidth="4" android:pathData="M148,82 L148,164" />
+    <path android:fillColor="#EF4444" android:pathData="M140,96 h16 v52 h-16 z" />
+    <path android:fillColor="#FACC15" android:pathData="M84,172 h72 v4 h-72 z" />
+</vector>

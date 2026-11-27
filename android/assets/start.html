@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Belfort</title>
+<link rel="stylesheet" href="start.css">
+</head>
+<body>
+<div class="loader" id="loader" aria-hidden="true">
+  <svg viewBox="0 0 120 80" width="168" height="112">
+    <g class="c" style="--d:0s"><line x1="20" y1="28" x2="20" y2="66" stroke="#22c55e" stroke-width="2"/><rect x="15" y="36" width="10" height="22" fill="#22c55e"/></g>
+    <g class="c" style="--d:.18s"><line x1="44" y1="20" x2="44" y2="58" stroke="#22c55e" stroke-width="2"/><rect x="39" y="26" width="10" height="24" fill="#22c55e"/></g>
+    <g class="c" style="--d:.36s"><line x1="68" y1="12" x2="68" y2="52" stroke="#22c55e" stroke-width="2"/><rect x="63" y="16" width="10" height="26" fill="#22c55e"/></g>
+    <g class="c" style="--d:.54s"><line x1="92" y1="18" x2="92" y2="70" stroke="#ef4444" stroke-width="2"/><rect x="87" y="26" width="10" height="34" fill="#ef4444"/></g>
+  </svg>
+  <div class="word">Belfort</div>
+</div>
+
+<main class="wrap" id="main" hidden>
+  <header>
+    <div class="word">Belfort</div>
+    <blockquote class="quote">“Risk comes from not knowing what you’re doing.”<cite>Warren Buffett</cite></blockquote>
+  </header>
+
+  <p class="msg" id="msg" role="status"></p>
+
+  <section class="card">
+    <h2>Connect to Belfort on your computer</h2>
+    <p>Research, Learn, Practice and News run in the Belfort app on your Windows computer. Start it there, then enter its address. The phone and the computer must be on the same Wi-Fi.</p>
+    <form id="connect">
+      <label>Address<input id="server" inputmode="url" autocomplete="url" placeholder="http://192.168.1.20:8766" required></label>
+      <button class="btn" type="submit">Connect</button>
+    </form>
+    <details><summary>How to find the address</summary>
+      <ol>
+        <li>On the computer, start Belfort so the phone can reach it:<br><code>.venv\Scripts\python -m uvicorn belfort.main:app --host 0.0.0.0 --port 8766</code></li>
+        <li>Set an access code first, so only you can open it: <code>$env:ACCESS_CODES = "your-code"</code>. Belfort asks for it on the phone.</li>
+        <li>The address is <code>http://</code> + the computer's Wi-Fi IP (Settings, Network, Wi-Fi, Properties) + <code>:8766</code>.</li>
+      </ol>
+    </details>
+  </section>
+
+  <section class="card" id="offline" hidden>
+    <h2>Tip Check, on this phone</h2>
+    <p>Paste a tip from WhatsApp or Telegram. These checks read only the text and work without the computer or the internet. Connect to Belfort to also check NSE's surveillance lists and the price.</p>
+    <textarea id="tip" rows="5" placeholder="Paste the message here"></textarea>
+    <button class="btn" id="check" type="button">Check this tip</button>
+    <div id="out" aria-live="polite"></div>
+  </section>
+
+  <p class="small">Belfort is free, open-source software for learning. It never says what to buy or sell, and practice uses virtual points only.</p>
+</main>
+<script src="phrases.js"></script>
+<script src="tipcheck-offline.js"></script>
+<script src="start.js"></script>
+</body>
+</html>

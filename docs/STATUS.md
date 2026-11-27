@@ -26,6 +26,7 @@
 | Area | Limitation | Task |
 |---|---|---|
 | Practice | Long only, one account, end-of-day fills | |
+| Android | First version shows Belfort from your computer over Wi-Fi; only Tip Check's text checks run on the phone alone. The APK was built and its contents checked, but it has not been installed on a phone or emulator yet (no platform-tools or emulator on the build machine). | T48 |
 | Learn | 38 of 38 lessons written, each with multiple-choice plus true or false, order and number exercises | |
 | Learn | Stage progress is per local user; XP, hearts and streaks use the device's date. Moving between devices waits for accounts | T43 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
