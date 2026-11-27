@@ -32,7 +32,7 @@
 | T18 | Lessons: Journal module (3) | 2 Learn | P1 | M | Done ([#25](https://github.com/sarthakviche/belfort/pull/25)) |
 | T19 | Lessons: Market context module (3) | 2 Learn | P1 | M | Done ([#26](https://github.com/sarthakviche/belfort/pull/26)) |
 | T20 | Lessons: Portfolio and Psychology modules (4) | 2 Learn | P1 | M | Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) |
-| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Done ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)) |
+| T21 | Lessons: Taxes and records module (2) | 2 Learn | P1 | M | Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) |
 | T22 | Lessons: Safety module (3) | 2 Learn | P1 | M | In progress (Sarthak) |
 | T23 | Replay drills inside lessons | 2 Learn | P1 | M | Ready |
 | T24 | Module checkpoints and progress summary | 2 Learn | P2 | S | Ready |
@@ -165,7 +165,7 @@ Write lessons in module order. Each lesson: 5 to 8 minutes, objectives, a `::cha
 - **Owner:** Devansh · **P1 · M · Status:** Done ([#27](https://github.com/sarthakviche/belfort/pull/27)) · `open-risk`, `drawdown-rules`, `biases`, `rules`.
 
 ### T21 · Lessons: Taxes and records module
-- **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)) · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
+- **Owner:** Sarthak (agent) · **P1 · M · Status:** Done ([#35](https://github.com/sarthakviche/belfort/pull/35)) · `capital-gains`, `records`. Rates change every Budget: describe the rules, cite the current official source and date, and request Sarthak's review.
 
 ### T22 · Lessons: Safety module
 - **P1 · M · Status:** Ready · `tip-scams`, `check-registration` (how to verify a SEBI registration and file a complaint, with official links), `myths`.
@@ -331,4 +331,4 @@ Shared contracts every Phase 6 task uses:
 - T18 Lessons: Journal module, trade journal, expectancy and calibration ([#25](https://github.com/sarthakviche/belfort/pull/25)).
 - T19 Lessons: Market context module, index trend and breadth, sectors, flows and events ([#26](https://github.com/sarthakviche/belfort/pull/26)).
 - T20 Lessons: Portfolio and Psychology modules, open risk, drawdown rules, biases and rules ([#27](https://github.com/sarthakviche/belfort/pull/27)).
-- T21 Lessons: Taxes and records module, capital gains on shares, records and filing ([#PRNUM](https://github.com/sarthakviche/belfort/pull/PRNUM)).
+- T21 Lessons: Taxes and records module, capital gains on shares, records and filing ([#35](https://github.com/sarthakviche/belfort/pull/35)).
