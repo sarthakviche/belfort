@@ -1,0 +1,4 @@
+Name,Registration No.,E-mail,Validity
+Example Research Analysts LLP,INH000012345,contact@example.com,Perpetual
+Sample Advisory Services,INA000067890,hello@example.com,Perpetual
+Broken Row,not a number,,

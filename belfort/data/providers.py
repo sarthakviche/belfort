@@ -12,6 +12,7 @@ from datetime import date, datetime, timedelta
 import httpx
 import pandas as pd
 
+from .. import settings
 from .cache import cached
 
 warnings.filterwarnings("ignore")
@@ -19,6 +20,9 @@ warnings.filterwarnings("ignore")
 SYMBOL_RE = re.compile(r"^[A-Z0-9&\-]{1,20}$")
 INFO_KEYS = [
     "longName",
+    "longBusinessSummary",
+    "website",
+    "fullTimeEmployees",
     "shortName",
     "sector",
     "industry",
@@ -90,7 +94,7 @@ class YahooProvider:
             out["info"] = self._info(t)
             return out
 
-        return cached(f"fund:{symbol}", 24 * 3600, load)
+        return cached(f"fund2:{symbol}", 24 * 3600, load)
 
     @staticmethod
     def _info(t) -> dict:
@@ -101,7 +105,7 @@ class YahooProvider:
         return {k: info.get(k) for k in INFO_KEYS}
 
     def info(self, symbol: str) -> dict:
-        return cached(f"info2:{symbol}", 24 * 3600, lambda: self._info(self._ticker(symbol)))
+        return cached(f"info3:{symbol}", 24 * 3600, lambda: self._info(self._ticker(symbol)))
 
     def earnings_date(self, symbol: str) -> date | None:
         def load():
@@ -121,6 +125,7 @@ class NseArchiveProvider:
     name = "NSE archives"
     BHAV = "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{d}.csv"
     BULK = "https://nsearchives.nseindia.com/content/equities/bulk.csv"
+    NIFTY50 = "https://www.niftyindices.com/IndexConstituent/ind_nifty50list.csv"
     HEADERS = {"User-Agent": "stock-analyst/0.1"}
 
     def _get(self, url: str) -> str | None:
@@ -130,6 +135,23 @@ class NseArchiveProvider:
         return r.text
 
     LISTED = "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+
+    def nifty50(self) -> list[str] | None:
+        """Current Nifty 50 symbols from NSE Indices' constituent file, cached for a week. None if unavailable."""
+
+        def load():
+            try:
+                r = httpx.get(self.NIFTY50, headers={"User-Agent": "Mozilla/5.0"}, timeout=8.0, follow_redirects=True)
+            except Exception:
+                return None
+            if r.status_code != 200 or "Symbol" not in r.text[:300]:
+                return None
+            df = pd.read_csv(io.StringIO(r.text), skipinitialspace=True)
+            df.columns = [c.strip() for c in df.columns]
+            syms = [str(s).strip() for s in df.get("Symbol", []) if str(s).strip()]
+            return syms if settings.NIFTY_MIN_MEMBERS <= len(syms) <= 50 else None
+
+        return cached("nifty50:v1", 7 * 86400, load)
 
     def listed(self) -> list[tuple[str, str]]:
         """(symbol, company name) for every NSE-listed equity. Empty list if the file cannot be fetched."""
