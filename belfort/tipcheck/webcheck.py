@@ -1,4 +1,4 @@
-"""Tip Check's web check (T52): Gemini searches Google for public facts about a tip, with the user's own key.
+"""Tip Check's web check (T53): Gemini searches Google for public facts about a tip, with the user's own key.
 
 The rules in rules.py still decide the red flags; this only adds "What the web says", labelled as AI, with the sources
 Google returned. It looks for SEBI and exchange actions on the stock, scam reports about the sender or group, whether

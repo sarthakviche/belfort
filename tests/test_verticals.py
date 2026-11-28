@@ -413,6 +413,12 @@ def test_rss_parse_clean_and_categorise():
         ("Tata Motors (Hold) after the demerger", True),
         ("Brokers call off strike at the port", False),
         ("Buy now, pay later lender raises funds", False),
+        ("BEL, Solar Industries, HAL - Motilal Oswal names 3 shares to buy as big orders loom", True),
+        ("Five shares to watch this week", True),
+        ("Analyst's stock picks for December", True),
+        ("Brokerage names preferred picks in defence", True),
+        ("Board approves 10 lakh shares to buy back from holders", False),
+        ("Last day to buy Tech Mahindra shares for bonus eligibility", False),
     ],
 )
 def test_tip_style_headlines_are_flagged(title, tip):

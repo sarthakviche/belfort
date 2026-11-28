@@ -154,7 +154,7 @@
     $("tc-out").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
   }
 
-  /* ---------- the web check (T52): Gemini with Google Search, the user's own key ---------- */
+  /* ---------- the web check (T53): Gemini with Google Search, the user's own key ---------- */
   function webAnswer(text) {
     const lines = text.split(/[\r\n]+/).map((l) => l.trim()).filter(Boolean);
     const items = lines.filter((l) => /^[-*•]\s+/.test(l)).map((l) => `<li>${esc(l.replace(/^[-*•]\s+/, "").replace(/\*\*/g, ""))}</li>`);

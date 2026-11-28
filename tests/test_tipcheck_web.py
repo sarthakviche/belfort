@@ -1,4 +1,4 @@
-"""Tip Check's web check (T52). Gemini is faked: no network."""
+"""Tip Check's web check (T53). Gemini is faked: no network."""
 
 import httpx
 import pytest

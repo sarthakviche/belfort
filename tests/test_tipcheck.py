@@ -87,6 +87,48 @@ def test_every_phrase_compiles_and_every_flag_has_three_languages():
         assert set(data[flag]) == {"en", "hinglish", "hi"}, flag
 
 
+@pytest.mark.parametrize(
+    "tip",
+    [
+        "Target 2x in 5 din",
+        "Target 68, sirf 3 din",
+        "XYZ target within 10 dino",
+    ],
+)
+def test_a_short_deadline_is_found_without_mein(tip):
+    assert rules.phrase_check("target_days", tip).status == "flag"
+
+
+@pytest.mark.parametrize(
+    "tip",
+    [
+        "VIP Telegram group join karne ke liye message",
+        "Join the premium WhatsApp channel",
+        "Paid stock tips group open",
+        "Entry ke liye ₹999 bhejo",
+        "Rs. 4,999/- send karo",
+        "999 rupees transfer karo",
+    ],
+)
+def test_a_money_or_private_group_ask_is_found_with_words_in_between(tip):
+    assert rules.phrase_check("money_ask", tip).status == "flag"
+
+
+@pytest.mark.parametrize(
+    "note",
+    [
+        "Results are due in 5 days.",
+        "Office 5 din band rahega.",
+        "The company reported a profit of ₹999 crore.",
+        "Dividend of Rs 5 per share, record date next week.",
+        "The group channel strategy was discussed at the premium segment review.",
+    ],
+)
+def test_ordinary_sentences_raise_no_deadline_or_money_flag(note):
+    assert rules.phrase_check("target_days", note).status == "clear"
+    assert rules.phrase_check("money_ask", note).status == "clear"
+
+
 # ---------------- registration ----------------
 
 

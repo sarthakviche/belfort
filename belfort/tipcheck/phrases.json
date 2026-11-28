@@ -109,6 +109,8 @@
       "re:\\b\\d+\\s*(din|dino|dinon)\\s*(mein|me|main|mai)\\b",
       "re:\\b(ek|do|teen|char|paanch|1|2|3|4|5|7)\\s*(hafte|hafton)\\s*(mein|me|main)\\b",
       "re:\\btarget\\b[^\\n]{0,30}?\\b(kal|aaj|parso)\\b",
+      "re:\\b(in|within)\\s*\\d+\\s*(din|dino|dinon|hafte|hafton)\\b",
+      "re:\\b(target|tgt)\\b[^\\n]{0,30}?\\b\\d+\\s*(din|dino|dinon|hafte|hafton)\\b",
       "kal tak target",
       "aaj hi target"
     ],
@@ -229,6 +231,7 @@
   },
   "money_ask": {
     "en": [
+      "re:\\b(vip|premium|paid)\\s+((telegram|whatsapp|discord|stocks?|trading|calls?|tips?|signals?)\\s+){0,3}(group|channel)\\b",
       "premium group",
       "vip group",
       "paid group",
@@ -268,6 +271,7 @@
       "msg karo",
       "message karo",
       "dm karo",
+      "re:((₹|\\brs\\.?|\\binr)\\s*\\d[\\d,]*|\\b\\d[\\d,]*\\s*(rs|rupees|rupaye|rupay)\\b)\\s*(/-)?\\s*(bhejo|bhejiye|bhejein|bhej do|send karo|pay karo|transfer karo)\\b",
       "profit mein hissa"
     ],
     "hi": [

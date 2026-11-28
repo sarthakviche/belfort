@@ -82,8 +82,8 @@ def _when(s: str) -> str | None:
 # Headlines that pass on someone's buy/sell call or price target. Belfort hides them by default: it does not
 # relay stock tips, even when a publisher prints them.
 TIP_RE = re.compile(
-    r"(stocks? to (buy|sell|watch|pick)|buy or sell|should you buy|buy,? sell,? hold|\bbuy\b.*\btarget\b|"
-    r"\btarget price\b|\btarget,? (sl|stop)|(?-i:\bSL\b)|stop[- ]loss|multibagger|top picks?|\bpicks? for\b|"
+    r"((stocks?|shares?) to (buy|sell|watch|pick)\b(?![- ]back)|buy or sell|should you buy|buy,? sell,? hold|"
+    r"\bbuy\b.*\btarget\b|(stock|preferred) picks?\b|\btarget price\b|\btarget,? (sl|stop)|(?-i:\bSL\b)|stop[- ]loss|multibagger|top picks?|\bpicks? for\b|"
     r"recommends? (a )?(buy|sell)|\bbrokerage(s)? (say|bet|bullish|suggest)|technical picks|trading ideas?|"
     r"(buy|sell|accumulate)\s+(rating|call)|(upside|downside) of\s+\d|broker(?:[’']s|s[’'])\s+call|"
     r"\((buy|sell|hold|accumulate|reduce|add|neutral)\))",

@@ -4,7 +4,8 @@
 
 ## Verified
 
-- 191 automated tests pass offline, with 83% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
+- 374 automated tests pass offline, with 85% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux. `tests/test_symbols.py::test_search_is_fast_on_a_full_size_listing` is a timing test: it failed on a laptop that was busy with Docker and passed on an idle one.
+- Docker (T52) was checked on 28 November 2026 on Docker 29.5.3: both images build, lint and tests pass in the test image (372 passed, 2 skipped), and the app container reports healthy and answered the page, config, syllabus, a Tip Check, a research report and the pattern statistics. CI does not build the images.
 - The contributor setup was followed on a clean clone on Windows 11 with Python 3.12.4 on 22 November 2026: setup, hooks, tests and the app all worked.
 - Eight languages (T50) were clicked through in the built-in browser on 28 November 2026: the intro chips, the sidebar, the Learn path, a Hindi lesson, the dictionary and Settings in Tamil and Hindi, at desktop width and at 360 px, with an automated scan for clipped text. All catalogues are machine drafts; no fluent speaker has reviewed them.
 - The gamified Learn path (T42) was clicked through in the built-in browser on 28 November 2026: the path, a lesson as cards with every exercise type, a wrong answer losing a heart, a locked lesson refused with 403, the placement test unlocking Intermediate, a checkpoint with its review screen, and the out-of-hearts screen. Reduced-motion behaviour was reviewed in code only; it was not tried with the system setting on.
@@ -25,13 +26,15 @@
 
 | Area | Limitation | Task |
 |---|---|---|
+| News | The tip-style headline filter is a pattern list; it was widened on 28 November 2026 after a broker's "shares to buy" headline got through, and will still miss some phrasing | |
+| Research | `data/pattern_stats.json` is generated, not committed, so a fresh clone shows no pattern statistics until `python scripts/run_backtest.py` is run | |
 | Practice | Long only, one account, end-of-day fills | |
 | Android | First version shows Belfort from your computer over Wi-Fi; only Tip Check's text checks run on the phone alone. The APK was built and its contents checked, but it has not been installed on a phone or emulator yet (no platform-tools or emulator on the build machine). | T48 |
 | Learn | 38 of 38 lessons written, each with multiple-choice plus true or false, order and number exercises | |
 | Learn | Stage progress is per local user; XP, hearts and streaks use the device's date. Moving between devices waits for accounts | T43 |
 | News | Company tags cover only about 130 built-in stocks; the tip filter is a pattern list and will miss some phrasing | T28 |
 | Research | Rule thresholds can be changed only in code | T25 |
-| Tip Check | Phrase rules miss wording they do not list; SEBI registration numbers are checked against a copy the user must import from SEBI's site (shape only until then); company size comes from Yahoo and may be missing. The web check (T52) needs a Gemini key and can miss or misread pages; it never changes the flag count | T44, T52 |
+| Tip Check | Phrase rules miss wording they do not list; SEBI registration numbers are checked against a copy the user must import from SEBI's site (shape only until then); company size comes from Yahoo and may be missing. The web check (T53) needs a Gemini key and can miss or misread pages; it never changes the flag count | T44, T53 |
 | Front end | No browser tests; JavaScript is checked only by syntax check and clicking through | T31 |
 | Packaging | `Belfort.exe` builds and runs (single file, unsigned, no installer or uninstaller yet); fonts still load from Google Fonts | T36, T38, T39, D7 |
 | Data | Yahoo Finance and NSE archive files are unofficial and can change or block access | D4 |

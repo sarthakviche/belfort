@@ -1,0 +1,31 @@
+# Keep secrets, personal data and build output out of the image.
+
+# secrets
+**/.env
+**/.env.*
+!.env.example
+**/.vercel
+**/*.keystore
+**/*.jks
+
+# personal data: only the pattern backtest summary, if you have generated it, goes in
+data/*
+!data/pattern_stats.json
+.tmpdata
+
+# local tools and build output
+.git
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+.coverage
+coverage.xml
+build
+dist
+android/build
+**/*.log
+.claude
+design assets
+pitch
