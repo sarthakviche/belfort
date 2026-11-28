@@ -524,6 +524,23 @@ It shows up to 6 dated bullet points, an "Overall" line, and the list of pages G
 
 ---
 
+## 21. The web check falls back to Groq ✅
+
+**Why:** with your real Gemini key, ordinary answers worked, but every Google Search call returned "You exceeded your current quota" (tried on gemini-flash-latest, gemini-3.8-flash and gemini-flash-lite-latest). Gemini's Google Search has its own quota, separate from normal answers, and this key has none left. Your Groq key works, and Groq's `openai/gpt-oss-120b` can search the web with its `browser_search` tool.
+
+**What changed:**
+- **Order:** Gemini first (when it is your provider). If it says its search quota is used up, or there is no Gemini key, Groq searches with the same prompt. The panel then says "Gemini's Google Search quota is used up, so Groq searched the web instead."
+- **Where the Groq key comes from:** `GROQ_API_KEY` in `.env`, or your own OpenAI-compatible provider in Settings when its address is api.groq.com.
+- **Sources:** pages the model actually opened come first, then other search results; the search engine's own page is dropped and Groq's citation marks are removed from the text.
+- **Messages:** clear sentences for a wrong Groq key, Groq's rate limit, timeouts and no answer; with neither key, it says what to add.
+- **Config:** `/api/config` has `web_check_ready`, so the button works with only a Groq key in `.env`.
+- **Tests:** 11 new ones (fallback, Groq alone, Groq as your own provider, errors, network failures, config); 393 pass.
+- **Checked live:** with your keys, the SUZLON sample tip: Gemini was out of search quota, Groq answered with six dated findings (a SEBI penalty, ASM surveillance in 2023 and its removal in 2024, an exchange warning letter, no registration number in the tip, and no source for its price claim) and eight sources, including sebi.gov.in.
+
+**For you:** to use Gemini's own search instead, turn on billing for the key's project in Google AI Studio. Nothing else is needed; Groq covers it in the meantime.
+
+---
+
 ## Open items for you
 - **Sarthak:** approve or change the rule-7 amendment so #42 (accounts) can merge, and decide on #30 and #19.
 - **Hindi lessons:** machine drafts; someone fluent should read them before release.
