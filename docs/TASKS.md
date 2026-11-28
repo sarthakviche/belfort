@@ -63,7 +63,7 @@
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
 | T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Done ([#41](https://github.com/sarthakviche/belfort/pull/41)) |
 | T51 | Dictionary: offer Ask Belfort when only a close spelling matches | 6 Belfort 2 | P1 | S | Done ([#45](https://github.com/sarthakviche/belfort/pull/45)) |
-| T52 | Tip Check: AI web check with Gemini and Google Search | 6 Belfort 2 | P1 | S | Done (PR link added on merge) |
+| T52 | Tip Check: AI web check with Gemini and Google Search | 6 Belfort 2 | P1 | S | Done ([#47](https://github.com/sarthakviche/belfort/pull/47)) |
 
 ---
 
@@ -310,7 +310,7 @@ Shared contracts every Phase 6 task uses:
 - A search such as "swing trade index" matched "Swing trade" as a close spelling, so the page showed one result and never offered Ask Belfort or a web search. The search API now returns `close_only` when the best match is only a close spelling or a word in an explanation, and the page shows those results with "Not quite what you meant?" and both buttons under them.
 
 ### T52 · Tip Check: AI web check with Gemini and Google Search
-- **P1 · S · Owner:** Devansh · **Status:** Done (PR link added on merge) · **Area:** tipcheck, assistant
+- **P1 · S · Owner:** Devansh · **Status:** Done ([#47](https://github.com/sarthakviche/belfort/pull/47)) · **Area:** tipcheck, assistant
 - After the rule-based result, a "What the web says" panel (labelled AI) lets the user have Gemini search Google, with their own key, for SEBI and exchange actions, scam reports and news about the stock and the sender, and lists the sources. Gemini only, because its API can search Google itself. The tip is data in the prompt, the answer passes the banned-wording filter, and the flag count is unchanged. See `docs/ARCHITECTURE.md` (Tip Check).
 
 ## Decisions (maintainers, not code)
