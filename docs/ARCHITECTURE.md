@@ -112,6 +112,10 @@ The **assistant** serves all four: the page sends the context on screen (a repor
 | Quality | 81 unit and API tests; Ruff, coverage, audit and policy checks in GitHub Actions on Windows and Linux | Browser smoke tests (Playwright), accessibility checks, release checklist |
 | Hosting | None | A **static** docs and landing site only. A hosted Research service is deliberately not planned: per-stock labels served for money would fall under SEBI's research analyst rules. Hosting shared, non-personal content (lessons, news) is possible later. |
 
+## Running in a container
+
+The `Dockerfile` has a `test` stage (lint and the offline tests) and a final stage with only `belfort/`, `content/`, the optional pattern statistics and the pinned runtime packages. It runs as an unprivileged user and keeps data in the `/data` volume. The server listens on all interfaces inside the container, so publish the port on `127.0.0.1` only. `.dockerignore` keeps `.env` files, local databases and signing keys out of the image.
+
 ## Languages
 
 Belfort speaks English (the default and the first choice), हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ (T50). The Android app reuses the same files.

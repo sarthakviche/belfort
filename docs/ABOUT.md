@@ -4,7 +4,7 @@ Everything about the project in one place: what it does, what works today, what 
 
 ## What Belfort is
 
-An app for beginner and intermediate traders who want to swing or positional trade NSE stocks properly. It has four parts:
+An app for beginner and intermediate traders who want to swing or positional trade NSE stocks properly. Besides Tip Check, which reads a forwarded stock tip for red flags, it has four parts:
 
 | Part | What a user does there |
 |---|---|
@@ -21,12 +21,14 @@ An app for beginner and intermediate traders who want to swing or positional tra
 |---|---|---|
 | **Research** | Fuzzy company search (names, initials, nicknames, typos), per-stock report, three screens, pattern reliability backtest, position sizing | Carried over from the earlier Belfort AI project. Labels are now descriptive: "Conditions met", "Partly met", "Rule excludes". |
 | **Learn** | Syllabus of 3 tracks, 12 modules, 38 lessons; **38 lessons written** with quizzes; quiz grading on the server; progress and streaks; example charts | Lesson charts only use prices at least 30 days old (SEBI education norm from July 2026). |
-| **Practice: paper account** | Stock picker by company name (no symbol needed), order ticket with last close, mini chart, stop idea and "Size it", market and limit orders, required stop, optional target, raised and trailing stops, partial exits, open-risk total and size warnings, end-of-day fills, gaps, costs, exits, trade reviews with setup and mistake tags, journal analytics (R distribution, by setup, holding time and mistake, habits), win rate, average R, equity curve with largest drawdown, CSV and JSON export with backup restore | Long only. Virtual points, never redeemable. |
+| **Practice: paper account** | Stock picker by company name (no symbol needed), order ticket with last close, mini chart, stop idea and "Size it", market and limit orders, optional stop and target, raised and trailing stops, partial exits, open-risk total and size warnings, end-of-day fills, gaps, costs, exits, trade reviews with setup and mistake tags, journal analytics (R distribution, by setup, holding time and mistake, habits), win rate, average R, equity curve with largest drawdown, CSV and JSON export with backup restore | Long only. Virtual points, never redeemable. |
 | **Practice: predictions** | Log a call with direction, horizon and confidence; auto-resolution; Brier score, points, calibration chart, badges | |
 | **Practice: chart replay** | Random hidden past chart, plan a stop and target, animated reveal, R result, running record | |
-| **News** | Six RSS sources, de-duplication, categories, company tags, hover definitions, "Explain this", tip-style headlines hidden | Headlines and feed descriptions only; links out. |
+| **Tip Check** | Red flags in a forwarded tip: registration number, promised returns, deadline, pressure, secrecy, money ask, NSE surveillance lists, pump pattern; screenshots read with your own AI key | It never says whether to buy or sell. New wording can slip past. |
+| **Languages** | Eight languages in the app, 16 Beginner lessons in Hindi | Unreviewed machine drafts. |
+| **News** | Six RSS sources, de-duplication, categories, company tags, hover definitions, "Explain this", a filter for tip-style headlines | Headlines and feed descriptions only; links out. |
 | **Assistant** | Bring-your-own-key chat with Gemini or OpenAI-compatible providers; context-aware (report, lesson, story); wording filter; clear errors that never echo the key | |
-| **Platform** | FastAPI app, SQLite store with migrations, static front end, Windows launcher, 138 offline tests at 79% coverage, lint, format and audit checks, CI on Windows and Linux | |
+| **Platform** | FastAPI app, SQLite store with migrations, static front end, Windows launcher, 374 offline tests at 85% coverage, a Docker build, lint, format and audit checks, CI on Windows and Linux | |
 | **Docs** | Architecture, syllabus method, compliance, competitor landscape, roadmap | In this folder. |
 
 ## What is yet to build
@@ -34,7 +36,8 @@ An app for beginner and intermediate traders who want to swing or positional tra
 The full plan is in [ROADMAP.md](ROADMAP.md); the work ready to pick up today is in [TASKS.md](TASKS.md). The headlines:
 
 - **Decisions:** brand name, download location and code signing; a securities lawyer's review.
-- **Learn:** 5 of 38 lessons, replay drills linked to lessons, a content checker in CI, Hindi.
+- **Learn:** replay drills linked to lessons, a content checker in CI.
+- **Accounts, languages and mobile:** accounts and sync, fluent-speaker review of translations, Android on phones.
 - **Research:** editable rule thresholds, watchlists, market context.
 - **News:** wider company tagging, NSE announcements, events calendar.
 - **Platform:** browser tests, accessibility pass, offline assets, Windows installer and release workflow.
@@ -50,7 +53,7 @@ belfort/    research/  learn/  practice/  news/  assistant/  core/  data/  stati
 content/    learn/syllabus.json   learn/lessons/*.md   news/feeds.json
 docs/       ARCHITECTURE  CONVENTIONS  SYLLABUS  COMPLIANCE  LANDSCAPE  ROADMAP
             TASKS  STATUS  CONVENTIONS
-tests/      138 tests, no network needed
+tests/      offline tests, no network needed
 ```
 
 ## Data
