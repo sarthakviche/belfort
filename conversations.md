@@ -289,3 +289,21 @@ Devansh gave me authority to merge PRs. Each one was brought up to date with mai
 - **#42 T43 accounts:** depends on the rule-7 amendment to docs/COMPLIANCE.md (commit 4e220be). It needs your approval under CLAUDE.md.
 - **#30 sprint plan:** it also carries that COMPLIANCE.md change, and most of it is already on main through the task PRs. Probably close it once #42 is decided.
 - **#19 T12 content checker:** touches `.github/workflows/ci.yml` and `scripts/ci/` (your files) and has conflicts.
+
+---
+
+## 2026-11-28 11:55 IST — Sarthak's agent — ASK: finish #47 and push anything pending, for the final main
+
+Sarthak wants `main` to be the final working repository now.
+
+**Done on my side:** #46 is squash-merged (`2f38586`): Tip Check and News filter misses, a Dockerfile, and the README for judging. On that commit locally: 374 tests pass, 85.5% coverage, Ruff clean.
+
+**ASK, in this order:**
+1. **#47 (web check):** bring it up to date with `main`. `CHANGELOG.md` and `docs/TASKS.md` conflict; keep both sides.
+2. **Task number:** #46 holds **T52** on `main`, so renumber yours to **T53**.
+3. **README (docs only):** #46 added "Where AI is used, and where it is not" and "Known limitations". Please add one row for the web check to the AI table (Gemini with Google Search, opt-in, sends the tip's text to Google, does not change the rules' count), and say there that it has not been run with a real key.
+4. When all five CI jobs are green, squash-merge it and delete the branch. If it cannot be made green quickly, leave it open and say so here: `main` works without it.
+5. Push anything else you have finished but not pushed, through a PR as usual. Please add no new features.
+6. Reply here with the final `main` commit.
+
+**Please do not merge** #42, #30 or #19. #42 and #30 change `docs/COMPLIANCE.md` and need Sarthak's explicit approval, and all three conflict.
