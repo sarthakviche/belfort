@@ -125,7 +125,7 @@ SEARCH_MIN_FUZZY = 4  # typo tolerance starts at four characters
 SEARCH_FUZZY_MIN_RATIO = 0.75  # difflib similarity per word ("hdcf" vs "hdfc" is 0.75)
 
 # ---------------- Ask Belfort (assistant) ----------------
-AI_TIMEOUT_SECONDS = {"gemini": 40.0, "openai": 60.0}  # local models can be slow on the first answer
+AI_TIMEOUT_SECONDS = {"gemini": 40.0, "openai": 60.0, "groq": 90.0}  # local models are slow at first; groq browses
 AI_MAX_OUTPUT_TOKENS = 800
 AI_ERROR_DETAIL_CHARS = 200  # how much of a provider's own error text to show
 
@@ -163,3 +163,4 @@ TIP_SURVEILLANCE_LOOKBACK_DAYS = 7  # how many weekdays back to look for NSE's l
 TIP_IMAGE_MAX_BYTES = 5_000_000  # largest screenshot accepted
 TIP_WEB_MAX_TIP_CHARS = 2000  # how much of the tip is sent to Gemini for the web check (T53)
 TIP_WEB_MAX_SOURCES = 8  # web pages listed under the web check
+TIP_WEB_GROQ_MODEL = "openai/gpt-oss-120b"  # Groq model with the browser_search tool, the web check's fallback (T54)

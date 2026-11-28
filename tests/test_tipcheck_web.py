@@ -27,7 +27,7 @@ def grounded(text: str, chunks: list[dict] | None = None, queries: list[str] | N
 
 @pytest.fixture
 def no_env_key(monkeypatch):
-    for k in ("GEMINI_API_KEY", "OPENAI_API_KEY", "AI_PROVIDER", "AI_MODEL", "OPENAI_BASE_URL"):
+    for k in ("GEMINI_API_KEY", "OPENAI_API_KEY", "GROQ_API_KEY", "AI_PROVIDER", "AI_MODEL", "OPENAI_BASE_URL"):
         monkeypatch.delenv(k, raising=False)
     monkeypatch.setattr(service, "companies", lambda: [("SUZLON", "Suzlon Energy Limited")])
 
@@ -126,3 +126,130 @@ def test_sources_are_capped(monkeypatch):
     chunks = [{"web": {"uri": f"https://example.org/{i}", "title": str(i)}} for i in range(5)]
     assert len(webcheck.sources_of({"groundingMetadata": {"groundingChunks": chunks}})) == 2
     assert webcheck.sources_of({}) == []
+
+
+# ---------------- Groq fallback (T54) ----------------
+
+QUOTA_429 = Reply(429, {"error": {"message": "You exceeded your current quota, please check your plan."}})
+
+
+def groq_reply(content: str) -> Reply:
+    tools = [
+        {
+            "type": "browser_search",
+            "arguments": '{"query": "SUZLON SEBI order"}',
+            "search_results": {
+                "results": [
+                    {"title": "Search", "url": "https://exa.ai/search?q=x"},
+                    {"title": "Some news", "url": "https://news.example/a"},
+                    {"title": "SEBI order - viewing lines [0 - 13] of 13", "url": "https://www.sebi.gov.in/o.html"},
+                ]
+            },
+        },
+        {
+            "type": "browser.open",
+            "search_results": {
+                "results": [{"title": "SEBI order - viewing lines [0 - 13] of 13", "url": "https://www.sebi.gov.in/o.html"}]
+            },
+        },
+    ]
+    return Reply(200, {"choices": [{"message": {"content": content, "executed_tools": tools}}]})
+
+
+@pytest.fixture
+def both(monkeypatch, no_env_key):
+    """Gemini and Groq faked: replies are taken in order, and every request is recorded."""
+    calls, replies = [], []
+
+    def post(url, headers=None, json=None, timeout=None):
+        calls.append({"url": url, "headers": headers, "body": json})
+        return replies.pop(0)
+
+    monkeypatch.setattr(webcheck.httpx, "post", post)
+    return calls, replies
+
+
+def test_gemini_out_of_search_quota_falls_back_to_groq(both, monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    calls, replies = both
+    replies += [
+        QUOTA_429,
+        groq_reply("- 30 April 2026, SEBI: order on two Telegram channels【1†L11-L12】.  \nOverall: nothing supports the tip."),
+    ]
+    d = client.post("/api/tipcheck/web", json={"text": TIP, "symbol": "SUZLON"}, headers=GEMINI).json()
+    assert [c["url"].split("/")[2] for c in calls] == ["generativelanguage.googleapis.com", "api.groq.com"]
+    groq = calls[1]
+    assert groq["headers"] == {"Authorization": "Bearer gsk_test"}
+    assert groq["body"]["model"] == "openai/gpt-oss-120b" and groq["body"]["tools"] == [{"type": "browser_search"}]
+    assert "<tip>" in groq["body"]["messages"][0]["content"]
+    assert d["note"] == webcheck.FELL_BACK and "Groq" in d["label"]
+    assert d["answer"] == "- 30 April 2026, SEBI: order on two Telegram channels.\nOverall: nothing supports the tip."
+    # pages the model opened come first; the search engine's own page is dropped; "viewing lines" is trimmed
+    assert d["sources"] == [
+        {"title": "SEBI order", "url": "https://www.sebi.gov.in/o.html"},
+        {"title": "Some news", "url": "https://news.example/a"},
+    ]
+    assert d["queries"] == ['{"query": "SUZLON SEBI order"}']
+
+
+def test_groq_alone_works_without_a_gemini_key(both, monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    calls, replies = both
+    replies.append(groq_reply("Overall: the web says nothing about it."))
+    r = client.post("/api/tipcheck/web", json={"text": TIP})
+    assert r.status_code == 200 and "note" not in r.json() and len(calls) == 1
+
+
+def test_groq_as_the_users_own_openai_compatible_provider(both):
+    calls, replies = both
+    replies.append(groq_reply("Overall: nothing found."))
+    headers = {"X-AI-Provider": "openai", "X-AI-Key": "gsk_mine", "X-AI-Base": "https://api.groq.com/openai/v1"}
+    r = client.post("/api/tipcheck/web", json={"text": TIP}, headers=headers)
+    assert r.status_code == 200 and calls[0]["headers"] == {"Authorization": "Bearer gsk_mine"}
+
+
+def test_quota_without_groq_explains_both_ways_out(both):
+    _, replies = both
+    replies.append(QUOTA_429)
+    r = client.post("/api/tipcheck/web", json={"text": TIP}, headers=GEMINI)
+    assert r.status_code == 503 and r.json()["detail"] == webcheck.QUOTA and "GROQ_API_KEY" in webcheck.QUOTA
+
+
+@pytest.mark.parametrize(
+    ("reply", "words"),
+    [
+        (Reply(401, {}), "did not accept"),
+        (Reply(429, {}), "rate limit"),
+        (Reply(500, {}), "(500)"),
+        (Reply(200, {"choices": [{"message": {"content": ""}}]}), "no answer"),
+    ],
+)
+def test_groq_errors_become_plain_sentences(both, monkeypatch, reply, words):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    _, replies = both
+    replies.append(reply)
+    r = client.post("/api/tipcheck/web", json={"text": TIP})
+    assert r.status_code == 503 and words in r.json()["detail"]
+
+
+def test_groq_network_failures(no_env_key, monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    for exc, words in ((httpx.ReadTimeout("slow"), "too long"), (httpx.ConnectError("offline"), "connection")):
+
+        def post(*a, exc=exc, **k):
+            raise exc
+
+        monkeypatch.setattr(webcheck.httpx, "post", post)
+        r = client.post("/api/tipcheck/web", json={"text": TIP})
+        assert r.status_code == 503 and words in r.json()["detail"]
+
+
+def test_no_provider_that_can_search(no_env_key):
+    r = client.post("/api/tipcheck/web", json={"text": TIP}, headers={"X-AI-Provider": "openai", "X-AI-Key": "sk-x"})
+    assert r.status_code == 400 and r.json()["detail"] == webcheck.NO_PROVIDER
+
+
+def test_config_says_whether_the_web_check_can_run(no_env_key, monkeypatch):
+    assert client.get("/api/config").json()["web_check_ready"] is False
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
+    assert client.get("/api/config").json()["web_check_ready"] is True

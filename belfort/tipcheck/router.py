@@ -60,12 +60,16 @@ def web_check(
     x_ai_model: str | None = Header(default=None),
     x_ai_base: str | None = Header(default=None),
 ):
-    """What the web says about the tip: Gemini searches Google with the user's own key. The rules still set the flags."""
+    """What the web says about the tip: Gemini or Groq searches the web with the user's own key. The rules still set
+    the flags."""
     symbol = (body.symbol or "").strip().upper() or None
     name = dict(service.companies()).get(symbol) if symbol else None
     try:
-        p = chat.Provider.resolve(x_ai_provider, x_ai_key, x_ai_model, x_ai_base)
-        return webcheck.check(body.text, symbol, name, p)
+        p, no_key = chat.Provider.resolve(x_ai_provider, x_ai_key, x_ai_model, x_ai_base), None
+    except chat.ChatError as e:
+        p, no_key = None, e  # no Gemini or OpenAI key: a Groq key can still search
+    try:
+        return webcheck.check(body.text, symbol, name, p, no_key)
     except webcheck.WebCheckError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except chat.ChatError as e:

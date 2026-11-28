@@ -96,7 +96,7 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 | Chart pattern detection | Geometric rules, measured below. Not used in the label |
 | Reading the text in a tip screenshot | A vision model of your choice, with your key. It only copies the text; the rules judge it, and you see what it copied |
 | Ask Belfort, "Ask" in the dictionary, "Explain in your language" | A language model of your choice (Gemini, OpenAI-compatible or local Ollama), given the text on screen |
-| Tip Check's "What the web says" (optional, on a button) | Gemini with Google Search and your key: dated findings about the stock and sender, with the sources it used. It never changes the red-flag count |
+| Tip Check's "What the web says" (optional, on a button) | Gemini with Google Search and your key, or Groq (gpt-oss with web search) when there is no Gemini key or its search quota is used up: dated findings about the stock and sender, with the sources it used. It never changes the red-flag count |
 
 **Guardrails.** A fixed system instruction (no advice, no predictions, only the figures given). Replies containing promise-style phrases are replaced; this catches listed phrases, not every form of advice. Your key stays in your browser, is sent with each request to the local server and on to your provider only, and is removed from error messages. (If you put a key in `.env` instead, it is read from that file.) Request bodies are length-limited, and screenshots are checked for type and size. There is no dedicated prompt-injection filter and no rate limiting.
 
@@ -253,6 +253,7 @@ Everything works without a `.env`. To enable the Ask Belfort chat, paste your ke
 | Variable | Purpose |
 |---|---|
 | `GEMINI_API_KEY` | Google Gemini ([free key](https://aistudio.google.com/apikey)) |
+| `GROQ_API_KEY` | Groq ([key](https://console.groq.com/keys)): Tip Check's web check uses it when Gemini can't search |
 | `AI_PROVIDER`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `AI_MODEL` | Any OpenAI-compatible service, or a local Ollama (no key) |
 | `BELFORT_DATA_DIR` | Where the database and cache live |
 | `BELFORT_PORT` | Desktop-window port (default `8766`) |

@@ -133,8 +133,8 @@
         <div class="tc-cards">${d.findings.map(card).join("")}</div>
         <div class="panel glass tc-web" id="tc-web">
           <h3>What the web says <span class="tc-ai">AI</span></h3>
-          <p class="tc-web-intro">Gemini searches Google for SEBI and NSE actions, scam reports and news about this stock and the sender, with your own key.
-            The red-flag count above comes from Belfort's rules only. Pressing the button sends the tip's text to Google.</p>
+          <p class="tc-web-intro">AI (Gemini with Google Search, or Groq when Gemini is unavailable) searches the web for SEBI and NSE actions, scam reports and news about this stock and the sender, with your own key.
+            The red-flag count above comes from Belfort's rules only. Pressing the button sends the tip's text to that AI provider.</p>
           <button type="button" class="btn" id="tc-web-btn">Search the web with AI</button>
           <div id="tc-web-out" aria-live="polite"></div>
         </div>
@@ -163,20 +163,20 @@
   }
   async function webCheck(d) {
     const out = $("tc-web-out"), btn = $("tc-web-btn");
-    if (!aiReady()) {
-      out.innerHTML = `<p class="tc-note err">The web check needs your own Gemini key (free from Google AI Studio). <button type="button" class="linkish" id="tc-web-keys">Open Settings</button></p>`;
+    if (!aiReady() && !(S.cfg && S.cfg.web_check_ready)) {
+      out.innerHTML = `<p class="tc-note err">The web check needs your own Gemini key (free from Google AI Studio) or a Groq key in the .env file. <button type="button" class="linkish" id="tc-web-keys">Open Settings</button></p>`;
       $("tc-web-keys").addEventListener("click", () => $("settings-btn").click());
       return;
     }
     btn.disabled = true;
-    out.innerHTML = `<div class="tc-wait"><span class="tc-spin"></span>Searching the web with Gemini. This can take up to half a minute…</div>`;
+    out.innerHTML = `<div class="tc-wait"><span class="tc-spin"></span>Searching the web with AI. This can take up to a minute…</div>`;
     try {
       const r = await api("/api/tipcheck/web", { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, aiHeaders()), body: JSON.stringify({ text: TC.text, symbol: d.symbol }) });
       const srcs = r.sources.length
-        ? `<div class="tc-web-src"><b>Sources Google returned</b><ol>${r.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("")}</ol></div>`
-        : `<p class="src">Google returned no source links for this answer, so treat it with extra care.</p>`;
-      out.innerHTML = `<div class="tc-web-answer">${webAnswer(r.answer)}</div>${srcs}
-        <p class="src">${esc(r.label)} (${esc(r.model)}). AI can miss things or get them wrong: open the sources before you rely on anything here.</p>`;
+        ? `<div class="tc-web-src"><b>Sources the search returned</b><ol>${r.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("")}</ol></div>`
+        : `<p class="src">The search returned no source links for this answer, so treat it with extra care.</p>`;
+      out.innerHTML = `${r.note ? `<p class="src">${esc(r.note)}</p>` : ""}<div class="tc-web-answer">${webAnswer(r.answer)}</div>${srcs}
+        <p class="src">${esc(r.label)}${r.label.includes(r.model) ? "" : ` (${esc(r.model)})`}. AI can miss things or get them wrong: open the sources before you rely on anything here.</p>`;
       btn.textContent = "Search again";
     } catch (err) {
       out.innerHTML = `<p class="tc-note err">${esc(err.message)}</p>`;

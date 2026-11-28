@@ -53,6 +53,7 @@ def config():
         "universe": UNIVERSE,
         "glossary": GLOSSARY,
         "chat_env_ready": chat.configured(),
+        "web_check_ready": bool(os.environ.get("GEMINI_API_KEY") or os.environ.get("GROQ_API_KEY")),
         "practice": {"start_points": PAPER_START_POINTS, "horizons": list(PREDICTION_HORIZONS)},
         "edu_lag_days": EDU_LAG_DAYS,
         "languages": [{"code": c, "name": n[0], "native": n[1]} for c, n in LANGUAGES.items()],

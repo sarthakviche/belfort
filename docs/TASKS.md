@@ -65,6 +65,7 @@
 | T51 | Dictionary: offer Ask Belfort when only a close spelling matches | 6 Belfort 2 | P1 | S | Done ([#45](https://github.com/sarthakviche/belfort/pull/45)) |
 | T52 | Judging readiness: Docker, README, tip filter misses | 6 Belfort 2 | P0 | M | Done ([#46](https://github.com/sarthakviche/belfort/pull/46)) |
 | T53 | Tip Check: AI web check with Gemini and Google Search | 6 Belfort 2 | P1 | S | Done ([#47](https://github.com/sarthakviche/belfort/pull/47)) |
+| T54 | Tip Check: Groq fallback for the web check | 6 Belfort 2 | P1 | S | Done (PR link added on merge) |
 
 ---
 
@@ -317,6 +318,10 @@ Shared contracts every Phase 6 task uses:
 ### T53 · Tip Check: AI web check with Gemini and Google Search
 - **P1 · S · Owner:** Devansh · **Status:** Done ([#47](https://github.com/sarthakviche/belfort/pull/47)) · **Area:** tipcheck, assistant
 - After the rule-based result, a "What the web says" panel (labelled AI) lets the user have Gemini search Google, with their own key, for SEBI and exchange actions, scam reports and news about the stock and the sender, and lists the sources. Gemini only, because its API can search Google itself. The tip is data in the prompt, the answer passes the banned-wording filter, and the flag count is unchanged. See `docs/ARCHITECTURE.md` (Tip Check).
+
+### T54 · Tip Check: Groq fallback for the web check
+- **P1 · S · Owner:** Devansh · **Status:** Done (PR link added on merge) · **Area:** tipcheck, assistant
+- Gemini's Google Search has its own quota, and a free key can have none. When there is no Gemini key, or Gemini answers that its search quota is used up, the web check asks Groq's `openai/gpt-oss-120b` with its `browser_search` tool instead (`GROQ_API_KEY`, or the user's own OpenAI-compatible provider pointed at api.groq.com). Same prompt, same banned-wording filter, sources from the pages the model opened, and a note saying Groq was used.
 
 ## Decisions (maintainers, not code)
 
