@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from belfort.assistant import chat, glossary_router
 from belfort.core.glossary import GLOSSARY
-from belfort.core.glossary_search import clean, search, web_search_url
+from belfort.core.glossary_search import clean, close_only, search, web_search_url
 from belfort.main import app
 
 client = TestClient(app)
@@ -65,6 +65,24 @@ def test_search_endpoint():
     assert miss["results"] == [] and "qzxwvu" in miss["web_url"]
     allr = client.get("/api/glossary/search", params={"q": "", "limit": 500}).json()
     assert allr["count"] == len(GLOSSARY) and allr["web_url"] is None
+
+
+def test_close_only_when_the_best_match_is_a_close_spelling():
+    # "swing trade index" is not in the dictionary; "Swing trade" is only a close spelling of it
+    assert close_only("swing trade index") is True
+    assert close_only("swing trade") is False  # exact term
+    assert close_only("swing") is False  # prefix
+    assert close_only("qzxwvu") is False  # no match at all: the page shows its own not-found screen
+    assert close_only("") is False
+
+
+def test_search_endpoint_marks_close_only_results():
+    weak = client.get("/api/glossary/search", params={"q": "swing trade index"}).json()
+    assert weak["results"] and weak["close_only"] is True and "swing+trade+index" in weak["web_url"]
+    strong = client.get("/api/glossary/search", params={"q": "swing trade"}).json()
+    assert strong["close_only"] is False
+    miss = client.get("/api/glossary/search", params={"q": "qzxwvu"}).json()
+    assert miss["close_only"] is False
 
 
 @pytest.fixture

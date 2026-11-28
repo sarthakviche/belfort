@@ -10,7 +10,7 @@ from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from ..core import i18n
-from ..core.glossary_search import MAX_QUERY, search, web_search_url
+from ..core.glossary_search import MAX_QUERY, close_only, search, web_search_url
 from . import chat
 
 router = APIRouter(prefix="/api/glossary", tags=["glossary"])
@@ -31,7 +31,13 @@ class TermIn(BaseModel):
 @router.get("/search")
 def api_search(q: str = "", limit: int = 20):
     results = search(q, limit=max(1, min(limit, 500)))
-    return {"query": q, "count": len(results), "results": results, "web_url": web_search_url(q) if q.strip() else None}
+    return {
+        "query": q,
+        "count": len(results),
+        "results": results,
+        "close_only": bool(results) and close_only(q),
+        "web_url": web_search_url(q) if q.strip() else None,
+    }
 
 
 @router.post("/ask")

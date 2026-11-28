@@ -50,6 +50,7 @@ All notable changes to Belfort. The format follows [Keep a Changelog](https://ke
 - Renamed single-letter and uppercase local variables in the research engine to descriptive names; no behaviour change.
 
 ### Fixed
+- Dictionary: when a search only finds a close spelling (for example "swing trade index" finds "Swing trade"), the page now also offers Ask Belfort and Search the web under the results, instead of only when nothing matches.
 - Research report: switching between Swing and Positional, or changing capital, risk or your own stop, no longer jumps the page back to the top. Opening a different stock still starts at the top.
 - Research header: with a long company name (for example Power Grid Corporation of India Limited) the day's figures were squeezed into a narrow column on the right, pushing the name and price far down the page. The figures now sit in their own row under the name and price.
 - After an update, the home lists and the tagged news feed are rebuilt instead of serving what the previous version produced. Results Belfort builds are cached under a fingerprint of its code; downloaded prices, company figures and exchange files stay cached as before.

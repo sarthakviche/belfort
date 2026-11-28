@@ -2,6 +2,8 @@
 
 Order of preference: exact term, exact match phrase, term prefix, phrase prefix, a word of the term starting with the
 query, substring of the term or a phrase, a close spelling (difflib), then a whole word in the explanation.
+A search whose best match is only a close spelling or a word in an explanation is "close only": the term the user
+typed is probably not in the dictionary, so the page offers Ask Belfort and a web search next to the results.
 """
 
 import re
@@ -12,6 +14,7 @@ from .glossary import GLOSSARY
 
 MAX_QUERY = 80
 FUZZY_CUTOFF = 0.75
+STRONG_SCORE = 55  # a substring of a term or phrase, or better; below this a match is only a close spelling
 WEB_SEARCH = "https://www.google.com/search?q="
 
 
@@ -64,3 +67,13 @@ def search(query: str, entries: list[dict] | None = None, limit: int = 20) -> li
     scored = [(s, e) for e in entries if (s := _score(q, e)) > 0]
     scored.sort(key=lambda se: (-se[0], len(se[1]["term"]), se[1]["term"]))
     return [e for _, e in scored[:limit]]
+
+
+def close_only(query: str, entries: list[dict] | None = None) -> bool:
+    """True when `query` has matches but none better than a close spelling or a word in an explanation."""
+    entries = GLOSSARY if entries is None else entries
+    q = clean(query)
+    if not q:
+        return False
+    best = max((_score(q, e) for e in entries), default=0)
+    return 0 < best < STRONG_SCORE

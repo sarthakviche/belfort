@@ -116,6 +116,7 @@
  "dx.need_key": "Ask Belfort needs your own AI key. Open {settings} (in the sidebar), choose a provider and paste a key; a Gemini key is free from Google AI Studio. Until then, you can search the web instead.",
  "dx.not_found": "Belfort's dictionary doesn't have “{term}” yet.",
  "dx.not_found_text": "You can ask Belfort for a short explanation, or look it up on the web.",
+ "dx.not_quite": "Not quite what you meant? Ask Belfort about “{term}”, or search the web.",
  "dx.placeholder": "Search the dictionary, for example stop-loss",
  "dx.web": "Search the web",
  "dx.web_instead": "{why} You can search the web instead.",

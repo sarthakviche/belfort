@@ -116,6 +116,7 @@
  "dx.need_key": "Ask Belfort માટે તમારી પોતાની AI કી જોઈએ. સાઇડબારમાં {settings} ખોલો, પ્રોવાઇડર પસંદ કરો અને કી પેસ્ટ કરો; Gemini કી Google AI Studio પરથી મફત મળે છે. ત્યાં સુધી તમે વેબ પર શોધી શકો.",
  "dx.not_found": "Belfort ની ડિક્શનરીમાં હજી “{term}” નથી.",
  "dx.not_found_text": "તમે Belfort ને ટૂંકી સમજૂતી માટે પૂછી શકો, અથવા વેબ પર જોઈ શકો.",
+ "dx.not_quite": "આ જ શોધતા હતા? નહીં તો Belfort ને “{term}” વિશે પૂછો, અથવા વેબ પર શોધો.",
  "dx.placeholder": "ડિક્શનરીમાં શોધો, દા.ત. stop-loss",
  "dx.web": "વેબ પર શોધો",
  "dx.web_instead": "{why} તેના બદલે તમે વેબ પર શોધી શકો.",

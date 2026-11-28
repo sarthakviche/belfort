@@ -116,6 +116,7 @@
  "dx.need_key": "Ask Belfort के लिए आपकी अपनी AI key चाहिए। साइडबार में {settings} खोलें, प्रदाता चुनें और key पेस्ट करें; Gemini की key Google AI Studio से मुफ़्त मिलती है। तब तक आप वेब पर खोज सकते हैं।",
  "dx.not_found": "Belfort की डिक्शनरी में अभी “{term}” नहीं है।",
  "dx.not_found_text": "आप Belfort से छोटी-सी व्याख्या माँग सकते हैं, या वेब पर देख सकते हैं।",
+ "dx.not_quite": "आप यही ढूँढ रहे थे? नहीं तो Belfort से “{term}” के बारे में पूछें, या वेब पर खोजें।",
  "dx.placeholder": "डिक्शनरी में खोजें, जैसे stop-loss",
  "dx.web": "वेब पर खोजें",
  "dx.web_instead": "{why} आप वेब पर खोज सकते हैं।",
