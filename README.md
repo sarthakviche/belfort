@@ -56,7 +56,7 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 - **Patterns shown, not scored.** A five-year backtest on 47 large NSE stocks found a weak, mixed edge, so patterns appear with that evidence but stay out of the label.
 - **Position size rounds down.** A stopped-out loss never exceeds your stated risk.
 - **Explains, never advises.** No buy, sell or hold words, no price predictions, and the app never places orders. Practice points are never redeemable.
-- **Tip Check and a dictionary.** Paste a stock tip and see its red flags (registration, promised returns, surveillance lists); search any market term.
+- **Tip Check and a dictionary.** Paste a stock tip and see its red flags (registration, promised returns, surveillance lists), then optionally have Gemini search the web for SEBI actions and scam reports about it, with sources; search any market term.
 - **Eight languages.** English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ, switchable without a reload. Translations are machine drafts for now.
 - **Bring your own AI key.** Optional explainer chat with Gemini, any OpenAI-compatible service, or a local Ollama model. Replies pass the same wording filter.
 - **Source and date on every figure.** Prices are end-of-day. Missing data is shown as missing.

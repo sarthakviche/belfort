@@ -101,3 +101,15 @@
   background: #26272b; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.55; }
 .tc-hit { background: none; color: inherit; text-decoration: underline wavy var(--tc-red); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .tc-quote { background: #26272b; border: 0; border-radius: 4px 12px 12px 12px; text-decoration: underline var(--tc-red); text-underline-offset: 3px; }
+
+/* The web check (T52) */
+.tc-web { margin-top: 18px; }
+.tc-web h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.tc-ai { font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; background: rgba(192,132,252,.16); color: #d8b4fe; }
+.tc-web-intro { color: var(--muted); margin: 0 0 12px; font-size: 14px; line-height: 1.55; }
+.tc-web-answer { margin-top: 14px; line-height: 1.6; }
+.tc-web-answer ul { margin: 0 0 10px; padding-left: 20px; }
+.tc-web-answer li { margin: 4px 0; }
+.tc-web-src { margin-top: 10px; font-size: 14px; }
+.tc-web-src ol { margin: 6px 0 0; padding-left: 20px; }
+.tc-web-src a { overflow-wrap: anywhere; }

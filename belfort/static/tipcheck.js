@@ -131,6 +131,13 @@
         <figure class="tc-msg"><figcaption>The tip you checked</figcaption>
           <blockquote class="tc-bubble" data-quoted-tip>${bubble(TC.text, d.findings.filter((f) => f.status === "flag").flatMap((f) => f.evidence))}</blockquote></figure>
         <div class="tc-cards">${d.findings.map(card).join("")}</div>
+        <div class="panel glass tc-web" id="tc-web">
+          <h3>What the web says <span class="tc-ai">AI</span></h3>
+          <p class="tc-web-intro">Gemini searches Google for SEBI and NSE actions, scam reports and news about this stock and the sender, with your own key.
+            The red-flag count above comes from Belfort's rules only. Pressing the button sends the tip's text to Google.</p>
+          <button type="button" class="btn" id="tc-web-btn">Search the web with AI</button>
+          <div id="tc-web-out" aria-live="polite"></div>
+        </div>
         <div class="panel glass tc-next">
           <h3>What to do next</h3>
           <ol>${d.next_steps.map((s) => `<li>${esc(s.text)}${links(s)}</li>`).join("")}</ol>
@@ -141,9 +148,40 @@
     if (reduceMotion()) $("tc-out").querySelectorAll(".tc-card").forEach((c) => c.classList.add("still"));
     $("tc-share").addEventListener("click", () => share(d));
     $("tc-copy").addEventListener("click", () => copy(d));
+    $("tc-web-btn").addEventListener("click", () => webCheck(d));
     $("tc-symbol").addEventListener("stock-pick", (e) => run(e.detail.symbol));
     $("tc-out").querySelectorAll("[data-tc-lesson]").forEach((b) => b.addEventListener("click", () => go("learn", { lesson: b.dataset.tcLesson })));
     $("tc-out").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  }
+
+  /* ---------- the web check (T52): Gemini with Google Search, the user's own key ---------- */
+  function webAnswer(text) {
+    const lines = text.split(/[\r\n]+/).map((l) => l.trim()).filter(Boolean);
+    const items = lines.filter((l) => /^[-*•]\s+/.test(l)).map((l) => `<li>${esc(l.replace(/^[-*•]\s+/, "").replace(/\*\*/g, ""))}</li>`);
+    const rest = lines.filter((l) => !/^[-*•]\s+/.test(l)).map((l) => `<p>${esc(l.replace(/\*\*/g, ""))}</p>`);
+    return (items.length ? `<ul>${items.join("")}</ul>` : "") + rest.join("");
+  }
+  async function webCheck(d) {
+    const out = $("tc-web-out"), btn = $("tc-web-btn");
+    if (!aiReady()) {
+      out.innerHTML = `<p class="tc-note err">The web check needs your own Gemini key (free from Google AI Studio). <button type="button" class="linkish" id="tc-web-keys">Open Settings</button></p>`;
+      $("tc-web-keys").addEventListener("click", () => $("settings-btn").click());
+      return;
+    }
+    btn.disabled = true;
+    out.innerHTML = `<div class="tc-wait"><span class="tc-spin"></span>Searching the web with Gemini. This can take up to half a minute…</div>`;
+    try {
+      const r = await api("/api/tipcheck/web", { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, aiHeaders()), body: JSON.stringify({ text: TC.text, symbol: d.symbol }) });
+      const srcs = r.sources.length
+        ? `<div class="tc-web-src"><b>Sources Google returned</b><ol>${r.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("")}</ol></div>`
+        : `<p class="src">Google returned no source links for this answer, so treat it with extra care.</p>`;
+      out.innerHTML = `<div class="tc-web-answer">${webAnswer(r.answer)}</div>${srcs}
+        <p class="src">${esc(r.label)} (${esc(r.model)}). AI can miss things or get them wrong: open the sources before you rely on anything here.</p>`;
+      btn.textContent = "Search again";
+    } catch (err) {
+      out.innerHTML = `<p class="tc-note err">${esc(err.message)}</p>`;
+    }
+    btn.disabled = false;
   }
 
   /* ---------- screenshots ---------- */
