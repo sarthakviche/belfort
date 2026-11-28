@@ -486,6 +486,23 @@ You gave me authority to merge pull requests. For each one I:
 
 ---
 
+## 19. Dictionary offers Ask Belfort when only a close spelling matches ✅
+
+**What you saw:** typing "swing trade index" in the Dictionary showed one card, "Swing trade", and no way to ask Gemini.
+
+**Why:** the search counts a close spelling as a match ("swing trade index" is 78% like "swing trade", and the cut-off is 75%). The page only showed Ask Belfort and Search the web when there were zero matches.
+
+**What changed:**
+- **Search API** (`belfort/core/glossary_search.py`, `belfort/assistant/glossary_router.py`): a new `close_only` flag. It is true when the best match is only a close spelling or a word inside an explanation, not the term itself, its start or part of it.
+- **Dictionary page** (`dictionary.js`, `dictionary.css`): with `close_only`, the results still show, followed by "Not quite what you meant? Ask Belfort about “…”, or search the web." and both buttons.
+- **Languages:** the new line is in all eight catalogues (machine drafts).
+- **Tests:** two new tests; 354 pass, coverage 85.5%.
+- **Checked in the app:** "swing trade index" shows the card and the Ask box; "swing trade" shows only the card.
+
+**Note:** Ask Belfort needs your Gemini key saved in Settings. Without one it explains how to add it instead of calling Gemini.
+
+---
+
 ## Open items for you
 - **Sarthak:** approve or change the rule-7 amendment so #42 (accounts) can merge, and decide on #30 and #19.
 - **Hindi lessons:** machine drafts; someone fluent should read them before release.

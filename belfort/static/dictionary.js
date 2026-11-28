@@ -14,15 +14,27 @@ function dxBrowse(list) {
   dxBody().innerHTML = `<div class="dx-list dx-fade">${shown.map(dxCard).join("")}</div>`;
 }
 
+/* The Ask Belfort and web-search buttons, with the box the answer goes into. */
+function dxAskBlock() {
+  return `<div class="dx-actions"><button type="button" class="btn" id="dx-ask">${T("dx.ask")}</button><button type="button" class="btn ghost" id="dx-web">${T("dx.web")}</button></div>
+    <div id="dx-ai" class="dx-ai" aria-live="polite"></div>`;
+}
+
 function dxNoMatch(term, webUrl) {
   const t = esc(term);
   dxBody().innerHTML = `<div class="dx-empty dx-fade">
     <img src="img/mascot/mascot-shrug.gif" alt="" width="140" height="140">
     <h3>${T("dx.not_found", { term: t })}</h3>
     <p>${T("dx.not_found_text")}</p>
-    <div class="dx-actions"><button type="button" class="btn" id="dx-ask">${T("dx.ask")}</button><button type="button" class="btn ghost" id="dx-web">${T("dx.web")}</button></div>
-    <div id="dx-ai" class="dx-ai" aria-live="polite"></div></div>`;
+    ${dxAskBlock()}</div>`;
   dxBody().dataset.term = term; dxBody().dataset.web = webUrl || "";
+}
+
+/* Matches that are only close spellings: the typed term is probably missing, so offer Ask Belfort under them. */
+function dxCloseOnly(term, d) {
+  dxBody().innerHTML = `<div class="dx-count">${T("dx.matches", { n: d.count })}</div><div class="dx-list dx-fade">${d.results.map(dxCard).join("")}</div>
+    <div class="dx-close dx-fade"><p>${T("dx.not_quite", { term: esc(term) })}</p>${dxAskBlock()}</div>`;
+  dxBody().dataset.term = term; dxBody().dataset.web = d.web_url || "";
 }
 
 async function dxSearch() {
@@ -33,6 +45,7 @@ async function dxSearch() {
     if (!q) return dxBrowse(d.results);
     $("dx-cats").hidden = true;
     if (!d.results.length) return dxNoMatch(q, d.web_url);
+    if (d.close_only) return dxCloseOnly(q, d);
     dxBody().innerHTML = `<div class="dx-count">${T("dx.matches", { n: d.count })}</div><div class="dx-list dx-fade">${d.results.map(dxCard).join("")}</div>`;
   } catch (e) { if (my === DX.seq) dxBody().innerHTML = `<p class="missing">${esc(e.message)}</p>`; }
 }
