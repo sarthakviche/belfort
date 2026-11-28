@@ -15,13 +15,29 @@ Belfort is a free, open-source desktop app that teaches beginners how NSE tradin
 [![Domain](https://img.shields.io/badge/Domain-Indian%20Equities-1e293b?style=for-the-badge&logo=googlefinance&logoColor=facc15)](#about--key-features)
 [![Platform](https://img.shields.io/badge/Platform-Windows-1e293b?style=for-the-badge&logo=windows11&logoColor=0078D4)](https://github.com/sarthakviche/belfort/releases/latest)
 
-[**Live Demo**](https://belfort-ai-learn.vercel.app/) · [**Documentation**](docs/ABOUT.md) · [**Report a Bug**](https://github.com/sarthakviche/belfort/issues/new)
+[**Website**](https://belfort-ai-learn.vercel.app/) · [**Run it**](#installation--quickstart) · [**Architecture**](#system-architecture) · [**Known limitations**](#known-limitations) · [**Report a Bug**](https://github.com/sarthakviche/belfort/issues/new)
 
 <br>
 
 <img src="docs/assets/screen-report.png" alt="A Belfort research report: candlestick chart with support and resistance, the label, the main risk and the price that proves the idea wrong" width="100%">
 
 </div>
+
+---
+
+## The problem
+
+**First-time investors in India meet stock tips on WhatsApp, Telegram and Instagram long before they can judge them, and acting without knowing the risk is expensive:** SEBI's study found that [93% of individual futures-and-options traders lost money from FY22 to FY24](https://www.sebi.gov.in/media-and-notifications/press-releases/sep-2024/updated-sebi-study-reveals-93-of-individual-traders-incurred-losses-in-equity-fando-between-fy22-and-fy24-aggregate-losses-exceed-1-8-lakh-crores-over-three-years_86906.html), more than ₹1.8 lakh crore in all. Belfort does not cover futures and options. It works on what comes earlier: reading a tip, understanding the market and practising before money is at stake.
+
+**AEGYTHON 2026 · Track 6: AI for Everyday Life**
+
+| Who is stuck today | What Belfort changes |
+|---|---|
+| Someone who receives a "sure" tip | **Tip Check** quotes the red-flag wording back, checks NSE's surveillance lists and the price pattern, and says what to do next |
+| A beginner who does not know the words | **Learn** (38 short lessons), a **dictionary** and screens in eight languages |
+| Someone about to risk money untested | **Practice** with virtual points, position sizing, a journal and chart replay |
+| A regular trader who wants discipline | **Research**: the same seven conditions every time, with the price that proves an idea wrong |
+| Anyone lost in market news | **News** with terms explained, and an optional **AI explainer** |
 
 ---
 
@@ -54,7 +70,7 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 
 - **Deterministic labels.** The label comes from code, not a language model: same inputs, same label. A business concern can lower a label, never raise it.
 - **Patterns shown, not scored.** A five-year backtest on 47 large NSE stocks found a weak, mixed edge, so patterns appear with that evidence but stay out of the label.
-- **Position size rounds down.** A stopped-out loss never exceeds your stated risk.
+- **Position size rounds down.** The planned loss at your stop stays within your stated risk (a price gap can do worse).
 - **Explains, never advises.** No buy, sell or hold words, no price predictions, and the app never places orders. Practice points are never redeemable.
 - **Tip Check and a dictionary.** Paste a stock tip and see its red flags (registration, promised returns, surveillance lists); search any market term.
 - **Eight languages.** English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ, switchable without a reload. Translations are machine drafts for now.
@@ -67,6 +83,32 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 <td width="50%"><img src="docs/assets/screen-practice.png" alt="Practice: paper account, predictions, chart replay"></td>
 </tr>
 </table>
+
+---
+
+## Where AI is used, and where it is not
+
+**Rules decide. AI reads and explains.** No machine-learning model is trained or shipped with Belfort.
+
+| Task | Done by |
+|---|---|
+| Tip Check's red flags and the research report's label | Plain, tested code. Same input, same answer, every reason shown |
+| Chart pattern detection | Geometric rules, measured below. Not used in the label |
+| Reading the text in a tip screenshot | A vision model of your choice, with your key. It only copies the text; the rules judge it, and you see what it copied |
+| Ask Belfort, "Ask" in the dictionary, "Explain in your language" | A language model of your choice (Gemini, OpenAI-compatible or local Ollama), given the text on screen |
+
+**Guardrails.** A fixed system instruction (no advice, no predictions, only the figures given). Replies containing promise-style phrases are replaced; this catches listed phrases, not every form of advice. Your key stays in your browser, is sent with each request to the local server and on to your provider only, and is removed from error messages. (If you put a key in `.env` instead, it is read from that file.) Request bodies are length-limited, and screenshots are checked for type and size. There is no dedicated prompt-injection filter and no rate limiting.
+
+**Evaluation.** Each pattern detector was run on 200 computer-drawn examples and 600 random charts, then on 47 large NSE stocks (November 2021 to November 2026) against random entry days with the same target and stop distances. It found 82% to 100% of the drawn shapes, with false alarms on 0.7% to 12.5% of random charts. On real history no pattern clearly beat random entries:
+
+| Pattern (30 sessions) | Signals | Reached target first | Random-entry days |
+|---|---|---|---|
+| Double bottom | 148 | 62% | 57% (close target: reward-to-risk 0.63) |
+| Double top | 147 | 36% | 43% |
+| Cup and handle | 168 | 8% | 14% |
+| Head and shoulders | 77 | 17% | 13% |
+
+The test leaves out costs and uses today's large companies, which flatters results. All eight patterns are in the [pattern lesson](content/learn/lessons/pattern-evidence.md); `python scripts/run_backtest.py` reruns the test. **Not measured:** the language model's accuracy, and how many real tips Tip Check catches or misses.
 
 ---
 
@@ -98,6 +140,22 @@ A modular monolith: one Python process, one SQLite file, one static front end wi
                                              (Belfort.exe)      (localhost:8765)
 ```
 
+**Tip Check, from input to output:**
+
+```
+ pasted text ───────────────────────┐
+ screenshot ─▶ your AI model ───────┤ (copies the text only)
+                                    ▼
+                  tipcheck/rules.py  pure functions over phrases.json
+                                    ├─ SEBI registration number
+                                    ├─ NSE surveillance file   ┐ 8-second budget;
+                                    └─ price and volume bars   ┘ otherwise "Not checked"
+                                    ▼
+                  flags with quoted evidence ─▶ next steps ─▶ safety lessons
+```
+
+Domain rules are kept apart from the web layer: `router.py` files handle HTTP, `service.py` files fetch and store, and `practice/engine.py`, `learn/engine.py` and `tipcheck/rules.py` are pure functions with no network or database.
+
 Full details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [compliance principles](docs/COMPLIANCE.md).
 
 ---
@@ -126,17 +184,27 @@ Full details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [compliance princi
 
 ## Installation & Quickstart
 
-### Option A. Windows app (no Python needed)
+For the current version, use **Docker (A)** or **run from source (B)**. The downloadable Windows app (C) is older.
 
-1. Download **`Belfort.exe`** from the [latest release](https://github.com/sarthakviche/belfort/releases/latest).
-2. Run it. The exe is not code-signed yet, so on the SmartScreen warning choose **More info → Run anyway**.
-3. Your data is kept in `%LOCALAPPDATA%\Belfort`.
+### Option A. Docker
 
-Needs Windows 10/11 with the Microsoft Edge WebView2 runtime (built into Windows 11). To verify the download, compare against `Belfort.exe.sha256` on the release page:
+With [Docker](https://docs.docker.com/get-docker/) running:
 
 ```powershell
-Get-FileHash .\Belfort.exe -Algorithm SHA256
+git clone https://github.com/sarthakviche/belfort.git
+cd belfort
+docker build -t belfort .
+docker run --rm -p 127.0.0.1:8765:8765 -v belfort-data:/data belfort
 ```
+
+Open <http://localhost:8765>. Keep the `127.0.0.1:` in the port: Belfort is a single-user app, not a public service. Lint and tests run in a container too:
+
+```powershell
+docker build --target test -t belfort-test .
+docker run --rm belfort-test
+```
+
+The report's pattern-reliability table comes from `data/pattern_stats.json`, which is generated, not committed. To include it, run `python scripts/run_backtest.py` (Option B setup, needs the internet) before `docker build`.
 
 ### Option B. Run from source
 
@@ -162,6 +230,20 @@ Or run only the server and use any browser at <http://localhost:8765>:
 ```
 
 On macOS or Linux use `python3.12` and `.venv/bin/python` with the `uvicorn` command (the desktop window targets Windows).
+
+### Option C. Windows app (no Python needed, older version)
+
+The published `Belfort.exe` is 0.2.0 beta 1 (22 November 2026). It **does not include** Tip Check, the learning path or the Indian languages.
+
+1. Download **`Belfort.exe`** from the [latest release](https://github.com/sarthakviche/belfort/releases/latest).
+2. Run it. The exe is not code-signed yet, so on the SmartScreen warning choose **More info → Run anyway**.
+3. Your data is kept in `%LOCALAPPDATA%\Belfort`.
+
+Needs Windows 10/11 with the Microsoft Edge WebView2 runtime (built into Windows 11). To verify the download, compare against `Belfort.exe.sha256` on the release page:
+
+```powershell
+Get-FileHash .\Belfort.exe -Algorithm SHA256
+```
 
 ### Optional configuration
 
@@ -218,7 +300,7 @@ curl "http://localhost:8765/api/practice/size?symbol=TCS&stop=2380&risk_pct=1"
 {"symbol":"TCS","entry":2460.0,"stop":2380.0,"risk_pct":1.0,"quantity":125,"risk_amount":10000.0,"position_value":307500.0,"account_value":1000000.0,"over_limit":false}
 ```
 
-**Place a paper trade.** A stop and a written reason are required.
+**Place a paper trade.** A written reason is required. The stop is optional but recommended.
 
 ```bash
 curl -X POST http://localhost:8765/api/practice/trades \
@@ -240,19 +322,39 @@ Without a thesis, Belfort refuses the order and explains why, because reviewing 
 
 ---
 
+## Known limitations
+
+| Area | Limitation |
+|---|---|
+| Tip Check | Matches listed phrases, so new wording slips past. "No flags" never means a tip is safe. How many real tips it misses has not been measured |
+| SEBI registration | SEBI offers no download, so numbers are checked for shape only until you import its lists (`python -m belfort.tipcheck.register`) |
+| AI features | Need your own key or a local model. Answer quality and screenshot reading accuracy have not been measured, and a successful reply from a real provider is not yet on record |
+| Languages | Translations are unreviewed machine drafts. Tip Check results, report text and news stay in English. Only the Beginner lessons are translated, into Hindi |
+| Data | Yahoo Finance and NSE archive files are free, unofficial, end-of-day and can change or block access |
+| News | The tip-style headline filter is a pattern list and misses some phrasing. Company tags cover about 130 stocks |
+| Practice | Long only, one account, end-of-day fills |
+| Accounts and sync | Not available: records stay on one computer |
+| Android | First version shows Belfort from your computer over Wi-Fi; only Tip Check's text checks run on the phone. Not yet tried on a device |
+| Windows app | The published build is older, unsigned, and has no installer. Fonts load from Google Fonts |
+| Testing | No browser tests; the front end is checked by hand. No load testing |
+
+Full list: [docs/STATUS.md](docs/STATUS.md).
+
+---
+
 ## Roadmap
 
 - [x] Research reports with rule-based labels, patterns, backtested reliability and position sizing
-- [x] Learn: 33 of 38 lessons with graded quizzes and streaks
+- [x] Learn: all 38 lessons on a three-stage path with four exercise types, XP, streaks and hearts
 - [x] Practice: paper account, trade journal analytics, predictions, chart replay, CSV/JSON export and restore
-- [x] News from six public feeds with hover glossary
-- [x] Bring-your-own-key assistant
-- [x] Windows `Belfort.exe` release and CI on Windows and Linux
-- [ ] Remaining 5 lessons, replay drills linked to lessons, Hindi
-- [ ] Editable rule thresholds and watchlists
-- [ ] NSE announcements and an events calendar
-- [ ] Browser tests and an accessibility pass
-- [ ] Windows installer and code signing
+- [x] Tip Check, dictionary search, eight languages (machine drafts)
+- [x] News from six public feeds with hover glossary; bring-your-own-key assistant
+- [x] CI on Windows and Linux, Docker build, first Android version
+- [ ] Measure Tip Check on a labelled set of real tips
+- [ ] Fluent-speaker review of translations
+- [ ] Accounts and sync; Belfort tried and finished on phones
+- [ ] Replay drills linked to lessons, editable rule thresholds, watchlists
+- [ ] Browser tests, accessibility pass, Windows installer and code signing
 
 Details in [docs/ROADMAP.md](docs/ROADMAP.md), [docs/STATUS.md](docs/STATUS.md) and the [task board](docs/TASKS.md).
 

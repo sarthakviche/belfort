@@ -63,6 +63,7 @@
 | T49 | New exercise types in every lesson | 6 Belfort 2 | P1 | M | Done ([#38](https://github.com/sarthakviche/belfort/pull/38)) |
 | T50 | Belfort in Indian languages | 6 Belfort 2 | P0 | L | Done ([#41](https://github.com/sarthakviche/belfort/pull/41)) |
 | T51 | Dictionary: offer Ask Belfort when only a close spelling matches | 6 Belfort 2 | P1 | S | Done ([#45](https://github.com/sarthakviche/belfort/pull/45)) |
+| T52 | Judging readiness: Docker, README, tip filter misses | 6 Belfort 2 | P0 | M | Done ([#46](https://github.com/sarthakviche/belfort/pull/46)) |
 
 ---
 
@@ -307,6 +308,11 @@ Shared contracts every Phase 6 task uses:
 ### T51 · Dictionary: offer Ask Belfort when only a close spelling matches
 - **P1 · S · Owner:** Devansh · **Status:** Done ([#45](https://github.com/sarthakviche/belfort/pull/45)) · **Area:** ui, assistant
 - A search such as "swing trade index" matched "Swing trade" as a close spelling, so the page showed one result and never offered Ask Belfort or a web search. The search API now returns `close_only` when the best match is only a close spelling or a word in an explanation, and the page shows those results with "Not quite what you meant?" and both buttons under them.
+
+### T52 · Judging readiness: Docker, README, tip filter misses
+- **Owner:** Sarthak (agent) · **P0 · M · Status:** Done ([#46](https://github.com/sarthakviche/belfort/pull/46)) · **Area:** platform, docs, research, news
+- **Do:** a Dockerfile with an app image and a test image; a README that states the problem and track, the architecture, where AI is used, how it was measured and the known limitations; fix the wording Tip Check and the News tip filter were seen to miss.
+- **Done when:** the images build and pass the tests, the container serves the app, and each missed phrase has a test.
 
 ## Decisions (maintainers, not code)
 

@@ -4,7 +4,8 @@
 
 ## Verified
 
-- 191 automated tests pass offline, with 83% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux.
+- 374 automated tests pass offline, with 85% coverage (`python -m pytest --cov`); Ruff lint and format are clean. CI runs the tests on Windows and Linux. `tests/test_symbols.py::test_search_is_fast_on_a_full_size_listing` is a timing test: it failed on a laptop that was busy with Docker and passed on an idle one.
+- Docker (T52) was checked on 28 November 2026 on Docker 29.5.3: both images build, lint and tests pass in the test image (372 passed, 2 skipped), and the app container reports healthy and answered the page, config, syllabus, a Tip Check, a research report and the pattern statistics. CI does not build the images.
 - The contributor setup was followed on a clean clone on Windows 11 with Python 3.12.4 on 22 November 2026: setup, hooks, tests and the app all worked.
 - Eight languages (T50) were clicked through in the built-in browser on 28 November 2026: the intro chips, the sidebar, the Learn path, a Hindi lesson, the dictionary and Settings in Tamil and Hindi, at desktop width and at 360 px, with an automated scan for clipped text. All catalogues are machine drafts; no fluent speaker has reviewed them.
 - The gamified Learn path (T42) was clicked through in the built-in browser on 28 November 2026: the path, a lesson as cards with every exercise type, a wrong answer losing a heart, a locked lesson refused with 403, the placement test unlocking Intermediate, a checkpoint with its review screen, and the out-of-hearts screen. Reduced-motion behaviour was reviewed in code only; it was not tried with the system setting on.
@@ -25,6 +26,8 @@
 
 | Area | Limitation | Task |
 |---|---|---|
+| News | The tip-style headline filter is a pattern list; it was widened on 28 November 2026 after a broker's "shares to buy" headline got through, and will still miss some phrasing | |
+| Research | `data/pattern_stats.json` is generated, not committed, so a fresh clone shows no pattern statistics until `python scripts/run_backtest.py` is run | |
 | Practice | Long only, one account, end-of-day fills | |
 | Android | First version shows Belfort from your computer over Wi-Fi; only Tip Check's text checks run on the phone alone. The APK was built and its contents checked, but it has not been installed on a phone or emulator yet (no platform-tools or emulator on the build machine). | T48 |
 | Learn | 38 of 38 lessons written, each with multiple-choice plus true or false, order and number exercises | |
