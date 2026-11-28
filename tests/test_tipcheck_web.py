@@ -99,9 +99,13 @@ def test_no_key_explains_how_to_add_one(no_env_key):
 
 
 def test_provider_errors_become_plain_sentences(gemini):
-    gemini["reply"] = Reply(429, {"error": {"message": "quota"}})
+    gemini["reply"] = Reply(429, {"error": {"message": "Resource exhausted, try later"}})
     r = client.post("/api/tipcheck/web", json={"text": TIP}, headers=GEMINI)
     assert r.status_code == 503 and "limit" in r.json()["detail"]
+    # Google Search has its own quota: say so, instead of "wait a minute"
+    gemini["reply"] = Reply(429, {"error": {"message": "You exceeded your current quota, please check your plan."}})
+    r = client.post("/api/tipcheck/web", json={"text": TIP}, headers=GEMINI)
+    assert r.status_code == 503 and r.json()["detail"] == webcheck.QUOTA and "billing" in webcheck.QUOTA
 
 
 def test_empty_answer_and_network_failure(gemini, monkeypatch):

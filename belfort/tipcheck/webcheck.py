@@ -43,6 +43,11 @@ BLOCKED = (
     "The sources it found are listed below so you can read them yourself."
 )
 LABEL = "AI · Gemini with Google Search · your own key"
+QUOTA = (
+    "Your Gemini key has no Google Search quota left. Searching Google from Gemini has its own limit, separate from "
+    "ordinary answers, and on some keys it needs billing turned on in Google AI Studio (aistudio.google.com, under "
+    "Usage and billing). Ask Belfort and the rest of Tip Check still work; the red flags above are unaffected."
+)
 
 
 class WebCheckError(Exception):
@@ -100,6 +105,8 @@ def check(text: str, symbol: str | None, name: str | None, p: Provider) -> dict:
             msg = err.get("message", "") if isinstance(err, dict) else str(err)
         except Exception:
             msg = ""
+        if r.status_code == 429 and "quota" in msg.lower():
+            raise ChatError(QUOTA)
         raise _http_error(p, r.status_code, msg)
     try:
         cand = r.json()["candidates"][0]
