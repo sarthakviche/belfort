@@ -66,7 +66,7 @@
 | T52 | Judging readiness: Docker, README, tip filter misses | 6 Belfort 2 | P0 | M | Done ([#46](https://github.com/sarthakviche/belfort/pull/46)) |
 | T53 | Tip Check: AI web check with Gemini and Google Search | 6 Belfort 2 | P1 | S | Done ([#47](https://github.com/sarthakviche/belfort/pull/47)) |
 | T54 | Tip Check: Groq fallback for the web check | 6 Belfort 2 | P1 | S | Done ([#48](https://github.com/sarthakviche/belfort/pull/48)) |
-| T55 | Explainer guides: codebase overview, how it works, internal-logic PDF | 6 Belfort 2 | P2 | S | Done (PR link added on merge) |
+| T55 | Explainer guides: codebase overview, how it works, internal-logic PDF | 6 Belfort 2 | P2 | S | Done ([#49](https://github.com/sarthakviche/belfort/pull/49)) |
 
 ---
 
