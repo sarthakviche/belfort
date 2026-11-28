@@ -503,6 +503,27 @@ You gave me authority to merge pull requests. For each one I:
 
 ---
 
+## 20. Tip Check searches the web with AI ✅
+
+**What it does:** after the usual red-flag result, a new **What the web says** panel (labelled AI) has a **Search the web with AI** button. Gemini, with your own key, searches Google for:
+- SEBI, NSE or BSE actions about the stock (orders, surveillance, suspensions) and reports of it being pushed in tip groups;
+- scam reports, SEBI orders or police news about the sender, group, phone number or website, and whether a registration number belongs to them;
+- whether any claim in the tip (news, an "approval", a tie-up) is reported by a reliable source.
+
+It shows up to 6 dated bullet points, an "Overall" line, and the list of pages Google used.
+
+**How it is built:**
+- **Backend:** `belfort/tipcheck/webcheck.py`, endpoint `POST /api/tipcheck/web`. It uses Gemini's `google_search` tool, so Gemini only; with another provider it says so plainly.
+- **Safety:** the tip is wrapped as data in the prompt (it can't close its own block), the prompt forbids buy, sell or hold, targets and predictions, and the answer goes through both banned-wording lists. If it trips them, the summary is withheld but the sources stay.
+- **Rules still decide:** the red-flag count doesn't change. The button is opt-in because it sends the tip's text to Google.
+- **Settings:** `TIP_WEB_MAX_TIP_CHARS` (2,000) and `TIP_WEB_MAX_SOURCES` (8).
+- **Tests:** `tests/test_tipcheck_web.py`, 8 tests with Gemini faked; 362 pass in total.
+- **Checked in the app:** the panel appears under the result; without a key it points to Settings; with a (faked) answer it shows the bullets, the sources and the AI label.
+
+**Not checked yet:** a live call to Gemini with a real key, since this machine has none saved. Try it once with your key before the pitch.
+
+---
+
 ## Open items for you
 - **Sarthak:** approve or change the rule-7 amendment so #42 (accounts) can merge, and decide on #30 and #19.
 - **Hindi lessons:** machine drafts; someone fluent should read them before release.

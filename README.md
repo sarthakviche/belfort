@@ -72,7 +72,7 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 - **Patterns shown, not scored.** A five-year backtest on 47 large NSE stocks found a weak, mixed edge, so patterns appear with that evidence but stay out of the label.
 - **Position size rounds down.** The planned loss at your stop stays within your stated risk (a price gap can do worse).
 - **Explains, never advises.** No buy, sell or hold words, no price predictions, and the app never places orders. Practice points are never redeemable.
-- **Tip Check and a dictionary.** Paste a stock tip and see its red flags (registration, promised returns, surveillance lists); search any market term.
+- **Tip Check and a dictionary.** Paste a stock tip and see its red flags (registration, promised returns, surveillance lists), then optionally have Gemini search the web for SEBI actions and scam reports about it, with sources; search any market term.
 - **Eight languages.** English, हिन्दी, मराठी, বাংলা, தமிழ், తెలుగు, ગુજરાતી and ಕನ್ನಡ, switchable without a reload. Translations are machine drafts for now.
 - **Bring your own AI key.** Optional explainer chat with Gemini, any OpenAI-compatible service, or a local Ollama model. Replies pass the same wording filter.
 - **Source and date on every figure.** Prices are end-of-day. Missing data is shown as missing.
@@ -96,6 +96,7 @@ One report per NSE stock: a seven-condition checklist, support and resistance, p
 | Chart pattern detection | Geometric rules, measured below. Not used in the label |
 | Reading the text in a tip screenshot | A vision model of your choice, with your key. It only copies the text; the rules judge it, and you see what it copied |
 | Ask Belfort, "Ask" in the dictionary, "Explain in your language" | A language model of your choice (Gemini, OpenAI-compatible or local Ollama), given the text on screen |
+| Tip Check's "What the web says" (optional, on a button) | Gemini with Google Search and your key: dated findings about the stock and sender, with the sources it used. It never changes the red-flag count |
 
 **Guardrails.** A fixed system instruction (no advice, no predictions, only the figures given). Replies containing promise-style phrases are replaced; this catches listed phrases, not every form of advice. Your key stays in your browser, is sent with each request to the local server and on to your provider only, and is removed from error messages. (If you put a key in `.env` instead, it is read from that file.) Request bodies are length-limited, and screenshots are checked for type and size. There is no dedicated prompt-injection filter and no rate limiting.
 

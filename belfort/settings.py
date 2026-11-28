@@ -161,3 +161,5 @@ TIP_SMALL_CAP_CRORE = 5000  # market value below this (in crore rupees) counts a
 TIP_HISTORY_GAP_BARS = 60  # sessions after a past pump signature that Tip Check reports on
 TIP_SURVEILLANCE_LOOKBACK_DAYS = 7  # how many weekdays back to look for NSE's latest surveillance file
 TIP_IMAGE_MAX_BYTES = 5_000_000  # largest screenshot accepted
+TIP_WEB_MAX_TIP_CHARS = 2000  # how much of the tip is sent to Gemini for the web check (T53)
+TIP_WEB_MAX_SOURCES = 8  # web pages listed under the web check
